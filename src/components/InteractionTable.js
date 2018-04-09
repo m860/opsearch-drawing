@@ -37,6 +37,14 @@ export default class InteractionTable extends PureComponent {
 		const columns = Array.apply(null, {length: this.state.columns}).map((x, i) => i);
 		return (
 			<WorkSpace className={this.props.className}
+					   actions={[
+						   <a key="0"
+							  onClick={() => this.setState({rows: this.state.rows + 1})}
+							  href="javascript:void(0)">ADD ROW</a>,
+						   <a key="1"
+							  onClick={() => this.setState({columns: this.state.columns + 1})}
+							  href="javascript:void(0)">ADD COLUMN</a>
+					   ]}
 					   style={this.props.style}>
 				<table style={this.props.tableOption.style}
 					   className={this.props.tableOption.className}>
