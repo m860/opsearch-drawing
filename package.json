@@ -28,6 +28,7 @@
     "babel-eslint": "^8.1.2",
     "babel-jest": "^22.0.4",
     "babel-loader": "^7.1.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-runtime": "^6.26.0",
@@ -62,6 +63,8 @@
     "react-dom": "^16.2.0"
   },
   "dependencies": {
-    "d3": "^5.0.0"
+    "classnames": "^2.2.5",
+    "d3": "^5.0.0",
+    "object-path": "^0.11.4"
   }
 }

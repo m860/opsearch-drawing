@@ -10,6 +10,9 @@
     "es6": true
   },
   "rules": {
+    "no-mixed-spaces-and-tabs": 0,
+    "react/jsx-key": 1,
+    "no-console": 0
   },
   "plugins": [
     "react"
