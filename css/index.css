@@ -1,0 +1,15 @@
+.work-space {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px #cccccc;
+  padding: 0 0 10px 0;
+  border-radius: 10px; }
+  .work-space .work-space-actions {
+    height: 40px;
+    border-bottom: solid 1px #cccccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center; }
+  .work-space .work-space-content {
+    flex: 1 0 auto;
+    padding: 10px; }

@@ -1,5 +1,5 @@
 {
-  "name": "d3-drawing-for-opserarch",
+  "name": "@m860/opserarch-drawing",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/m860/d3-drawing-for-opserarch.git"
+    "url": "git+https://github.com/m860/opserarch-drawing.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/m860/d3-drawing-for-opserarch/issues"
+    "url": "https://github.com/m860/opserarch-drawing/issues"
   },
-  "homepage": "https://github.com/m860/d3-drawing-for-opserarch#readme",
+  "homepage": "https://github.com/m860/opserarch-drawing#readme",
   "devDependencies": {
     "autoprefixer": "^7.2.3",
     "babel-cli": "^6.26.0",
@@ -58,9 +58,6 @@
     "yargs": "^10.0.3"
   },
   "peerDependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
   },
   "dependencies": {
     "classnames": "^2.2.5",
