@@ -2,14 +2,17 @@ import './sass/index.sass'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import InteractionTable from './components/InteractionTable'
+import InteractionGraph from './components/InteractionGraph'
 import {set as setPath, get as getPath} from 'object-path'
 
 class Example extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tableData: []
+			tableData: [],
+			actions: []
 		};
+		this.circleStyle = "background-color:gray";
 	}
 
 	render() {
@@ -39,6 +42,21 @@ class Example extends Component {
 					},
 					cells: this.state.tableData
 				}}/>
+				<InteractionGraph actions={[{
+					type: "draw",
+					params: {
+						type: "line",
+						attrs: {
+							x1: 10,
+							y1: 10,
+							x2: 100,
+							y2: 100,
+							fill: "none",
+							stroke: "black",
+							"stroke-width": "10px"
+						}
+					}
+				}]}/>
 			</div>
 		);
 	}

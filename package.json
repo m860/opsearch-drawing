@@ -29,6 +29,7 @@
     "babel-jest": "^22.0.4",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-runtime": "^6.26.0",
@@ -57,11 +58,15 @@
     "webpack-dev-server": "^2.9.7",
     "yargs": "^10.0.3"
   },
-  "peerDependencies": {
-  },
+  "peerDependencies": {},
   "dependencies": {
     "classnames": "^2.2.5",
     "d3": "^5.0.0",
+    "deepmerge": "^2.1.0",
+    "fast-deep-equal": "^1.1.0",
+    "guid": "0.0.12",
+    "immutability-helper": "^2.6.6",
+    "merge": "^1.2.0",
     "object-path": "^0.11.4"
   }
 }
