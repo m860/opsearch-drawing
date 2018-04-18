@@ -6,7 +6,6 @@ import equal from 'fast-deep-equal'
 import WorkSpace from './WorkSpace'
 import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
-import merge from 'deepmerge'
 
 const drawTypeEnums = {
 	none: "none",
@@ -32,23 +31,22 @@ export default class InteractionGraph extends PureComponent {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		style: PropTypes.object,
-		linkStyle: PropTypes.string,
-		links: PropTypes.arrayOf(PropTypes.shape({
-			source: PropTypes.number,
-			target: PropTypes.number
-		})),
-		circles: PropTypes.arrayOf(PropTypes.shape({
-			cx: PropTypes.number,
-			cy: PropTypes.number,
-			r: PropTypes.number,
-			style: PropTypes.string
-		})),
 		actions: PropTypes.arrayOf(PropTypes.shape({
-			type: PropTypes.oneOf(['draw', 'select', 'delete', 'move', 'undo', 'data']),
-			params: PropTypes.object
+			type: PropTypes.oneOf(['draw', 'select', 'delete', 'move', 'undo', 'data']).isRequired,
+			params: PropTypes.oneOfType([
+				PropTypes.shape({
+					id:PropTypes.string.isRequired,
+					type:PropTypes.oneOf(['none','line','link','arrowLink','dot','circle','text']).isRequired,
+					attrs:PropTypes.object,
+					text:PropTypes.oneOfType([PropTypes.string,PropTypes.func])
+				})
+			])
 		})),
 		defaultAttrs: PropTypes.shape({
 			line: PropTypes.object,
+			dot:PropTypes.object,
+			circle:PropTypes.object,
+			text:PropTypes.object
 		})
 	};
 	static defaultProps = {
@@ -62,6 +60,20 @@ export default class InteractionGraph extends PureComponent {
 				fill: "none",
 				stroke: "black",
 				"stroke-width": "3px"
+			},
+			dot:{
+				fill:"black",
+				stoke:"none",
+				r:"5px"
+			},
+            circle:{
+				fill:"none",
+				stroke:"black",
+				r:"10px",
+				"stroke-width":"1px"
+			},
+            text:{
+				"font-size":"20px"
 			}
 		}
 	}
@@ -69,6 +81,7 @@ export default class InteractionGraph extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.ele = null;
+		//画图的类型
 		this.currentDrawType = drawTypeEnums.none;
 		this.draws = [];
 	}
@@ -83,9 +96,14 @@ export default class InteractionGraph extends PureComponent {
 		this.draw();
 	}
 
-	updateDraw(draw) {
-		const index = this.draws.findIndex(f => f.id === draw.id);
-		this.draws[index] = merge(this.draws[index], draw);
+	findDrawById(id){
+		const index=this.draws.findIndex(f=>f.id===id);
+		return this.draws[index];
+	}
+
+	updateDraw(id,draw) {
+		const index = this.draws.findIndex(f => f.id ===id);
+		this.draws[index] = update(this.draws[index],draw);
 		this.draw();
 	}
 
@@ -96,7 +114,6 @@ export default class InteractionGraph extends PureComponent {
 				case drawTypeEnums.line:
 					this._id = guid.raw();
 					this._mouseDownEvent = d3.event;
-					console.log(d3.event)
 					this.addDraw({
 						id: this._id,
 						type: drawTypeEnums.line,
@@ -108,17 +125,42 @@ export default class InteractionGraph extends PureComponent {
 						}, getPath(this.props.defaultAttrs, drawTypeEnums.line))
 					});
 					break;
+				case drawTypeEnums.dot:
+                    this._id = guid.raw();
+                    this._mouseDownEvent = d3.event;
+                    this.addDraw({
+                        id: this._id,
+                        type: drawTypeEnums.dot,
+                        attrs: Object.assign({
+                            cx: d3.event.offsetX,
+                            cy: d3.event.offsetY,
+                        }, getPath(this.props.defaultAttrs, drawTypeEnums.dot))
+                    });
+					break;
+				case drawTypeEnums.circle:
+                    this._id = guid.raw();
+                    this._mouseDownEvent = d3.event;
+                    this.addDraw({
+                        id: this._id,
+                        type: drawTypeEnums.circle,
+                        attrs: Object.assign({
+                            cx: d3.event.offsetX,
+                            cy: d3.event.offsetY,
+                        }, getPath(this.props.defaultAttrs, drawTypeEnums.circle))
+                    });
+					break;
 			}
 		});
 		svg.on("mousemove", () => {
 			if (this._mouseDownEvent) {
-				this.updateDraw({
-					id: this._id,
-					attrs: {
-						x2: d3.event.offsetX,
-						y2: d3.event.offsetY
-					}
-				})
+				if(this.currentDrawType===drawTypeEnums.line) {
+                    this.updateDraw(this._id, {
+                        attrs: {
+                            x2: {$set: d3.event.offsetX},
+                            y2: {$set: d3.event.offsetY}
+                        }
+                    });
+                }
 			}
 		});
 		svg.on("mouseup", () => {
@@ -131,23 +173,17 @@ export default class InteractionGraph extends PureComponent {
 
 	doActions(actions) {
 		const draws = actions.filter(f => f.type === "draw").map(data => {
-			if (!data.id) {
-				return Object.assign({
-					id: guid.raw()
-				}, data.params);
-			}
-			return data;
+			return data.params;
 		});
 		this.draws = draws;
 		this.draw();
 	}
 
 	draw() {
-		// console.log(`draw length = ${this.state.draws.length}`);
 		this.drawLines(this.draws.filter(f => f.type === drawTypeEnums.line));
-		this.draws.forEach(item => {
-			console.log(`${item.id} : ${item.constructor.name}`);
-		})
+		this.drawDots(this.draws.filter(f=>f.type===drawTypeEnums.dot));
+		this.drawCircles(this.draws.filter(f=>f.type===drawTypeEnums.circle));
+		this.drawTexts(this.draws.filter(f=>f.type===drawTypeEnums.text));
 	}
 
 	updateAttrs(ele, drawType, attrs) {
@@ -157,30 +193,74 @@ export default class InteractionGraph extends PureComponent {
 		}
 	}
 
-	drawLines(lines) {
-		lines.forEach((line) => {
-			let ele;
-			if (!line._node) {
-				ele = d3.select(this.ele)
-					.append('line');
-				line._node = ele.node();
+    drawTexts(texts){
+        texts.forEach(text=>{
+            if(!text.selection){
+                text.selection=d3.select(this.ele).append("text");
+            }
+            text.selection.call(self=>{
+                this.updateAttrs(self,drawTypeEnums.circle,text.attrs);
+                if(text.text) {
+                    self.text(text.text);
+                }
+                else{
+                	console.warn('no text in `<text>`')
+				}
+            })
+        })
+    }
+
+    drawCircles(circles){
+        circles.forEach(circle=>{
+            if(!circle.selection){
+                circle.selection=d3.select(this.ele).append("circle");
+            }
+            circle.selection.call(self=>{
+                this.updateAttrs(self,drawTypeEnums.circle,circle.attrs);
+            })
+        })
+	}
+
+    drawDots(dots){
+		dots.forEach(dot=>{
+			if(!dot.selection){
+				dot.selection=d3.select(this.ele).append("circle");
 			}
-			else {
-				ele = d3.select(line._node);
-			}
-			console.log(ele.constructor.name);
-			ele.call(self => {
-				this.updateAttrs(self, drawTypeEnums.line, line.attrs);
+			dot.selection.call(self=>{
+				this.updateAttrs(self,drawTypeEnums.dot,dot.attrs);
 			})
+		})
+	}
+
+	drawLines(lines) {
+		lines.forEach(line=>{
+            if(!line.selection){
+                line.selection=d3.select(this.ele).append("line");
+            }
+            line.selection.call(self=>{
+                this.updateAttrs(self, drawTypeEnums.line, line.attrs);
+            })
 		})
 	}
 
 	render() {
 		return (
 			<WorkSpace actions={[
-				<a href="javascript:void(0)" key="draw-line" onClick={() => {
+				<a href="javascript:void(0)"
+				   key="draw-line"
+				   onClick={() => {
 					this.currentDrawType = drawTypeEnums.line
-				}}>DRAW LINE</a>
+				}}>DRAW LINE</a>,
+				<a href="javascript:void(0)"
+				   key="draw-dot"
+				   onClick={() => {
+                    this.currentDrawType = drawTypeEnums.dot
+                }}>DRAW DOT</a>,
+				<a href="javascript:void(0)"
+				   key="draw-circle"
+				   onClick={() => {
+                    this.currentDrawType = drawTypeEnums.circle
+                }}>DRAW CIRCLE</a>
 			]}>
 				<svg ref={ref => this.ele = ref}
 					 style={this.props.style}
@@ -199,13 +279,4 @@ export default class InteractionGraph extends PureComponent {
 		this.initialSVG();
 		this.doActions(this.props.actions);
 	}
-
-	// componentWillUpdate() {
-	// 	console.log('will update')
-	// }
-	//
-	// componentDidUpdate() {
-	// 	console.log('did update')
-	// 	this.draw(this.state.draws);
-	// }
 }

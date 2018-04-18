@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import InteractionTable from './components/InteractionTable'
 import InteractionGraph from './components/InteractionGraph'
 import {set as setPath, get as getPath} from 'object-path'
+import guid from 'guid'
 
 class Example extends Component {
 	constructor(props) {
@@ -29,7 +30,6 @@ class Example extends Component {
 						cells: [1, 2, 3]
 					},
 					renderCell: (data, rowIndex, columnIndex) => {
-						console.log(`${rowIndex}:${columnIndex}`, data)
 						return (
 							<input type="text"
 								   onChange={({target: {value}}) => {
@@ -45,6 +45,7 @@ class Example extends Component {
 				<InteractionGraph actions={[{
 					type: "draw",
 					params: {
+						id:guid.raw(),
 						type: "line",
 						attrs: {
 							x1: 10,
@@ -54,6 +55,37 @@ class Example extends Component {
 							fill: "none",
 							stroke: "black",
 							"stroke-width": "10px"
+						}
+					}
+				},{
+					type:"draw",
+					params:{
+						id:guid.raw(),
+						type:"dot",
+						attrs:{
+							cx:"150px",
+							cy:"50px"
+						}
+					}
+				},{
+					type:"draw",
+					params:{
+						id:guid.raw(),
+						type:"circle",
+						attrs:{
+							cx:"150px",
+							cy:"30px"
+						}
+					}
+				},{
+					type:"draw",
+					params:{
+						id:guid.raw(),
+						type:"text",
+						text:"abc",
+						attrs:{
+							x:"200px",
+							y:"10px"
 						}
 					}
 				}]}/>
