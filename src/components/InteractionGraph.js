@@ -2,7 +2,6 @@ import React, {Component, PureComponent} from "react";
 import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import guid from 'guid'
-import equal from 'fast-deep-equal'
 import WorkSpace from './WorkSpace'
 import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
