@@ -18,6 +18,7 @@ const drawTypeEnums = {
 
 const actionTypeEnums = {
 	draw: "draw",
+	redraw: "redraw",
 	select: "select",
 	unselect: "unselect",
 	delete: "delete",
@@ -29,6 +30,53 @@ const actionTypeEnums = {
 const selectModeEnums = {
 	single: "single",
 	multiple: "multiple"
+};
+
+const builtinDrawType = {
+	line: {
+		defaultAttrs: {
+			fill: "transparent",
+			stroke: "black",
+			"stroke-width": "3px"
+		},
+		selectedAttrs: {
+			stroke: "red"
+		},
+		render: function (svg) {
+			return svg.append("line")
+		},
+		renderToolbar: function LineButton(drawType, index) {
+			return (
+				<a key={index} href="javascript:void(0)">Line</a>
+			);
+		}
+	},
+	circle: {
+		defaultAttrs: {
+			fill: "transparent",
+			stroke: "black",
+			r: "10px",
+			"stroke-width": "1px"
+		},
+		selectedAttrs: {
+			stroke: "red"
+		},
+		render: function (svg) {
+			return svg.append("circle")
+		}
+	},
+	text: {
+		defaultAttrs: {
+			fill: "black",
+			"font-size": "20px"
+		},
+		selectedAttrs: {
+			fill: "red"
+		},
+		render: function (svg) {
+			return svg.append("text")
+		}
+	}
 };
 
 class DrawAction {
@@ -49,6 +97,16 @@ class UnSelectAction {
 	constructor(id) {
 		this.params = id;
 		this.type = actionTypeEnums.unselect;
+	}
+}
+
+class ReDrawAction {
+	constructor(id, state) {
+		this.type = actionTypeEnums.redraw;
+		this.params = {
+			id,
+			state
+		}
 	}
 }
 
@@ -85,7 +143,7 @@ export default class InteractionGraph extends PureComponent {
 				//draw
 				PropTypes.shape({
 					id: PropTypes.string.isRequired,
-					type: PropTypes.oneOf(['none', 'line', 'link', 'arrowLink', 'dot', 'circle', 'text']).isRequired,
+					type: PropTypes.string.isRequired,
 					attrs: PropTypes.object,
 					text: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
 				}),
@@ -106,7 +164,10 @@ export default class InteractionGraph extends PureComponent {
 			dot: PropTypes.object,
 		}),
 		//选择模式,是多选还是单选
-		selectMode: PropTypes.oneOf(['single', 'multiple'])
+		selectMode: PropTypes.oneOf(['single', 'multiple']),
+		//自定义绘制类型
+		customDrawType: PropTypes.object,
+		onDrawTypeChange: PropTypes.func
 	};
 	static defaultProps = {
 		width: 400,
@@ -150,7 +211,8 @@ export default class InteractionGraph extends PureComponent {
 				fill: "red"
 			}
 		},
-		selectMode: "single"
+		selectMode: "single",
+		onDrawTypeChange: () => null
 	}
 
 	constructor(props) {
@@ -162,16 +224,18 @@ export default class InteractionGraph extends PureComponent {
 		this.shapes = [];
 		//已经选中的图形的id
 		this.selectedShapeId = [];
+		//绘制类型
+		this.drawTypes = Object.assign({}, builtinDrawType, this.props.customDrawType);
 	}
 
-	findDrawById(id) {
+	findShapeById(id) {
 		const index = this.shapes.findIndex(f => f.id === id);
 		return this.shapes[index];
 	}
 
-	updateDraw(id, draw) {
+	updateShape(id, shape) {
 		const index = this.shapes.findIndex(f => f.id === id);
-		this.shapes[index] = update(this.shapes[index], draw);
+		this.shapes[index] = update(this.shapes[index], shape);
 		this.drawShapes(this.shapes);
 	}
 
@@ -190,7 +254,7 @@ export default class InteractionGraph extends PureComponent {
 							y1: d3.event.offsetY,
 							x2: d3.event.offsetX,
 							y2: d3.event.offsetY
-						}, getPath(this.props.defaultAttrs, drawTypeEnums.line))
+						}, getPath(this.drawTypes, `${this.currentDrawType}.defaultAttrs`, {}))
 					})])
 					break;
 				case drawTypeEnums.dot:
@@ -222,7 +286,7 @@ export default class InteractionGraph extends PureComponent {
 		svg.on("mousemove", () => {
 			if (this._mouseDownEvent) {
 				if (this.currentDrawType === drawTypeEnums.line) {
-					this.updateDraw(this._id, {
+					this.updateShape(this._id, {
 						attrs: {
 							x2: {$set: d3.event.offsetX},
 							y2: {$set: d3.event.offsetY}
@@ -240,13 +304,29 @@ export default class InteractionGraph extends PureComponent {
 	}
 
 	doActions(actions) {
-		//#region draw
 		console.log('do actions ...')
+		//#region draw
 		const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
 		if (drawActions.length > 0) {
 			console.log(`draw : ${drawActions.map(f => f.params.type).join(',')}`)
 			this.shapes = this.shapes.concat(drawActions.map(data => data.params));
 			this.drawShapes(this.shapes);
+		}
+		//#endregion
+
+		//#region redraw
+		const redrawActions = actions.filter(f => f.type === actionTypeEnums.redraw);
+		if (redrawActions.length > 0) {
+			console.log(`redraw : ${redrawActions.map(f => f.params.id).join(',')}`);
+			let shapes = [];
+			redrawActions.forEach(action => {
+				const index = this.shapes.findIndex(f => f.id === action.params.id);
+				if (index >= 0) {
+					this.shapes[index] = update(this.shapes[index], action.params.state);
+					shapes.push(this.shapes[index]);
+				}
+			});
+			this.drawShapes(shapes);
 		}
 		//#endregion
 
@@ -278,11 +358,11 @@ export default class InteractionGraph extends PureComponent {
 
 	select(ids) {
 		ids.forEach(id => {
-			const draw = this.findDrawById(id);
-			if (draw) {
-				if (draw.selection) {
-					const attrs = getPath(this.props.selectedAttrs, draw.type, {})
-					draw.selection.call(self => {
+			const shape = this.findShapeById(id);
+			if (shape) {
+				if (shape.selection) {
+					const attrs = getPath(this.drawTypes, `${shape.type}.selectedAttrs`, {})
+					shape.selection.call(self => {
 						for (let key in attrs) {
 							self.attr(key, attrs[key]);
 						}
@@ -298,98 +378,103 @@ export default class InteractionGraph extends PureComponent {
 	}
 
 	drawShapes(shapes) {
-		this.drawLines(shapes.filter(f => f.type === drawTypeEnums.line));
-		this.drawDots(shapes.filter(f => f.type === drawTypeEnums.dot));
-		this.drawCircles(shapes.filter(f => f.type === drawTypeEnums.circle));
-		this.drawTexts(shapes.filter(f => f.type === drawTypeEnums.text));
+		const svg = d3.select(this.ele);
+		shapes.forEach(shape => {
+			const drawing = this.drawTypes[shape.type];
+			if (drawing) {
+				if (!shape.selection) {
+					// create element
+					shape.selection = drawing.render.call(this, svg)
+					//listene click event
+					shape.selection.on('click', () => {
+						this.doActions([new SelectAction(shape.id)]);
+					})
+				}
+				//update attrs
+				shape.selection.call(self => {
+					this.updateShapeAttrs(self, shape.type, Object.assign({}, drawing.defaultAttrs, shape.attrs));
+				});
+				//update text
+				if (shape.text) {
+					shape.selection.text(shape.text);
+				}
+			}
+			else {
+				console.warn(`draw type \`${shape.type}\` is not defined`);
+			}
+		})
+		// this.drawLines(shapes.filter(f => f.type === drawTypeEnums.line));
+		// this.drawDots(shapes.filter(f => f.type === drawTypeEnums.dot));
+		// this.drawCircles(shapes.filter(f => f.type === drawTypeEnums.circle));
+		// this.drawTexts(shapes.filter(f => f.type === drawTypeEnums.text));
 	}
 
-	updateAttrs(ele, drawType, attrs) {
+	updateShapeAttrs(ele, drawType, attrs) {
 		const newAttrs = Object.assign({}, getPath(this.props.defaultAttrs, drawType, {}), attrs);
 		for (let key in newAttrs) {
 			ele.attr(key, newAttrs[key]);
 		}
 	}
 
-	drawTexts(texts) {
-		texts.forEach(text => {
-			if (!text.selection) {
-				text.selection = this.createShape(text, 'text');
-			}
-			text.selection.call(self => {
-				this.updateAttrs(self, drawTypeEnums.text, text.attrs);
-				if (text.text) {
-					self.text(text.text);
-				}
-				else {
-					console.warn('no text in `<text>`')
-				}
-			})
-		})
-	}
-
-	drawCircles(circles) {
-		circles.forEach(circle => {
-			if (!circle.selection) {
-				circle.selection = this.createShape(circle, "circle");
-			}
-			circle.selection.call(self => {
-				this.updateAttrs(self, drawTypeEnums.circle, circle.attrs);
-			})
-		})
-	}
-
-	drawDots(dots) {
-		dots.forEach(dot => {
-			if (!dot.selection) {
-				dot.selection = this.createShape(dot, "circle");
-			}
-			dot.selection.call(self => {
-				this.updateAttrs(self, drawTypeEnums.dot, dot.attrs);
-			})
-		})
-	}
-
-	drawLines(lines) {
-		lines.forEach(line => {
-			if (!line.selection) {
-				//create line
-				line.selection = this.createShape(line, "line")
-			}
-			line.selection.call(self => {
-				this.updateAttrs(self, drawTypeEnums.line, line.attrs);
-			})
-		})
-	}
-
-	createShape(shapeDefine, tag) {
-		const shape = d3.select(this.ele).append(tag);
-		//listen click event trigger selection action
-		shape.on('click', () => {
-			this.doActions([new SelectAction(shapeDefine.id)]);
-		});
-		return shape;
-	}
-
 	render() {
 		return (
-			<WorkSpace actions={[
-				<a href="javascript:void(0)"
-				   key="draw-line"
-				   onClick={() => {
-					   this.currentDrawType = drawTypeEnums.line
-				   }}>DRAW LINE</a>,
-				<a href="javascript:void(0)"
-				   key="draw-dot"
-				   onClick={() => {
-					   this.currentDrawType = drawTypeEnums.dot
-				   }}>DRAW DOT</a>,
-				<a href="javascript:void(0)"
-				   key="draw-circle"
-				   onClick={() => {
-					   this.currentDrawType = drawTypeEnums.circle
-				   }}>DRAW CIRCLE</a>
-			]}>
+			<WorkSpace actions={Object.keys(this.drawTypes).map((key, index) => {
+				const drawType = this.drawTypes[key];
+				if (drawType) {
+					let button = (
+						<a key={index} href="javascript:void(0)">{key.toLocaleUpperCase()}</a>
+					);
+					if (drawType.renderToolbar) {
+						button = drawType.renderToolbar.call(this, drawType, index);
+					}
+					return React.cloneElement(button, {
+						onClick: () => {
+							const svg = d3.select(this.ele);
+							svg.on("mousedown mousemove mouseup", null);
+							const isBuiltin = Object.keys(builtinDrawType).indexOf(key) >= 0;
+							if (!isBuiltin) {
+								this.props.onDrawTypeChange(svg, key);
+							}
+							else {
+								//TODO deal with builtin draw type
+								switch (key) {
+									case "line":
+										svg.on("mousedown", () => {
+											this._id = guid.raw();
+											this.doActions([new DrawAction({
+												id: this._id,
+												type: key,
+												attrs: Object.assign({
+													x1: d3.event.offsetX,
+													y1: d3.event.offsetY,
+													x2: d3.event.offsetX,
+													y2: d3.event.offsetY
+												}, getPath(this.drawTypes, `${key}.defaultAttrs`, {}))
+											})])
+										}).on("mousemove", () => {
+											if (this._id) {
+												this.doActions([
+													new ReDrawAction(this._id, {
+														attrs: {
+															x2: {$set: d3.event.offsetX},
+															y2: {$set: d3.event.offsetY}
+														}
+													})
+												]);
+											}
+										}).on("mouseup", () => {
+											delete this._id;
+										})
+										break;
+									default:
+										console.warn(`draw type \`${key}\` is not implementation`)
+								}
+							}
+						}
+					});
+				}
+				return null;
+			})}>
 				<svg ref={ref => this.ele = ref}
 					 style={this.props.style}
 					 width={this.props.width}
@@ -404,7 +489,7 @@ export default class InteractionGraph extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.initialSVG();
+		// this.initialSVG();
 		this.doActions(this.props.actions);
 	}
 }

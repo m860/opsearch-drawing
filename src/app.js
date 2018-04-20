@@ -42,53 +42,71 @@ class Example extends Component {
 					},
 					cells: this.state.tableData
 				}}/>
-				<InteractionGraph actions={[{
-					type: "draw",
-					params: {
-						id:guid.raw(),
-						type: "line",
-						attrs: {
-							x1: 10,
-							y1: 10,
-							x2: 100,
-							y2: 100,
-							fill: "none",
-							stroke: "black",
-							"stroke-width": "10px"
+				<InteractionGraph
+					onDrawTypeChange={(svg, drawType) => {
+						console.log('draw type change', drawType);
+						svg.on("mousedown", () => console.log('custom mouse down'));
+					}}
+					customDrawType={{
+						dot: {
+							defaultAttrs: {
+								fill: "black",
+								stoke: "none",
+								r: "5px"
+							},
+							selectedAttrs: {
+								fill: "red"
+							},
+							render: svg => svg.append("circle")
 						}
-					}
-				},{
-					type:"draw",
-					params:{
-						id:guid.raw(),
-						type:"dot",
-						attrs:{
-							cx:"150px",
-							cy:"50px"
+					}}
+					actions={[{
+						type: "draw",
+						params: {
+							id: guid.raw(),
+							type: "line",
+							attrs: {
+								x1: 10,
+								y1: 10,
+								x2: 100,
+								y2: 100,
+								fill: "none",
+								stroke: "black",
+								"stroke-width": "10px"
+							}
 						}
-					}
-				},{
-					type:"draw",
-					params:{
-						id:guid.raw(),
-						type:"circle",
-						attrs:{
-							cx:"150px",
-							cy:"30px"
+					}, {
+						type: "draw",
+						params: {
+							id: guid.raw(),
+							type: "circle",
+							attrs: {
+								cx: "150px",
+								cy: "30px"
+							}
 						}
-					}
-				},{
-					type:"draw",
-					params:{
-						id:guid.raw(),
-						type:"text",
-						text:"abc",
-						attrs:{
-							x:"200px",
-							y:"10px"
+					}, {
+						type: "draw",
+						params: {
+							id: guid.raw(),
+							type: "text",
+							text: "abc",
+							attrs: {
+								x: "200px",
+								y: "10px"
+							}
 						}
-					}
-				}]}/>
+					}, {
+						type: "draw",
+						params: {
+							id: guid.raw(),
+							type: "dot",
+							attrs: {
+								cx: "100px",
+								cy: "50px"
+							}
+						}
+					}]}/>
 			</div>
 		);
 	}
