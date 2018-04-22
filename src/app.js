@@ -104,12 +104,31 @@ class Example extends Component {
 					}, {
 						type: "draw",
 						params: {
-							id: guid.raw(),
+							id: "circle1",
 							type: "circle",
 							attrs: {
 								cx: "150px",
 								cy: "30px"
 							}
+						}
+					}, {
+						type: "draw",
+						params: {
+							id: "circle2",
+							type: "circle",
+							attrs: {
+								cx: "250px",
+								cy: "130px"
+							}
+						}
+					}, {
+						type: "draw",
+						params: {
+							id: "circle1-circle2",
+							type: "link",
+							attrs: {},
+							source: "circle1",
+							target: "circle2",
 						}
 					}, {
 						type: "draw",
