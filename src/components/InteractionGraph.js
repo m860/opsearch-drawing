@@ -6,16 +6,6 @@ import WorkSpace from './WorkSpace'
 import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
 
-const drawTypeEnums = {
-	none: "none",
-	line: "line",
-	link: "link",
-	arrowLink: "arrowLink",
-	dot: "dot",
-	circle: "circle",
-	text: "text",
-};
-
 const actionTypeEnums = {
 	draw: "draw",
 	redraw: "redraw",
@@ -45,9 +35,43 @@ const builtinDrawType = {
 		render: function (svg) {
 			return svg.append("line")
 		},
-		renderToolbar: function LineButton(drawType, index) {
+		renderToolbar: function LineButton(context, drawType, index) {
 			return (
-				<a key={index} href="javascript:void(0)">Line</a>
+				<a key={index}
+				   onClick={() => {
+					   console.log('click');
+					   d3.select(context.ele)
+						   .on("mousedown", function () {
+							   this._id = guid.raw();
+							   context.doActions([
+								   new DrawAction({
+									   id: this._id,
+									   type: drawType.type,
+									   attrs: Object.assign({
+										   x1: d3.event.offsetX,
+										   y1: d3.event.offsetY,
+										   x2: d3.event.offsetX,
+										   y2: d3.event.offsetY
+									   }, drawType.defaultAttrs)
+								   })])
+						   })
+						   .on("mousemove", function () {
+							   if (drawType.type === "line" && this._id) {
+								   context.doActions([
+									   new ReDrawAction(this._id, {
+										   attrs: {
+											   x2: {$set: d3.event.offsetX},
+											   y2: {$set: d3.event.offsetY}
+										   }
+									   })
+								   ]);
+							   }
+						   })
+						   .on("mouseup", function () {
+							   delete this._id;
+						   })
+				   }}
+				   href="javascript:void(0)">Line</a>
 			);
 		}
 	},
@@ -63,6 +87,86 @@ const builtinDrawType = {
 		},
 		render: function (svg) {
 			return svg.append("circle")
+		},
+		renderToolbar: function CircleButton(context, drawType, index) {
+			return (
+				<a key={index}
+				   onClick={() => {
+					   d3.select(context.ele)
+						   .on("mousedown", function () {
+							   this._id = guid.raw();
+							   context.doActions([
+								   new DrawAction({
+									   id: this._id,
+									   type: drawType.type,
+									   attrs: Object.assign({
+										   cx: d3.event.offsetX,
+										   cy: d3.event.offsetY
+									   }, drawType.defaultAssignment)
+								   })
+							   ]);
+						   })
+						   .on("mouseup", function () {
+							   delete this._id;
+						   })
+				   }}
+				   href="javascript:void(0)">Circle</a>
+			);
+		}
+	},
+	rect: {
+		defaultAttrs: {},
+		selectedAttrs: {},
+		render: function (svg) {
+			return svg.append('path');
+		},
+		renderToolbar: function RectButton(context, drawType, index) {
+			return (
+				<a key={index} href="javascript:void(0)" onClick={() => {
+					d3.select(context.ele)
+						.on('mousedown', function () {
+							this._id = guid.raw();
+							this._mouseDownEvent = d3.event;
+							context.doActions([
+								new DrawAction({
+									id: this._id,
+									type: drawType.type,
+									attrs: Object.assign({
+										d: `M ${d3.event.offsetX} ${d3.event.offsetY} l 0 0 z`
+									}, drawType.defaultAttrs)
+								})
+							])
+						})
+						.on('mousemove', function () {
+							if (this._id
+								&& this._mouseDownEvent
+								&& drawType.type === "rect") {
+								const width = d3.event.offsetX - this._mouseDownEvent.offsetX;
+								const height = d3.event.offsetY - this._mouseDownEvent.offsetY;
+								console.log(`width:${width},height:${height}`)
+								const d = [
+									`M ${this._mouseDownEvent.offsetX} ${this._mouseDownEvent.offsetY}`,
+									`L ${d3.event.offsetX} ${this._mouseDownEvent.offsetY}`,
+									`L ${d3.event.offsetX} ${d3.event.offsetY}`,
+									`L ${this._mouseDownEvent.offsetX} ${d3.event.offsetY}`,
+									'z'
+								]
+								//update
+								context.doActions([
+									new ReDrawAction(this._id, {
+										attrs: {
+											d: {$set: d.join(' ')}
+										}
+									})
+								])
+							}
+						})
+						.on("mouseup", function () {
+							delete this._id;
+							delete this._mouseDownEvent
+						})
+				}}>Rect</a>
+			);
 		}
 	},
 	text: {
@@ -79,28 +183,28 @@ const builtinDrawType = {
 	}
 };
 
-class DrawAction {
+export class DrawAction {
 	constructor(params) {
 		this.params = params;
 		this.type = actionTypeEnums.draw
 	}
 }
 
-class SelectAction {
+export class SelectAction {
 	constructor(id) {
 		this.params = id;
 		this.type = actionTypeEnums.select;
 	}
 }
 
-class UnSelectAction {
+export class UnSelectAction {
 	constructor(id) {
 		this.params = id;
 		this.type = actionTypeEnums.unselect;
 	}
 }
 
-class ReDrawAction {
+export class ReDrawAction {
 	constructor(id, state) {
 		this.type = actionTypeEnums.redraw;
 		this.params = {
@@ -138,7 +242,7 @@ export default class InteractionGraph extends PureComponent {
 		style: PropTypes.object,
 		//action
 		actions: PropTypes.arrayOf(PropTypes.shape({
-			type: PropTypes.oneOf(['draw', 'select', 'unselect', 'delete', 'move', 'undo', 'data']).isRequired,
+			type: PropTypes.oneOf(Object.keys(actionTypeEnums)).isRequired,
 			params: PropTypes.oneOfType([
 				//draw
 				PropTypes.shape({
@@ -151,18 +255,18 @@ export default class InteractionGraph extends PureComponent {
 				PropTypes.string
 			])
 		})),
-		//默认的图形的样式
-		defaultAttrs: PropTypes.shape({
-			line: PropTypes.object,
-			dot: PropTypes.object,
-			circle: PropTypes.object,
-			text: PropTypes.object
-		}),
-		//图形被选中时候的样式
-		selectedAttrs: PropTypes.shape({
-			line: PropTypes.object,
-			dot: PropTypes.object,
-		}),
+		// //默认的图形的样式
+		// defaultAttrs: PropTypes.shape({
+		// 	line: PropTypes.object,
+		// 	dot: PropTypes.object,
+		// 	circle: PropTypes.object,
+		// 	text: PropTypes.object
+		// }),
+		// //图形被选中时候的样式
+		// selectedAttrs: PropTypes.shape({
+		// 	line: PropTypes.object,
+		// 	dot: PropTypes.object,
+		// }),
 		//选择模式,是多选还是单选
 		selectMode: PropTypes.oneOf(['single', 'multiple']),
 		//自定义绘制类型
@@ -218,8 +322,6 @@ export default class InteractionGraph extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.ele = null;
-		//画图的类型
-		this.currentDrawType = drawTypeEnums.none;
 		//画布中已有的图形
 		this.shapes = [];
 		//已经选中的图形的id
@@ -237,70 +339,6 @@ export default class InteractionGraph extends PureComponent {
 		const index = this.shapes.findIndex(f => f.id === id);
 		this.shapes[index] = update(this.shapes[index], shape);
 		this.drawShapes(this.shapes);
-	}
-
-	initialSVG() {
-		const svg = d3.select(this.ele);
-		svg.on('mousedown', () => {
-			switch (this.currentDrawType) {
-				case drawTypeEnums.line:
-					this._id = guid.raw();
-					this._mouseDownEvent = d3.event;
-					this.doActions([new DrawAction({
-						id: this._id,
-						type: drawTypeEnums.line,
-						attrs: Object.assign({
-							x1: d3.event.offsetX,
-							y1: d3.event.offsetY,
-							x2: d3.event.offsetX,
-							y2: d3.event.offsetY
-						}, getPath(this.drawTypes, `${this.currentDrawType}.defaultAttrs`, {}))
-					})])
-					break;
-				case drawTypeEnums.dot:
-					this._id = guid.raw();
-					this._mouseDownEvent = d3.event;
-					this.doActions([new DrawAction({
-						id: this._id,
-						type: drawTypeEnums.dot,
-						attrs: Object.assign({
-							cx: d3.event.offsetX,
-							cy: d3.event.offsetY,
-						}, getPath(this.props.defaultAttrs, drawTypeEnums.dot))
-					})])
-					break;
-				case drawTypeEnums.circle:
-					this._id = guid.raw();
-					this._mouseDownEvent = d3.event;
-					this.doActions([new DrawAction({
-						id: this._id,
-						type: drawTypeEnums.circle,
-						attrs: Object.assign({
-							cx: d3.event.offsetX,
-							cy: d3.event.offsetY,
-						}, getPath(this.props.defaultAttrs, drawTypeEnums.circle))
-					})])
-					break;
-			}
-		});
-		svg.on("mousemove", () => {
-			if (this._mouseDownEvent) {
-				if (this.currentDrawType === drawTypeEnums.line) {
-					this.updateShape(this._id, {
-						attrs: {
-							x2: {$set: d3.event.offsetX},
-							y2: {$set: d3.event.offsetY}
-						}
-					});
-				}
-			}
-		});
-		svg.on("mouseup", () => {
-			if (this._mouseDownEvent) {
-				delete this._mouseDownEvent;
-				delete this._id;
-			}
-		})
 	}
 
 	doActions(actions) {
@@ -425,53 +463,12 @@ export default class InteractionGraph extends PureComponent {
 						<a key={index} href="javascript:void(0)">{key.toLocaleUpperCase()}</a>
 					);
 					if (drawType.renderToolbar) {
-						button = drawType.renderToolbar.call(this, drawType, index);
+						button = drawType.renderToolbar(this, {
+							type: key,
+							...drawType
+						}, index);
 					}
-					return React.cloneElement(button, {
-						onClick: () => {
-							const svg = d3.select(this.ele);
-							svg.on("mousedown mousemove mouseup", null);
-							const isBuiltin = Object.keys(builtinDrawType).indexOf(key) >= 0;
-							if (!isBuiltin) {
-								this.props.onDrawTypeChange(svg, key);
-							}
-							else {
-								//TODO deal with builtin draw type
-								switch (key) {
-									case "line":
-										svg.on("mousedown", () => {
-											this._id = guid.raw();
-											this.doActions([new DrawAction({
-												id: this._id,
-												type: key,
-												attrs: Object.assign({
-													x1: d3.event.offsetX,
-													y1: d3.event.offsetY,
-													x2: d3.event.offsetX,
-													y2: d3.event.offsetY
-												}, getPath(this.drawTypes, `${key}.defaultAttrs`, {}))
-											})])
-										}).on("mousemove", () => {
-											if (this._id) {
-												this.doActions([
-													new ReDrawAction(this._id, {
-														attrs: {
-															x2: {$set: d3.event.offsetX},
-															y2: {$set: d3.event.offsetY}
-														}
-													})
-												]);
-											}
-										}).on("mouseup", () => {
-											delete this._id;
-										})
-										break;
-									default:
-										console.warn(`draw type \`${key}\` is not implementation`)
-								}
-							}
-						}
-					});
+					return button;
 				}
 				return null;
 			})}>

@@ -2,9 +2,10 @@ import './sass/index.sass'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import InteractionTable from './components/InteractionTable'
-import InteractionGraph from './components/InteractionGraph'
+import InteractionGraph, {ReDrawAction, DrawAction} from './components/InteractionGraph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
+import * as d3 from 'd3'
 
 class Example extends Component {
 	constructor(props) {
@@ -57,7 +58,32 @@ class Example extends Component {
 							selectedAttrs: {
 								fill: "red"
 							},
-							render: svg => svg.append("circle")
+							render: svg => svg.append("circle"),
+							renderToolbar: function DotButton(context, drawType, index) {
+								return (
+									<a key={index}
+									   href="javascript:void(0)"
+									   onClick={() => {
+										   d3.select(context.ele)
+											   .on("mousedown", function () {
+												   this._id = guid.raw();
+												   context.doActions([
+													   new DrawAction({
+														   id: this._id,
+														   type: drawType.type,
+														   attrs: {
+															   cx: d3.event.offsetX,
+															   cy: d3.event.offsetY
+														   }
+													   })
+												   ])
+											   })
+											   .on("mouseup", function () {
+												   delete this._id;
+											   })
+									   }}>Dot</a>
+								);
+							}
 						}
 					}}
 					actions={[{
