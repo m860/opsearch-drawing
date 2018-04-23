@@ -10,6 +10,14 @@ import update from 'immutability-helper'
  * action枚举
  * @readonly
  * @enum {string}
+ * @property {string} draw - 绘画
+ * @property {string} redraw - 重绘/更新
+ * @property {string} select - 选择
+ * @property {string} unselect - 反选
+ * @property {string} delete - 删除
+ * @property {string} move - 移动
+ * @property {string} undo - 撤销
+ * @property {string} data - 数据操作
  * */
 const actionTypeEnums = {
 	draw: "draw",
@@ -24,6 +32,10 @@ const actionTypeEnums = {
 
 /**
  * 选择模式枚举
+ * @readonly
+ * @enum {string}
+ * @property {string} single - 单选
+ * @property {string} multiple - 多选
  * */
 const selectModeEnums = {
 	single: "single",
