@@ -17,19 +17,35 @@
 
 ## actionTypeEnums
 
-[src/components/InteractionGraph.js:14-23](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L14-L23 "Source code on GitHub")
+[src/components/InteractionGraph.js:22-31](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L22-L31 "Source code on GitHub")
 
 action枚举
 
+**Properties**
+
+-   `draw` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 绘画
+-   `redraw` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 重绘/更新
+-   `select` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 选择
+-   `unselect` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 反选
+-   `delete` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 删除
+-   `move` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 移动
+-   `undo` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 撤销
+-   `data` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 数据操作
+
 ## selectModeEnums
 
-[src/components/InteractionGraph.js:28-31](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L28-L31 "Source code on GitHub")
+[src/components/InteractionGraph.js:40-43](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L40-L43 "Source code on GitHub")
 
 选择模式枚举
 
+**Properties**
+
+-   `single` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 单选
+-   `multiple` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 多选
+
 ## DrawAction
 
-[src/components/InteractionGraph.js:36-41](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L36-L41 "Source code on GitHub")
+[src/components/InteractionGraph.js:48-53](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L48-L53 "Source code on GitHub")
 
 绘图action
 
@@ -39,7 +55,7 @@ action枚举
 
 ## SelectAction
 
-[src/components/InteractionGraph.js:46-51](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L46-L51 "Source code on GitHub")
+[src/components/InteractionGraph.js:58-63](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L58-L63 "Source code on GitHub")
 
 选择action
 
@@ -49,7 +65,7 @@ action枚举
 
 ## UnSelectAction
 
-[src/components/InteractionGraph.js:56-61](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L56-L61 "Source code on GitHub")
+[src/components/InteractionGraph.js:68-73](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L68-L73 "Source code on GitHub")
 
 取消选择action
 
@@ -59,7 +75,7 @@ action枚举
 
 ## ReDrawAction
 
-[src/components/InteractionGraph.js:66-74](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L66-L74 "Source code on GitHub")
+[src/components/InteractionGraph.js:78-86](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L78-L86 "Source code on GitHub")
 
 重绘action
 
@@ -70,13 +86,13 @@ action枚举
 
 ## Drawing
 
-[src/components/InteractionGraph.js:79-95](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L79-L95 "Source code on GitHub")
+[src/components/InteractionGraph.js:91-107](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L91-L107 "Source code on GitHub")
 
 绘画接口
 
 ## LineDrawing
 
-[src/components/InteractionGraph.js:100-158](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L100-L158 "Source code on GitHub")
+[src/components/InteractionGraph.js:112-170](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L112-L170 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -84,7 +100,7 @@ action枚举
 
 ## CircleDrawing
 
-[src/components/InteractionGraph.js:163-215](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L163-L215 "Source code on GitHub")
+[src/components/InteractionGraph.js:175-227](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L175-L227 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -92,7 +108,7 @@ action枚举
 
 ## RectDrawing
 
-[src/components/InteractionGraph.js:220-281](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L220-L281 "Source code on GitHub")
+[src/components/InteractionGraph.js:232-293](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L232-L293 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -100,7 +116,7 @@ action枚举
 
 ## InteractionGraph
 
-[src/components/InteractionGraph.js:315-607](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L315-L607 "Source code on GitHub")
+[src/components/InteractionGraph.js:327-620](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L327-L620 "Source code on GitHub")
 
 **Extends PureComponent**
 
@@ -112,7 +128,7 @@ action枚举
 
 ### propTypes
 
-[src/components/InteractionGraph.js:322-358](https://github.com/m860/opserarch-drawing/blob/1d2768decbdb260ba8a8bc904670f9549e3e4d2f/src/components/InteractionGraph.js#L322-L358 "Source code on GitHub")
+[src/components/InteractionGraph.js:334-370](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L334-L370 "Source code on GitHub")
 
 **Properties**
 

@@ -151,6 +151,14 @@ class Example extends Component {
 								cy: "50px"
 							}
 						}
+					}, {
+						type: "draw",
+						params: {
+							id: guid.raw(),
+							type: "xaxis",
+							attrs: {
+							}
+						}
 					}]}/>
 			</div>
 		);

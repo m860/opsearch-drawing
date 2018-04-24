@@ -49,6 +49,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * action枚举
  * @readonly
  * @enum {string}
+ * @property {string} draw - 绘画
+ * @property {string} redraw - 重绘/更新
+ * @property {string} select - 选择
+ * @property {string} unselect - 反选
+ * @property {string} delete - 删除
+ * @property {string} move - 移动
+ * @property {string} undo - 撤销
+ * @property {string} data - 数据操作
  * */
 var actionTypeEnums = {
 	draw: "draw",
@@ -63,6 +71,10 @@ var actionTypeEnums = {
 
 /**
  * 选择模式枚举
+ * @readonly
+ * @enum {string}
+ * @property {string} single - 单选
+ * @property {string} multiple - 多选
  * */
 var selectModeEnums = {
 	single: "single",
@@ -545,6 +557,7 @@ var InteractionGraph = function (_PureComponent) {
 				if (shape) {
 					if (shape.selection) {
 						var attrs = (0, _objectPath.get)(_this6.drawTypes, shape.type + '.selectedAttrs', {});
+						console.log('select attrs', attrs);
 						shape.selection.call(function (self) {
 							for (var key in attrs) {
 								self.attr(key, attrs[key]);

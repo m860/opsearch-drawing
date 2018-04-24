@@ -89,18 +89,37 @@ export class ReDrawAction {
  * 绘画接口
  * */
 export class Drawing {
+	/**
+	 * 默认的attribute
+	 * */
 	get defaultAttrs() {
 		throw new Error('property `defaultAttrs` is not implementation');
 	}
 
+	/**
+	 * 选中时的attribute
+	 * */
 	get selectedAttrs() {
 		throw new Error('property `selectedAttrs` is not implementation');
 	}
 
+	/**
+	 * 是否可以选择
+	 * */
+	get canSelected() {
+		return true;
+	}
+
+	/**
+	 * 创建元素
+	 * */
 	render() {
 		throw new Error('method `render` is not implementation');
 	}
 
+	/**
+	 * 获取link的点的位置信息
+	 * */
 	getLinkPoint() {
 		throw new Error('method `getLinkPoint` is not implementation');
 	}
@@ -292,6 +311,47 @@ class RectDrawing extends Drawing {
 	}
 }
 
+/**
+ * 绘制水平刻度
+ * */
+class HorizontalScaleDrawing extends Drawing {
+	get defaultAttrs() {
+		return {}
+	}
+
+	get selectedAttrs() {
+		return {}
+	}
+
+	get canSelected() {
+		return false;
+	}
+
+	render(svg, shape) {
+		const g = svg.append("g");
+		const line = g.append("line")
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 100)
+			.attr("y2", 50)
+			.attr("stoke","black")
+			.attr("fill","transparent")
+			.attr("stroke-width","10px")
+		return g;
+	}
+
+	getLinkPoint() {
+		throw new Error('method `getLinkPoint` is not implementation');
+	}
+}
+
+/**
+ * 绘制水平刻度
+ * */
+class VerticalScaleDrawing extends Drawing {
+
+}
+
 const builtinDrawType = {
 	line: new LineDrawing(),
 	circle: new CircleDrawing(),
@@ -318,7 +378,9 @@ const builtinDrawType = {
 		render: function (svg) {
 			return svg.append("text")
 		}
-	}
+	},
+	xaxis: new HorizontalScaleDrawing(),
+	yaxis: new VerticalScaleDrawing()
 };
 
 /**
@@ -525,12 +587,14 @@ export default class InteractionGraph extends PureComponent {
 				//#region create selection
 				if (!shape.selection) {
 					// create element
-					shape.selection = drawing.render.call(this, svg)
+					shape.selection = drawing.render.call(null, svg, shape)
 					//listene click event
 					shape.selection.on('click', () => {
-						this.doActions([
-							new SelectAction(shape.id)
-						]);
+						if (drawing.canSelected) {
+							this.doActions([
+								new SelectAction(shape.id)
+							]);
+						}
 					})
 				}
 				//#endregion
@@ -580,7 +644,7 @@ export default class InteractionGraph extends PureComponent {
 	}
 
 	updateShapeAttrs(ele, drawType, attrs) {
-		const newAttrs = Object.assign({}, getPath(this.props.defaultAttrs, drawType, {}), attrs);
+		const newAttrs = Object.assign({}, this.drawTypes[drawType].defaultAttrs, attrs);
 		for (let key in newAttrs) {
 			ele.attr(key, newAttrs[key]);
 		}
