@@ -9,15 +9,26 @@
 -   [UnSelectAction](#unselectaction)
 -   [ReDrawAction](#redrawaction)
 -   [Drawing](#drawing)
+    -   [defaultAttrs](#defaultattrs)
+    -   [selectedAttrs](#selectedattrs)
+    -   [render](#render)
+    -   [getLinkPoint](#getlinkpoint)
+    -   [initialize](#initialize)
+    -   [updateAttrs](#updateattrs)
+    -   [select](#select)
 -   [LineDrawing](#linedrawing)
 -   [CircleDrawing](#circledrawing)
 -   [RectDrawing](#rectdrawing)
+-   [HorizontalScaleDrawing](#horizontalscaledrawing)
+-   [VerticalScaleDrawing](#verticalscaledrawing)
+-   [ArrowLinkDrawing](#arrowlinkdrawing)
+-   [LinkDrawing](#linkdrawing)
 -   [InteractionGraph](#interactiongraph)
     -   [propTypes](#proptypes)
 
 ## actionTypeEnums
 
-[src/components/InteractionGraph.js:22-31](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L22-L31 "Source code on GitHub")
+[src/components/InteractionGraph.js:22-31](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L22-L31 "Source code on GitHub")
 
 action枚举
 
@@ -34,7 +45,7 @@ action枚举
 
 ## selectModeEnums
 
-[src/components/InteractionGraph.js:40-43](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L40-L43 "Source code on GitHub")
+[src/components/InteractionGraph.js:40-43](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L40-L43 "Source code on GitHub")
 
 选择模式枚举
 
@@ -45,17 +56,17 @@ action枚举
 
 ## DrawAction
 
-[src/components/InteractionGraph.js:48-53](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L48-L53 "Source code on GitHub")
+[src/components/InteractionGraph.js:55-60](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L55-L60 "Source code on GitHub")
 
 绘图action
 
 **Parameters**
 
--   `params`  
+-   `drawing`  
 
 ## SelectAction
 
-[src/components/InteractionGraph.js:58-63](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L58-L63 "Source code on GitHub")
+[src/components/InteractionGraph.js:65-70](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L65-L70 "Source code on GitHub")
 
 选择action
 
@@ -65,7 +76,7 @@ action枚举
 
 ## UnSelectAction
 
-[src/components/InteractionGraph.js:68-73](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L68-L73 "Source code on GitHub")
+[src/components/InteractionGraph.js:75-80](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L75-L80 "Source code on GitHub")
 
 取消选择action
 
@@ -75,7 +86,7 @@ action枚举
 
 ## ReDrawAction
 
-[src/components/InteractionGraph.js:78-86](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L78-L86 "Source code on GitHub")
+[src/components/InteractionGraph.js:85-93](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L85-L93 "Source code on GitHub")
 
 重绘action
 
@@ -86,37 +97,139 @@ action枚举
 
 ## Drawing
 
-[src/components/InteractionGraph.js:91-107](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L91-L107 "Source code on GitHub")
+[src/components/InteractionGraph.js:98-173](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L98-L173 "Source code on GitHub")
 
-绘画接口
+绘画接口,所有的绘画类都需要继承这个类并实现相关方法
+
+**Parameters**
+
+-   `option`  
+
+### defaultAttrs
+
+[src/components/InteractionGraph.js:113-115](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L113-L115 "Source code on GitHub")
+
+默认的attribute
+
+### selectedAttrs
+
+[src/components/InteractionGraph.js:120-122](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L120-L122 "Source code on GitHub")
+
+选中时的attribute
+
+### render
+
+[src/components/InteractionGraph.js:127-133](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L127-L133 "Source code on GitHub")
+
+绘制,更新selection相关
+
+### getLinkPoint
+
+[src/components/InteractionGraph.js:138-140](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L138-L140 "Source code on GitHub")
+
+获取link的点的位置信息
+
+### initialize
+
+[src/components/InteractionGraph.js:145-148](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L145-L148 "Source code on GitHub")
+
+初始化drawing,创建selection,监听事件需要在里面实现
+
+**Parameters**
+
+-   `graph`  
+
+### updateAttrs
+
+[src/components/InteractionGraph.js:153-161](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L153-L161 "Source code on GitHub")
+
+批量更新attrs
+
+**Parameters**
+
+-   `attrs`  
+
+### select
+
+[src/components/InteractionGraph.js:166-172](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L166-L172 "Source code on GitHub")
+
+选中当前图形
 
 ## LineDrawing
 
-[src/components/InteractionGraph.js:112-170](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L112-L170 "Source code on GitHub")
+[src/components/InteractionGraph.js:178-245](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L178-L245 "Source code on GitHub")
 
 **Extends Drawing**
 
 绘画线
 
+**Parameters**
+
+-   `option`  
+
 ## CircleDrawing
 
-[src/components/InteractionGraph.js:175-227](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L175-L227 "Source code on GitHub")
+[src/components/InteractionGraph.js:250-309](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L250-L309 "Source code on GitHub")
 
 **Extends Drawing**
 
 绘画圈
 
+**Parameters**
+
+-   `option`  
+
 ## RectDrawing
 
-[src/components/InteractionGraph.js:232-293](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L232-L293 "Source code on GitHub")
+[src/components/InteractionGraph.js:314-375](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L314-L375 "Source code on GitHub")
 
 **Extends Drawing**
 
 绘画矩形
 
+## HorizontalScaleDrawing
+
+[src/components/InteractionGraph.js:380-409](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L380-L409 "Source code on GitHub")
+
+**Extends Drawing**
+
+绘制水平刻度
+
+## VerticalScaleDrawing
+
+[src/components/InteractionGraph.js:414-416](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L414-L416 "Source code on GitHub")
+
+**Extends Drawing**
+
+绘制水平刻度
+
+## ArrowLinkDrawing
+
+[src/components/InteractionGraph.js:421-491](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L421-L491 "Source code on GitHub")
+
+**Extends Drawing**
+
+绘制带箭头的link
+
+**Parameters**
+
+-   `option`  
+
+## LinkDrawing
+
+[src/components/InteractionGraph.js:496-549](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L496-L549 "Source code on GitHub")
+
+**Extends Drawing**
+
+绘制link
+
+**Parameters**
+
+-   `option`  
+
 ## InteractionGraph
 
-[src/components/InteractionGraph.js:327-620](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L327-L620 "Source code on GitHub")
+[src/components/InteractionGraph.js:580-784](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L580-L784 "Source code on GitHub")
 
 **Extends PureComponent**
 
@@ -128,11 +241,12 @@ action枚举
 
 ### propTypes
 
-[src/components/InteractionGraph.js:334-370](https://github.com/m860/opserarch-drawing/blob/9ab68c9c740fbfc5d657877ebd08163e7a009c14/src/components/InteractionGraph.js#L334-L370 "Source code on GitHub")
+[src/components/InteractionGraph.js:588-624](https://github.com/m860/opserarch-drawing/blob/f6f237eec27d00a31c71f8c406eb45905abd197a/src/components/InteractionGraph.js#L588-L624 "Source code on GitHub")
 
 **Properties**
 
+-   `width` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `height` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `style` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 -   `actions` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)** 所有的操作
--   `defaultAttrs` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 默认的图形的样式
--   `selectedAttrs` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 图形被选中时候的样式
--   `selectMode` **(single | multiple)** 选择模式,是多选还是单选
+-   `selectMode` **(single | multiple)** [single] - 选择模式,是多选还是单选

@@ -93,7 +93,7 @@ export class ReDrawAction {
 }
 
 /**
- * 绘画接口
+ * 绘画接口,所有的绘画类都需要继承这个类并实现相关方法
  * */
 export class Drawing {
 	constructor(option) {
@@ -122,7 +122,7 @@ export class Drawing {
 	}
 
 	/**
-	 * 绘制
+	 * 绘制,更新selection相关
 	 * */
 	render() {
 		const attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
@@ -139,11 +139,17 @@ export class Drawing {
 		throw new Error('method `getLinkPoint` is not implementation');
 	}
 
+	/**
+	 * 初始化drawing,创建selection,监听事件需要在里面实现
+	 * */
 	initialize(graph) {
 		this.graph = graph;
 		this.ready = true;
 	}
 
+	/**
+	 * 批量更新attrs
+	 * */
 	updateAttrs(attrs) {
 		if (this.selection) {
 			this.selection.call(self => {
@@ -154,6 +160,9 @@ export class Drawing {
 		}
 	}
 
+	/**
+	 * 选中当前图形
+	 * */
 	select() {
 		if (this.graph) {
 			this.graph.doActions([
@@ -406,6 +415,9 @@ class VerticalScaleDrawing extends Drawing {
 
 }
 
+/**
+ * 绘制带箭头的link
+ * */
 export class ArrowLinkDrawing extends Drawing {
 	constructor(option) {
 		super(option);
@@ -478,6 +490,9 @@ export class ArrowLinkDrawing extends Drawing {
 	}
 }
 
+/**
+ * 绘制link
+ * */
 export class LinkDrawing extends Drawing {
 	constructor(option) {
 		super(option);
@@ -534,9 +549,6 @@ export class LinkDrawing extends Drawing {
 }
 
 class TextDrawing extends Drawing {
-	/**
-	 * 默认的attribute
-	 * */
 	get defaultAttrs() {
 		return {
 			fill: "black",
@@ -544,34 +556,10 @@ class TextDrawing extends Drawing {
 		}
 	}
 
-	/**
-	 * 选中时的attribute
-	 * */
 	get selectedAttrs() {
 		return {
 			fill: "red"
 		}
-	}
-
-	/**
-	 * 是否可以选择
-	 * */
-	get canSelected() {
-		return true;
-	}
-
-	/**
-	 * 创建元素
-	 * */
-	render(svg) {
-		return svg.append("text")
-	}
-
-	/**
-	 * 获取link的点的位置信息
-	 * */
-	getLinkPoint() {
-		throw new Error('method `getLinkPoint` is not implementation');
 	}
 }
 
@@ -591,10 +579,11 @@ class TextDrawing extends Drawing {
  * */
 export default class InteractionGraph extends PureComponent {
 	/**
+	 * @property {number} width
+	 * @property {number} height
+	 * @property {object} style
 	 * @property {Array} actions - 所有的操作
-	 * @property {Object} defaultAttrs - 默认的图形的样式
-	 * @property {Object} selectedAttrs - 图形被选中时候的样式
-	 * @property {single|multiple} selectMode - 选择模式,是多选还是单选
+	 * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
 	 * */
 	static propTypes = {
 		width: PropTypes.number,
@@ -639,44 +628,9 @@ export default class InteractionGraph extends PureComponent {
 		style: {
 			backgroundColor: "#CCCCCC"
 		},
-		defaultAttrs: {
-			line: {
-				fill: "transparent",
-				stroke: "black",
-				"stroke-width": "3px"
-			},
-			dot: {
-				fill: "black",
-				stoke: "none",
-				r: "5px"
-			},
-			circle: {
-				fill: "transparent",
-				stroke: "black",
-				r: "10px",
-				"stroke-width": "1px"
-			},
-			text: {
-				fill: "black",
-				"font-size": "20px"
-			}
-		},
-		selectedAttrs: {
-			line: {
-				stroke: "red"
-			},
-			dot: {
-				fill: "red"
-			},
-			circle: {
-				stroke: "red"
-			},
-			text: {
-				fill: "red"
-			}
-		},
 		selectMode: "single",
-		onDrawTypeChange: () => null
+		onDrawTypeChange: () => null,
+		actions: []
 	}
 
 	constructor(props) {
