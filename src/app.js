@@ -2,7 +2,14 @@ import './sass/index.sass'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import InteractionTable from './components/InteractionTable'
-import InteractionGraph, {ReDrawAction, DrawAction} from './components/InteractionGraph'
+import InteractionGraph, {
+	ReDrawAction,
+	DrawAction,
+	LineDrawing,
+	CircleDrawing,
+	LinkDrawing,
+	ArrowLinkDrawing
+} from './components/InteractionGraph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
 import * as d3 from 'd3'
@@ -48,7 +55,7 @@ class Example extends Component {
 						console.log('draw type change', drawType);
 						svg.on("mousedown", () => console.log('custom mouse down'));
 					}}
-					customDrawType={{
+					customDefinedDrawing={{
 						dot: {
 							defaultAttrs: {
 								fill: "black",
@@ -86,80 +93,60 @@ class Example extends Component {
 							}
 						}
 					}}
-					actions={[{
-						type: "draw",
-						params: {
-							id: guid.raw(),
-							type: "line",
+					actions={[
+						new DrawAction(new LineDrawing({
 							attrs: {
-								x1: 10,
-								y1: 10,
+								x1: 50,
+								y1: 50,
 								x2: 100,
-								y2: 100,
-								fill: "none",
-								stroke: "black",
-								"stroke-width": "10px"
+								y2: 100
 							}
-						}
-					}, {
-						type: "draw",
-						params: {
+						})),
+						new DrawAction(new LineDrawing({
+							attrs: {
+								x1: 50,
+								y1: 150,
+								x2: 100,
+								y2: 200
+							}
+						})),
+						new DrawAction(new CircleDrawing({
 							id: "circle1",
-							type: "circle",
-							attrs: {
-								cx: "150px",
-								cy: "30px"
-							}
-						}
-					}, {
-						type: "draw",
-						params: {
-							id: "circle2",
-							type: "circle",
-							attrs: {
-								cx: "250px",
-								cy: "130px"
-							}
-						}
-					}, {
-						type: "draw",
-						params: {
-							id: "circle1-circle2",
-							type: "link",
-							attrs: {},
-							source: "circle1",
-							target: "circle2",
-						}
-					}, {
-						type: "draw",
-						params: {
-							id: guid.raw(),
-							type: "text",
-							text: "abc",
-							attrs: {
-								x: "200px",
-								y: "10px"
-							}
-						}
-					}, {
-						type: "draw",
-						params: {
-							id: guid.raw(),
-							type: "dot",
 							attrs: {
 								cx: "100px",
-								cy: "50px"
+								cy: "20px"
 							}
-						}
-					}, {
-						type: "draw",
-						params: {
-							id: guid.raw(),
-							type: "xaxis",
+						})),
+						new DrawAction(new CircleDrawing({
+							id: "circle2",
 							attrs: {
+								cx: "100px",
+								cy: "60px"
 							}
-						}
-					}]}/>
+						})),
+						new DrawAction(new LinkDrawing({
+							sourceId: "circle1",
+							targetId: "circle2"
+						})),
+						new DrawAction(new CircleDrawing({
+							id: "c3",
+							attrs: {
+								cx: "150",
+								cy: "20px"
+							}
+						})),
+						new DrawAction(new CircleDrawing({
+							id: "c4",
+							attrs: {
+								cx: "150px",
+								cy: "60px"
+							}
+						})),
+						new DrawAction(new ArrowLinkDrawing({
+							sourceId: "c3",
+							targetId: "c4"
+						}))
+					]}/>
 			</div>
 		);
 	}

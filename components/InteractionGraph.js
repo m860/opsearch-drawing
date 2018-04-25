@@ -441,9 +441,9 @@ var InteractionGraph = function (_PureComponent) {
 		//画布中已有的图形
 		_this4.shapes = [];
 		//已经选中的图形的id
-		_this4.selectedShapeId = [];
+		_this4.selectedShapes = [];
 		//绘制类型
-		_this4.drawTypes = Object.assign({}, builtinDrawType, _this4.props.customDrawType);
+		_this4.definedDrawing = Object.assign({}, builtinDrawType, _this4.props.customDrawType);
 		return _this4;
 	}
 
@@ -517,18 +517,18 @@ var InteractionGraph = function (_PureComponent) {
 				}).join(','));
 				if (this.props.selectMode === selectModeEnums.single) {
 					// this.unSelect(this.selectedShapeId);
-					this.doActions(this.selectedShapeId.map(function (id) {
+					this.doActions(this.selectedShapes.map(function (id) {
 						return new UnSelectAction(id);
 					}));
-					this.selectedShapeId = selectActions.map(function (f) {
+					this.selectedShapes = selectActions.map(function (f) {
 						return f.params;
 					});
 				} else {
-					this.selectedShapeId = this.selectedShapeId.concat(selectActions.map(function (f) {
+					this.selectedShapes = this.selectedShapes.concat(selectActions.map(function (f) {
 						return f.params;
 					}));
 				}
-				this.select(this.selectedShapeId);
+				this.select(this.selectedShapes);
 			}
 			//#endregion
 
@@ -556,7 +556,7 @@ var InteractionGraph = function (_PureComponent) {
 				var shape = _this6.findShapeById(id);
 				if (shape) {
 					if (shape.selection) {
-						var attrs = (0, _objectPath.get)(_this6.drawTypes, shape.type + '.selectedAttrs', {});
+						var attrs = (0, _objectPath.get)(_this6.definedDrawing, shape.type + '.selectedAttrs', {});
 						console.log('select attrs', attrs);
 						shape.selection.call(function (self) {
 							for (var key in attrs) {
@@ -582,7 +582,7 @@ var InteractionGraph = function (_PureComponent) {
 
 			var svg = d3.select(this.ele);
 			shapes.forEach(function (shape) {
-				var drawing = _this7.drawTypes[shape.type];
+				var drawing = _this7.definedDrawing[shape.type];
 				if (drawing) {
 					switch (shape.type) {
 						case "link":
@@ -624,7 +624,7 @@ var InteractionGraph = function (_PureComponent) {
 	}, {
 		key: 'getLinkPosition',
 		value: function getLinkPosition(shape) {
-			var drawing = this.drawTypes[shape.type];
+			var drawing = this.definedDrawing[shape.type];
 			if (drawing) {
 				return drawing.getLinkPoint(shape);
 			}
@@ -659,8 +659,8 @@ var InteractionGraph = function (_PureComponent) {
 
 			return _react2.default.createElement(
 				_WorkSpace2.default,
-				{ actions: Object.keys(this.drawTypes).map(function (key, index) {
-						var drawType = _this8.drawTypes[key];
+				{ actions: Object.keys(this.definedDrawing).map(function (key, index) {
+						var drawType = _this8.definedDrawing[key];
 						if (drawType) {
 							if (drawType.renderToolbar) {
 								return drawType.renderToolbar(_this8, _extends({

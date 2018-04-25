@@ -42,12 +42,19 @@ const selectModeEnums = {
 	multiple: "multiple"
 };
 
+class Point {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
 /**
  * 绘图action
  * */
 export class DrawAction {
-	constructor(params) {
-		this.params = params;
+	constructor(drawing) {
+		this.params = drawing;
 		this.type = actionTypeEnums.draw
 	}
 }
@@ -89,6 +96,17 @@ export class ReDrawAction {
  * 绘画接口
  * */
 export class Drawing {
+	constructor(option) {
+		this.id = getPath(option, "id", guid.raw());
+		this.attrs = getPath(option, "attrs", {});
+		this.text = getPath(option, "text", "");
+		this.selection = null;
+		this.type = null;
+		this.graph = null;
+		this.ready = false;
+		this.selected = false;
+	}
+
 	/**
 	 * 默认的attribute
 	 * */
@@ -104,17 +122,14 @@ export class Drawing {
 	}
 
 	/**
-	 * 是否可以选择
-	 * */
-	get canSelected() {
-		return true;
-	}
-
-	/**
-	 * 创建元素
+	 * 绘制
 	 * */
 	render() {
-		throw new Error('method `render` is not implementation');
+		const attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
+		this.updateAttrs(attrs);
+		if (this.text) {
+			this.selection.text(this.text);
+		}
 	}
 
 	/**
@@ -123,12 +138,40 @@ export class Drawing {
 	getLinkPoint() {
 		throw new Error('method `getLinkPoint` is not implementation');
 	}
+
+	initialize(graph) {
+		this.graph = graph;
+		this.ready = true;
+	}
+
+	updateAttrs(attrs) {
+		if (this.selection) {
+			this.selection.call(self => {
+				for (let key in attrs) {
+					self.attr(key, attrs[key]);
+				}
+			})
+		}
+	}
+
+	select() {
+		if (this.graph) {
+			this.graph.doActions([
+				new SelectAction(this.id)
+			])
+		}
+	}
 }
 
 /**
  * 绘画线
  * */
-class LineDrawing extends Drawing {
+export class LineDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "line";
+	}
+
 	get defaultAttrs() {
 		return {
 			fill: "transparent",
@@ -143,55 +186,64 @@ class LineDrawing extends Drawing {
 		};
 	}
 
-	render(svg) {
-		return svg.append("line")
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("line");
+		this.selection.on("click", () => {
+			this.select();
+		})
 	}
 
-	renderToolbar(context, drawType, index) {
-		return (
-			<a key={index}
-			   onClick={() => {
-				   console.log('click');
-				   d3.select(context.ele)
-					   .on("mousedown", function () {
-						   this._id = guid.raw();
-						   context.doActions([
-							   new DrawAction({
-								   id: this._id,
-								   type: drawType.type,
-								   attrs: Object.assign({
-									   x1: d3.event.offsetX,
-									   y1: d3.event.offsetY,
-									   x2: d3.event.offsetX,
-									   y2: d3.event.offsetY
-								   }, drawType.defaultAttrs)
-							   })])
-					   })
-					   .on("mousemove", function () {
-						   if (drawType.type === "line" && this._id) {
-							   context.doActions([
-								   new ReDrawAction(this._id, {
-									   attrs: {
-										   x2: {$set: d3.event.offsetX},
-										   y2: {$set: d3.event.offsetY}
-									   }
-								   })
-							   ]);
-						   }
-					   })
-					   .on("mouseup", function () {
-						   delete this._id;
-					   })
-			   }}
-			   href="javascript:void(0)">Line</a>
-		);
-	}
+	// renderToolbar(graph, drawType, index) {
+	// 	return (
+	// 		<a key={index}
+	// 		   onClick={() => {
+	// 			   console.log('click');
+	// 			   d3.select(graph.ele)
+	// 				   .on("mousedown", function () {
+	// 					   this._id = guid.raw();
+	// 					   graph.doActions([
+	// 						   new DrawAction({
+	// 							   id: this._id,
+	// 							   type: this.type,
+	// 							   attrs: Object.assign({
+	// 								   x1: d3.event.offsetX,
+	// 								   y1: d3.event.offsetY,
+	// 								   x2: d3.event.offsetX,
+	// 								   y2: d3.event.offsetY
+	// 							   }, this.defaultAttrs)
+	// 						   })])
+	// 				   })
+	// 				   .on("mousemove", function () {
+	// 					   if (drawType.type === "line" && this._id) {
+	// 						   graph.doActions([
+	// 							   new ReDrawAction(this._id, {
+	// 								   attrs: {
+	// 									   x2: {$set: d3.event.offsetX},
+	// 									   y2: {$set: d3.event.offsetY}
+	// 								   }
+	// 							   })
+	// 						   ]);
+	// 					   }
+	// 				   })
+	// 				   .on("mouseup", function () {
+	// 					   delete this._id;
+	// 				   })
+	// 		   }}
+	// 		   href="javascript:void(0)">Line</a>
+	// 	);
+	// }
 }
 
 /**
  * 绘画圈
  * */
-class CircleDrawing extends Drawing {
+export class CircleDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "circle";
+	}
+
 	get defaultAttrs() {
 		return {
 			fill: "transparent",
@@ -207,42 +259,44 @@ class CircleDrawing extends Drawing {
 		};
 	}
 
-	render(svg) {
-		return svg.append("circle")
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("circle");
+		this.selection.on("click", () => {
+			this.select();
+		})
 	}
 
-	renderToolbarCircleButton(context, drawType, index) {
-		return (
-			<a key={index}
-			   onClick={() => {
-				   d3.select(context.ele)
-					   .on("mousedown", function () {
-						   this._id = guid.raw();
-						   context.doActions([
-							   new DrawAction({
-								   id: this._id,
-								   type: drawType.type,
-								   attrs: Object.assign({
-									   cx: d3.event.offsetX,
-									   cy: d3.event.offsetY
-								   }, drawType.defaultAssignment)
-							   })
-						   ]);
-					   })
-					   .on("mouseup", function () {
-						   delete this._id;
-					   })
-			   }}
-			   href="javascript:void(0)">Circle</a>
-		);
+	// renderToolbarCircleButton(context, drawType, index) {
+	// 	return (
+	// 		<a key={index}
+	// 		   onClick={() => {
+	// 			   d3.select(context.ele)
+	// 				   .on("mousedown", function () {
+	// 					   this._id = guid.raw();
+	// 					   context.doActions([
+	// 						   new DrawAction({
+	// 							   id: this._id,
+	// 							   type: drawType.type,
+	// 							   attrs: Object.assign({
+	// 								   cx: d3.event.offsetX,
+	// 								   cy: d3.event.offsetY
+	// 							   }, drawType.defaultAssignment)
+	// 						   })
+	// 					   ]);
+	// 				   })
+	// 				   .on("mouseup", function () {
+	// 					   delete this._id;
+	// 				   })
+	// 		   }}
+	// 		   href="javascript:void(0)">Circle</a>
+	// 	);
+	// }
+
+	getLinkPoint() {
+		return new Point(parseFloat(this.attrs.cx), parseFloat(this.attrs.cy));
 	}
 
-	getLinkPoint(sourceShape, targetShape, targetDrawing) {
-		return {
-			x: sourceShape.attrs.cx,
-			y: sourceShape.attrs.cy
-		}
-	}
 }
 
 /**
@@ -334,9 +388,9 @@ class HorizontalScaleDrawing extends Drawing {
 			.attr("y1", 0)
 			.attr("x2", 100)
 			.attr("y2", 50)
-			.attr("stoke","black")
-			.attr("fill","transparent")
-			.attr("stroke-width","10px")
+			.attr("stoke", "black")
+			.attr("fill", "transparent")
+			.attr("stroke-width", "10px")
 		return g;
 	}
 
@@ -352,36 +406,185 @@ class VerticalScaleDrawing extends Drawing {
 
 }
 
-const builtinDrawType = {
-	line: new LineDrawing(),
-	circle: new CircleDrawing(),
-	rect: new RectDrawing(),
-	link: {
-		defaultAttrs: {
+export class ArrowLinkDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "arrow-link";
+		this.sourceId = getPath(option, "sourceId");
+		if (!this.sourceId) {
+			throw new Error(`ArrowLinkDrawing option require sourceId property`);
+		}
+		this.targetId = getPath(option, "targetId");
+		if (!this.targetId) {
+			throw new Error(`ArrowLinkDrawing option require targetId property`);
+		}
+		this.source = null;
+		this.target = null;
+	}
+
+	get defaultAttrs() {
+		return {
+			fill: "black",
+			stroke: "black"
+		};
+	}
+
+	get selectedAttrs() {
+		return {
+			stroke: "red"
+		};
+	}
+
+	initialize(graph) {
+		super.initialize(graph);
+		this.source = this.graph.findShapeById(this.sourceId);
+		this.target = this.graph.findShapeById(this.targetId);
+		this.selection = d3.select(graph.ele).append("path");
+		this.selection.on("click", () => {
+			this.select();
+		});
+	}
+
+	render() {
+		//计算link的位置信息
+		const p1 = this.source.getLinkPoint();
+		const p2 = this.target.getLinkPoint();
+		this.attrs = update(this.attrs, {
+			d: {$set: this.getArrowLinkPath(p1, p2).join(' ')}
+		});
+		super.render();
+	}
+
+	getArrowLinkPath(startPoint, endPoint, distance = 10) {
+		const diffX = startPoint.x - endPoint.x;
+		const diffY = startPoint.y - endPoint.y;
+		const a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
+		const q1x = endPoint.x + (distance * (diffX + diffY)) / a
+		const q1y = endPoint.y + (distance * (diffY - diffX)) / a
+		const q2x = endPoint.x + (diffX * distance) / a;
+		const q2y = endPoint.y + (diffY * distance) / a;
+		const q3x = endPoint.x + (distance * (diffX - diffY)) / a;
+		const q3y = endPoint.y + (distance * (diffX + diffY)) / a;
+		return [
+			`M ${startPoint.x} ${startPoint.y}`,
+			`L ${q2x} ${q2y}`,
+			`L ${q1x} ${q1y}`,
+			`L ${endPoint.x} ${endPoint.y}`,
+			`L ${q3x} ${q3y}`,
+			`L ${q2x} ${q2y}`,
+			`L ${startPoint.x} ${startPoint.y}`,
+			'Z'
+		];
+	}
+}
+
+export class LinkDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "link";
+		this.sourceId = getPath(option, "sourceId");
+		if (!this.sourceId) {
+			throw new Error(`LinkDrawing option require sourceId property`);
+		}
+		this.targetId = getPath(option, "targetId");
+		if (!this.targetId) {
+			throw new Error(`LinkDrawing option require targetId property`);
+		}
+		this.source = null;
+		this.target = null;
+	}
+
+	get defaultAttrs() {
+		return {
 			fill: "none",
 			"stroke-width": "2px",
 			stroke: "black"
-		},
-		selectedAttrs: {
+		}
+	}
+
+	get selectedAttrs() {
+		return {
 			stroke: "red"
-		},
-		render: svg => svg.append("line")
-	},
-	text: {
-		defaultAttrs: {
+		}
+	}
+
+	initialize(graph) {
+		super.initialize(graph);
+		this.source = this.graph.findShapeById(this.sourceId);
+		this.target = this.graph.findShapeById(this.targetId);
+		this.selection = d3.select(graph.ele).append("line");
+		this.selection.on("click", () => {
+			this.select();
+		});
+	}
+
+	render() {
+		//计算link的位置信息
+		const p1 = this.source.getLinkPoint();
+		const p2 = this.target.getLinkPoint();
+		this.attrs = update(this.attrs, {
+			x1: {$set: p1.x + 'px'},
+			y1: {$set: p1.y + 'px'},
+			x2: {$set: p2.x + 'px'},
+			y2: {$set: p2.y + 'px'}
+		});
+		super.render();
+	}
+
+}
+
+class TextDrawing extends Drawing {
+	/**
+	 * 默认的attribute
+	 * */
+	get defaultAttrs() {
+		return {
 			fill: "black",
 			"font-size": "20px"
-		},
-		selectedAttrs: {
-			fill: "red"
-		},
-		render: function (svg) {
-			return svg.append("text")
 		}
-	},
-	xaxis: new HorizontalScaleDrawing(),
-	yaxis: new VerticalScaleDrawing()
-};
+	}
+
+	/**
+	 * 选中时的attribute
+	 * */
+	get selectedAttrs() {
+		return {
+			fill: "red"
+		}
+	}
+
+	/**
+	 * 是否可以选择
+	 * */
+	get canSelected() {
+		return true;
+	}
+
+	/**
+	 * 创建元素
+	 * */
+	render(svg) {
+		return svg.append("text")
+	}
+
+	/**
+	 * 获取link的点的位置信息
+	 * */
+	getLinkPoint() {
+		throw new Error('method `getLinkPoint` is not implementation');
+	}
+}
+
+// const builtinDefinedDrawing = {
+// 	line: new LineDrawing(),
+// 	circle: new CircleDrawing(),
+// 	rect: new RectDrawing(),
+// 	link: new LinkDrawing(),
+// 	text: new TextDrawing(),
+// 	xAxis: new HorizontalScaleDrawing(),
+// 	yAxis: new VerticalScaleDrawing(),
+// 	arrowLink: new ArrowLinkDrawing()
+// };
 
 /**
  * 运筹学图形D3
@@ -427,7 +630,7 @@ export default class InteractionGraph extends PureComponent {
 		//选择模式,是多选还是单选
 		selectMode: PropTypes.oneOf(['single', 'multiple']),
 		//自定义绘制类型
-		customDrawType: PropTypes.object,
+		// customDefinedDrawing: PropTypes.object,
 		onDrawTypeChange: PropTypes.func
 	};
 	static defaultProps = {
@@ -482,9 +685,9 @@ export default class InteractionGraph extends PureComponent {
 		//画布中已有的图形
 		this.shapes = [];
 		//已经选中的图形的id
-		this.selectedShapeId = [];
+		this.selectedShapes = [];
 		//绘制类型
-		this.drawTypes = Object.assign({}, builtinDrawType, this.props.customDrawType);
+		// this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
 	}
 
 	findShapeById(id) {
@@ -492,11 +695,11 @@ export default class InteractionGraph extends PureComponent {
 		return this.shapes[index];
 	}
 
-	updateShape(id, shape) {
-		const index = this.shapes.findIndex(f => f.id === id);
-		this.shapes[index] = update(this.shapes[index], shape);
-		this.drawShapes(this.shapes);
-	}
+	// updateShape(id, shape) {
+	// 	const index = this.shapes.findIndex(f => f.id === id);
+	// 	this.shapes[index] = update(this.shapes[index], shape);
+	// 	this.drawShapes(this.shapes);
+	// }
 
 	doActions(actions) {
 		console.log('do actions ...')
@@ -530,14 +733,23 @@ export default class InteractionGraph extends PureComponent {
 		if (selectActions.length > 0) {
 			console.log(`${this.props.selectMode} select : ${selectActions.map(f => f.params).join(',')}`)
 			if (this.props.selectMode === selectModeEnums.single) {
-				// this.unSelect(this.selectedShapeId);
-				this.doActions(this.selectedShapeId.map(id => new UnSelectAction(id)))
-				this.selectedShapeId = selectActions.map(f => f.params);
+				this.doActions(this.selectedShapes.map(shape => new UnSelectAction(shape.id)))
+				this.selectedShapes = selectActions.map(f => {
+					const id = f.params;
+					let shape = this.findShapeById(id);
+					shape.selected = true;
+					return shape;
+				});
 			}
 			else {
-				this.selectedShapeId = this.selectedShapeId.concat(selectActions.map(f => f.params));
+				this.selectedShapes = this.selectedShapes.concat(selectActions.map(f => {
+					const id = f.params;
+					let shape = this.findShapeById(id);
+					shape.selected = true;
+					return shape;
+				}));
 			}
-			this.select(this.selectedShapeId);
+			this.drawShapes(this.selectedShapes);
 		}
 		//#endregion
 
@@ -545,125 +757,60 @@ export default class InteractionGraph extends PureComponent {
 		const unSelectActions = actions.filter(f => f.type === actionTypeEnums.unselect);
 		if (unSelectActions.length > 0) {
 			console.log(`unselect : ${unSelectActions.map(f => f.params).join(',')}`);
-			const ids = unSelectActions.map(f => f.params);
-			this.unSelect(ids);
+			const unSelectShape = unSelectActions.map(f => {
+				const id = f.params;
+				let shape = this.findShapeById(id);
+				shape.selected = false;
+				return shape;
+			});
+			this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
+			this.drawShapes(unSelectShape);
 		}
 		//#endregion
 	}
 
-	select(ids) {
-		ids.forEach(id => {
-			const shape = this.findShapeById(id);
-			if (shape) {
-				if (shape.selection) {
-					const attrs = getPath(this.drawTypes, `${shape.type}.selectedAttrs`, {});
-					console.log('select attrs', attrs);
-					shape.selection.call(self => {
-						for (let key in attrs) {
-							self.attr(key, attrs[key]);
-						}
-					})
-				}
-			}
-		})
-	}
-
-	unSelect(ids) {
-		const shapes = this.shapes.filter(f => ids.indexOf(f.id) >= 0);
-		this.drawShapes(shapes);
-	}
-
 	drawShapes(shapes) {
-		const svg = d3.select(this.ele);
 		shapes.forEach(shape => {
-			const drawing = this.drawTypes[shape.type];
-			if (drawing) {
-				switch (shape.type) {
-					case "link":
-						//计算link的相关属性
-						this.linkShape(shape, drawing);
-						break;
-				}
-				//#region create selection
-				if (!shape.selection) {
-					// create element
-					shape.selection = drawing.render.call(null, svg, shape)
-					//listene click event
-					shape.selection.on('click', () => {
-						if (drawing.canSelected) {
-							this.doActions([
-								new SelectAction(shape.id)
-							]);
-						}
-					})
-				}
-				//#endregion
-
-
-				//#region deal with svg common property
-				//update attrs
-				shape.selection.call(self => {
-					this.updateShapeAttrs(self, shape.type, Object.assign({}, drawing.defaultAttrs, shape.attrs));
-				});
-				//update text
-				if (shape.text) {
-					shape.selection.text(shape.text);
-				}
-				//#endregion
+			//初始化
+			if (!shape.ready) {
+				shape.initialize(this);
 			}
-			else {
-				console.warn(`draw type \`${shape.type}\` is not defined`);
-			}
+			shape.render();
 		})
-		// this.drawLines(shapes.filter(f => f.type === drawTypeEnums.line));
-		// this.drawDots(shapes.filter(f => f.type === drawTypeEnums.dot));
-		// this.drawCircles(shapes.filter(f => f.type === drawTypeEnums.circle));
-		// this.drawTexts(shapes.filter(f => f.type === drawTypeEnums.text));
 	}
 
-	getLinkPosition(shape) {
-		const drawing = this.drawTypes[shape.type];
-		if (drawing) {
-			return drawing.getLinkPoint(shape);
-		}
-		throw new Error(`draw type \`${shape.type}\` is not defined`);
-	}
+	// getLinkPosition(shape) {
+	// 	const drawing = this.definedDrawing[shape.type];
+	// 	if (drawing) {
+	// 		return drawing.getLinkPoint(shape);
+	// 	}
+	// 	throw new Error(`draw type \`${shape.type}\` is not defined`);
+	// }
+	//
+	// linkShape(shape) {
+	// 	const source = this.findShapeById(shape.source);
+	// 	const target = this.findShapeById(shape.target);
+	// 	if (source && target) {
+	// 		const sourcePos = this.getLinkPosition(source);
+	// 		const targetPos = this.getLinkPosition(target);
+	// 		shape.attrs.x1 = sourcePos.x;
+	// 		shape.attrs.y1 = sourcePos.y;
+	// 		shape.attrs.x2 = targetPos.x;
+	// 		shape.attrs.y2 = targetPos.y;
+	// 	}
+	// }
 
+	// updateShapeAttrs(ele, drawType, attrs) {
+	// 	const newAttrs = Object.assign({}, this.definedDrawing[drawType].defaultAttrs, attrs);
+	// 	for (let key in newAttrs) {
+	// 		ele.attr(key, newAttrs[key]);
+	// 	}
+	// }
 
-	linkShape(shape) {
-		const source = this.findShapeById(shape.source);
-		const target = this.findShapeById(shape.target);
-		if (source && target) {
-			const sourcePos = this.getLinkPosition(source);
-			const targetPos = this.getLinkPosition(target);
-			shape.attrs.x1 = sourcePos.x;
-			shape.attrs.y1 = sourcePos.y;
-			shape.attrs.x2 = targetPos.x;
-			shape.attrs.y2 = targetPos.y;
-		}
-	}
-
-	updateShapeAttrs(ele, drawType, attrs) {
-		const newAttrs = Object.assign({}, this.drawTypes[drawType].defaultAttrs, attrs);
-		for (let key in newAttrs) {
-			ele.attr(key, newAttrs[key]);
-		}
-	}
 
 	render() {
 		return (
-			<WorkSpace actions={Object.keys(this.drawTypes).map((key, index) => {
-				const drawType = this.drawTypes[key];
-				if (drawType) {
-					if (drawType.renderToolbar) {
-						return drawType.renderToolbar(this, {
-							type: key,
-							...drawType
-						}, index);
-					}
-				}
-				return null;
-			})}>
+			<WorkSpace>
 				<svg ref={ref => this.ele = ref}
 					 style={this.props.style}
 					 width={this.props.width}
@@ -678,7 +825,6 @@ export default class InteractionGraph extends PureComponent {
 	}
 
 	componentDidMount() {
-		// this.initialSVG();
 		this.doActions(this.props.actions);
 	}
 }
