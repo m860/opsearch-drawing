@@ -125,7 +125,25 @@ export class Drawing {
 	 * 绘制,更新selection相关
 	 * */
 	render() {
-		const attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
+		let attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
+		if (attrs.x1) {
+			attrs.x1 = this.graph.getX(attrs.x1);
+		}
+		if (attrs.x2) {
+			attrs.x2 = this.graph.getX(attrs.x2);
+		}
+		if (attrs.y1) {
+			attrs.y1 = this.graph.getY(attrs.y1);
+		}
+		if (attrs.y2) {
+			attrs.y2 = this.graph.getY(attrs.y2);
+		}
+		if (attrs.cx) {
+			attrs.cx = this.graph.getX(attrs.cx);
+		}
+		if (attrs.cy) {
+			attrs.cy = this.graph.getY(attrs.cy);
+		}
 		this.updateAttrs(attrs);
 		if (this.text) {
 			this.selection.text(this.text);
@@ -276,34 +294,41 @@ export class CircleDrawing extends Drawing {
 		})
 	}
 
-	// renderToolbarCircleButton(context, drawType, index) {
-	// 	return (
-	// 		<a key={index}
-	// 		   onClick={() => {
-	// 			   d3.select(context.ele)
-	// 				   .on("mousedown", function () {
-	// 					   this._id = guid.raw();
-	// 					   context.doActions([
-	// 						   new DrawAction({
-	// 							   id: this._id,
-	// 							   type: drawType.type,
-	// 							   attrs: Object.assign({
-	// 								   cx: d3.event.offsetX,
-	// 								   cy: d3.event.offsetY
-	// 							   }, drawType.defaultAssignment)
-	// 						   })
-	// 					   ]);
-	// 				   })
-	// 				   .on("mouseup", function () {
-	// 					   delete this._id;
-	// 				   })
-	// 		   }}
-	// 		   href="javascript:void(0)">Circle</a>
-	// 	);
-	// }
-
 	getLinkPoint() {
 		return new Point(parseFloat(this.attrs.cx), parseFloat(this.attrs.cy));
+	}
+
+}
+
+/**
+ * 绘制点
+ * */
+export class DotDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "dot";
+	}
+
+	get defaultAttrs() {
+		return {
+			fill: "black",
+			stroke: "black",
+			r: "5px"
+		};
+	}
+
+	get selectedAttrs() {
+		return {
+			stroke: "red"
+		};
+	}
+
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("circle");
+		this.selection.on("click", () => {
+			this.select();
+		})
 	}
 
 }
@@ -375,9 +400,20 @@ class RectDrawing extends Drawing {
 }
 
 /**
- * 绘制水平刻度
+ * 绘制刻度
  * */
-class HorizontalScaleDrawing extends Drawing {
+export class NumberScaleDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "number-scale";
+		this.grid = getPath(option, "grid", {
+			top: 20,
+			bottom: 20,
+			left: 20,
+			right: 20
+		})
+	}
+
 	get defaultAttrs() {
 		return {}
 	}
@@ -386,33 +422,28 @@ class HorizontalScaleDrawing extends Drawing {
 		return {}
 	}
 
-	get canSelected() {
-		return false;
+	initialize(graph) {
+		super.initialize(graph);
+		const width = graph.ele.clientWidth;
+		const height = graph.ele.clientHeight;
+		this.selection = d3.select(graph.ele).append("g");
+		//xAxis
+		this.selection.append("line")
+			.attr("x1", `${this.grid.left}px`)
+			.attr("y1", `${height - this.grid.bottom}px`)
+			.attr("x2", `${width - this.grid.right}px`)
+			.attr("y2", `${height - this.grid.bottom}px`)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1px");
+		//yAxis
+		this.selection.append("line")
+			.attr("x1", `${this.grid.left}px`)
+			.attr("y1", `${height - this.grid.bottom}px`)
+			.attr("x2", `${this.grid.left}px`)
+			.attr("y2", `${this.grid.top}px`)
+			.attr("stroke", "black")
+			.attr("stroke-width", "1px")
 	}
-
-	render(svg, shape) {
-		const g = svg.append("g");
-		const line = g.append("line")
-			.attr("x1", 0)
-			.attr("y1", 0)
-			.attr("x2", 100)
-			.attr("y2", 50)
-			.attr("stoke", "black")
-			.attr("fill", "transparent")
-			.attr("stroke-width", "10px")
-		return g;
-	}
-
-	getLinkPoint() {
-		throw new Error('method `getLinkPoint` is not implementation');
-	}
-}
-
-/**
- * 绘制水平刻度
- * */
-class VerticalScaleDrawing extends Drawing {
-
 }
 
 /**
@@ -478,13 +509,13 @@ export class ArrowLinkDrawing extends Drawing {
 		const q3x = endPoint.x + (distance * (diffX - diffY)) / a;
 		const q3y = endPoint.y + (distance * (diffX + diffY)) / a;
 		return [
-			`M ${startPoint.x} ${startPoint.y}`,
-			`L ${q2x} ${q2y}`,
-			`L ${q1x} ${q1y}`,
-			`L ${endPoint.x} ${endPoint.y}`,
-			`L ${q3x} ${q3y}`,
-			`L ${q2x} ${q2y}`,
-			`L ${startPoint.x} ${startPoint.y}`,
+			`M ${this.graph.getX(startPoint.x)} ${this.graph.getY(startPoint.y)}`,
+			`L ${this.graph.getX(q2x)} ${this.graph.getY(q2y)}`,
+			`L ${this.graph.getX(q1x)} ${this.graph.getY(q1y)}`,
+			`L ${this.graph.getX(endPoint.x)} ${this.graph.getY(endPoint.y)}`,
+			`L ${this.graph.getX(q3x)} ${this.graph.getY(q3y)}`,
+			`L ${this.graph.getX(q2x)} ${this.graph.getY(q2y)}`,
+			`L ${this.graph.getX(startPoint.x)} ${this.graph.getY(startPoint.y)}`,
 			'Z'
 		];
 	}
@@ -620,7 +651,12 @@ export default class InteractionGraph extends PureComponent {
 		selectMode: PropTypes.oneOf(['single', 'multiple']),
 		//自定义绘制类型
 		// customDefinedDrawing: PropTypes.object,
-		onDrawTypeChange: PropTypes.func
+		onDrawTypeChange: PropTypes.func,
+		original: PropTypes.shape({
+			x: PropTypes.number,
+			y: PropTypes.number
+		}),
+		coordinateType: PropTypes.oneOf(['screen', 'math'])
 	};
 	static defaultProps = {
 		width: 400,
@@ -630,7 +666,12 @@ export default class InteractionGraph extends PureComponent {
 		},
 		selectMode: "single",
 		onDrawTypeChange: () => null,
-		actions: []
+		actions: [],
+		original: {
+			x: 0,
+			y: 0
+		},
+		coordinateType: "screen"
 	}
 
 	constructor(props) {
@@ -647,6 +688,17 @@ export default class InteractionGraph extends PureComponent {
 	findShapeById(id) {
 		const index = this.shapes.findIndex(f => f.id === id);
 		return this.shapes[index];
+	}
+
+	getX(value) {
+		return this.props.original.x + parseFloat(value);
+	}
+
+	getY(value) {
+		if (this.props.coordinateType === "screen") {
+			return this.props.original.y + parseFloat(value);
+		}
+		return this.props.original.y - parseFloat(value);
 	}
 
 	// updateShape(id, shape) {

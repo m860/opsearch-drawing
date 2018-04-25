@@ -8,7 +8,9 @@ import InteractionGraph, {
 	LineDrawing,
 	CircleDrawing,
 	LinkDrawing,
-	ArrowLinkDrawing
+	ArrowLinkDrawing,
+	DotDrawing,
+	NumberScaleDrawing
 } from './components/InteractionGraph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -51,49 +53,16 @@ class Example extends Component {
 					cells: this.state.tableData
 				}}/>
 				<InteractionGraph
-					onDrawTypeChange={(svg, drawType) => {
-						console.log('draw type change', drawType);
-						svg.on("mousedown", () => console.log('custom mouse down'));
-					}}
-					customDefinedDrawing={{
-						dot: {
-							defaultAttrs: {
-								fill: "black",
-								stoke: "none",
-								r: "5px"
-							},
-							selectedAttrs: {
-								fill: "red"
-							},
-							render: svg => svg.append("circle"),
-							renderToolbar: function DotButton(context, drawType, index) {
-								return (
-									<a key={index}
-									   href="javascript:void(0)"
-									   onClick={() => {
-										   d3.select(context.ele)
-											   .on("mousedown", function () {
-												   this._id = guid.raw();
-												   context.doActions([
-													   new DrawAction({
-														   id: this._id,
-														   type: drawType.type,
-														   attrs: {
-															   cx: d3.event.offsetX,
-															   cy: d3.event.offsetY
-														   }
-													   })
-												   ])
-											   })
-											   .on("mouseup", function () {
-												   delete this._id;
-											   })
-									   }}>Dot</a>
-								);
-							}
-						}
-					}}
+					original={{x: 20, y: 280}}
+					coordinateType={"math"}
 					actions={[
+						new DrawAction(new NumberScaleDrawing()),
+						new DrawAction(new DotDrawing({
+							attrs: {
+								cx: "0px",
+								cy: "0px"
+							}
+						})),
 						new DrawAction(new LineDrawing({
 							attrs: {
 								x1: 50,
@@ -145,7 +114,14 @@ class Example extends Component {
 						new DrawAction(new ArrowLinkDrawing({
 							sourceId: "c3",
 							targetId: "c4"
-						}))
+						})),
+						new DrawAction(new DotDrawing({
+							attrs: {
+								cx: Math.random() * 100 + 'px',
+								cy: Math.random() * 100 + 'px'
+							}
+						})),
+
 					]}/>
 			</div>
 		);
