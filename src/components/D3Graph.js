@@ -608,7 +608,7 @@ class TextDrawing extends Drawing {
 /**
  * 运筹学图形D3
  * */
-export default class InteractionGraph extends PureComponent {
+export default class D3Graph extends PureComponent {
 	/**
 	 * @property {number} width
 	 * @property {number} height

@@ -2,7 +2,7 @@ import './sass/index.sass'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import InteractionTable from './components/InteractionTable'
-import InteractionGraph, {
+import D3Graph, {
 	ReDrawAction,
 	DrawAction,
 	LineDrawing,
@@ -11,7 +11,7 @@ import InteractionGraph, {
 	ArrowLinkDrawing,
 	DotDrawing,
 	NumberScaleDrawing
-} from './components/InteractionGraph'
+} from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
 import * as d3 from 'd3'
@@ -52,7 +52,7 @@ class Example extends Component {
 					},
 					cells: this.state.tableData
 				}}/>
-				<InteractionGraph
+				<D3Graph
 					original={{x: 20, y: 280}}
 					coordinateType={"math"}
 					actions={[
