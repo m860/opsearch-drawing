@@ -59,8 +59,8 @@ class Example extends Component {
 						new DrawAction(new NumberScaleDrawing()),
 						new DrawAction(new DotDrawing({
 							attrs: {
-								cx: "0px",
-								cy: "0px"
+								cx: 0,
+								cy: 0
 							}
 						})),
 						new DrawAction(new LineDrawing({
@@ -82,15 +82,15 @@ class Example extends Component {
 						new DrawAction(new CircleDrawing({
 							id: "circle1",
 							attrs: {
-								cx: "100px",
-								cy: "20px"
+								cx: 100,
+								cy: 20
 							}
 						})),
 						new DrawAction(new CircleDrawing({
 							id: "circle2",
 							attrs: {
-								cx: "100px",
-								cy: "60px"
+								cx: 100,
+								cy: 60
 							}
 						})),
 						new DrawAction(new LinkDrawing({
@@ -100,15 +100,15 @@ class Example extends Component {
 						new DrawAction(new CircleDrawing({
 							id: "c3",
 							attrs: {
-								cx: "150",
-								cy: "20px"
+								cx: 150,
+								cy: 20
 							}
 						})),
 						new DrawAction(new CircleDrawing({
 							id: "c4",
 							attrs: {
-								cx: "150px",
-								cy: "60px"
+								cx: 150,
+								cy: 60
 							}
 						})),
 						new DrawAction(new ArrowLinkDrawing({
@@ -117,8 +117,8 @@ class Example extends Component {
 						})),
 						new DrawAction(new DotDrawing({
 							attrs: {
-								cx: Math.random() * 100 + 'px',
-								cy: Math.random() * 100 + 'px'
+								cx: Math.random() * 100,
+								cy: Math.random() * 100
 							}
 						})),
 

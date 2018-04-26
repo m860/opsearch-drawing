@@ -429,20 +429,20 @@ export class NumberScaleDrawing extends Drawing {
 		this.selection = d3.select(graph.ele).append("g");
 		//xAxis
 		this.selection.append("line")
-			.attr("x1", `${this.grid.left}px`)
-			.attr("y1", `${height - this.grid.bottom}px`)
-			.attr("x2", `${width - this.grid.right}px`)
-			.attr("y2", `${height - this.grid.bottom}px`)
+			.attr("x1", this.grid.left)
+			.attr("y1", height - this.grid.bottom)
+			.attr("x2", width - this.grid.right)
+			.attr("y2", height - this.grid.bottom)
 			.attr("stroke", "black")
 			.attr("stroke-width", "1px");
 		//yAxis
 		this.selection.append("line")
-			.attr("x1", `${this.grid.left}px`)
-			.attr("y1", `${height - this.grid.bottom}px`)
-			.attr("x2", `${this.grid.left}px`)
-			.attr("y2", `${this.grid.top}px`)
+			.attr("x1", this.grid.left)
+			.attr("y1", height - this.grid.bottom)
+			.attr("x2", this.grid.left)
+			.attr("y2", this.grid.top)
 			.attr("stroke", "black")
-			.attr("stroke-width", "1px")
+			.attr("stroke-width", 1)
 	}
 }
 
@@ -569,10 +569,10 @@ export class LinkDrawing extends Drawing {
 		const p1 = this.source.getLinkPoint();
 		const p2 = this.target.getLinkPoint();
 		this.attrs = update(this.attrs, {
-			x1: {$set: p1.x + 'px'},
-			y1: {$set: p1.y + 'px'},
-			x2: {$set: p2.x + 'px'},
-			y2: {$set: p2.y + 'px'}
+			x1: {$set: p1.x},
+			y1: {$set: p1.y},
+			x2: {$set: p2.x},
+			y2: {$set: p2.y}
 		});
 		super.render();
 	}
