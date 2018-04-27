@@ -83,6 +83,13 @@ function registerDrawing(name, drawing) {
 	drawingIndex[name] = drawing;
 }
 
+function isNullOrUndefined(value) {
+	if (value === undefined || value === null) {
+		return true;
+	}
+	return false;
+}
+
 /**
  * 反序列化drawing
  * */
@@ -215,22 +222,28 @@ export class Drawing {
 	 * */
 	render() {
 		let attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
-		if (attrs.x1) {
+		if (!isNullOrUndefined(attrs.x)) {
+			attrs.x = this.graph.getX(attrs.x);
+		}
+		if (!isNullOrUndefined(attrs.y)) {
+			attrs.y = this.graph.getY(attrs.y);
+		}
+		if (!isNullOrUndefined(attrs.x1)) {
 			attrs.x1 = this.graph.getX(attrs.x1);
 		}
-		if (attrs.x2) {
+		if (!isNullOrUndefined(attrs.x2)) {
 			attrs.x2 = this.graph.getX(attrs.x2);
 		}
-		if (attrs.y1) {
+		if (!isNullOrUndefined(attrs.y1)) {
 			attrs.y1 = this.graph.getY(attrs.y1);
 		}
-		if (attrs.y2) {
+		if (!isNullOrUndefined(attrs.y2)) {
 			attrs.y2 = this.graph.getY(attrs.y2);
 		}
-		if (attrs.cx) {
+		if (!isNullOrUndefined(attrs.cx)) {
 			attrs.cx = this.graph.getX(attrs.cx);
 		}
-		if (attrs.cy) {
+		if (!isNullOrUndefined(attrs.cy)) {
 			attrs.cy = this.graph.getY(attrs.cy);
 		}
 		this.updateAttrs(attrs);
@@ -826,10 +839,16 @@ export default class D3Graph extends PureComponent {
 		return this.shapes[index];
 	}
 
+	/**
+	 * 根据坐标系计算x值
+	 * */
 	getX(value) {
 		return this.props.original.x + parseFloat(value);
 	}
 
+	/**
+	 * 根据坐标系计算y值
+	 * */
 	getY(value) {
 		if (this.props.coordinateType === "screen") {
 			return this.props.original.y + parseFloat(value);
