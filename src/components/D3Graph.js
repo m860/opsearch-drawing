@@ -65,7 +65,7 @@ const selectModeEnums = {
 	multiple: "multiple"
 };
 
-const graphMode = {
+export const graphMode = {
 	none: "none",
 	draw: "draw",
 	playing: "playing"
@@ -772,7 +772,15 @@ export class PathDrawing extends Drawing {
 
 registerDrawing("PathDrawing", PathDrawing)
 
-class TextDrawing extends Drawing {
+/**
+ * 绘制text
+ * */
+export class TextDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "text";
+	}
+
 	get defaultAttrs() {
 		return {
 			fill: "black",
@@ -785,7 +793,17 @@ class TextDrawing extends Drawing {
 			fill: "red"
 		}
 	}
+
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("text");
+		this.selection.on("click", () => {
+			this.select();
+		});
+	}
 }
+
+registerDrawing("TextDrawing", TextDrawing)
 
 // const builtinDefinedDrawing = {
 // 	line: new LineDrawing(),
@@ -886,6 +904,9 @@ export default class D3Graph extends PureComponent {
 		// this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
 	}
 
+	/**
+	 * 根据id查找对应的图形
+	 * */
 	findShapeById(id) {
 		const index = this.shapes.findIndex(f => f.id === id);
 		return this.shapes[index];
@@ -908,14 +929,8 @@ export default class D3Graph extends PureComponent {
 		return this.props.original.y - parseFloat(value);
 	}
 
-	// updateShape(id, shape) {
-	// 	const index = this.shapes.findIndex(f => f.id === id);
-	// 	this.shapes[index] = update(this.shapes[index], shape);
-	// 	this.drawShapes(this.shapes);
-	// }
-
 	doActions(actions) {
-		console.log('do actions ...')
+
 		//#region draw
 		const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
 		if (drawActions.length > 0) {
@@ -992,48 +1007,19 @@ export default class D3Graph extends PureComponent {
 		})
 	}
 
-	play() {
+	play(actions, playingOps) {
 		let actionIndex = 0;
 		const next = () => {
-			if (actionIndex >= this.props.actions.length) {
+			if (actionIndex >= actions.length) {
 				return;
 			}
-			const action = this.props.actions[actionIndex];
+			const action = actions[actionIndex];
 			this.doActions([action]);
 			actionIndex++;
-			setTimeout(next.bind(this), getPath(this.props.playingOption, "interval", 3000));
+			setTimeout(next.bind(this), getPath(playingOps, "interval", 1000));
 		}
 		next();
 	}
-
-	// getLinkPosition(shape) {
-	// 	const drawing = this.definedDrawing[shape.type];
-	// 	if (drawing) {
-	// 		return drawing.getLinkPoint(shape);
-	// 	}
-	// 	throw new Error(`draw type \`${shape.type}\` is not defined`);
-	// }
-	//
-	// linkShape(shape) {
-	// 	const source = this.findShapeById(shape.source);
-	// 	const target = this.findShapeById(shape.target);
-	// 	if (source && target) {
-	// 		const sourcePos = this.getLinkPosition(source);
-	// 		const targetPos = this.getLinkPosition(target);
-	// 		shape.attrs.x1 = sourcePos.x;
-	// 		shape.attrs.y1 = sourcePos.y;
-	// 		shape.attrs.x2 = targetPos.x;
-	// 		shape.attrs.y2 = targetPos.y;
-	// 	}
-	// }
-
-	// updateShapeAttrs(ele, drawType, attrs) {
-	// 	const newAttrs = Object.assign({}, this.definedDrawing[drawType].defaultAttrs, attrs);
-	// 	for (let key in newAttrs) {
-	// 		ele.attr(key, newAttrs[key]);
-	// 	}
-	// }
-
 
 	render() {
 		return (
@@ -1045,7 +1031,12 @@ export default class D3Graph extends PureComponent {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.doActions(nextProps.actions);
+		if (nextProps.mode === graphMode.draw) {
+			this.doActions(nextProps.actions);
+		}
+		if (nextProps.mode === graphMode.playing) {
+			this.play(nextProps.actions, nextProps.playingOption);
+		}
 	}
 
 	componentDidMount() {
@@ -1053,7 +1044,7 @@ export default class D3Graph extends PureComponent {
 			this.doActions(this.props.actions);
 		}
 		if (this.props.mode === graphMode.playing) {
-			this.play();
+			this.play(this.props.actions);
 		}
 	}
 }

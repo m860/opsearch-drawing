@@ -11,7 +11,9 @@ import D3Graph, {
 	ArrowLinkDrawing,
 	DotDrawing,
 	NumberScaleDrawing,
-	PathDrawing
+	PathDrawing,
+	graphMode,
+	TextDrawing
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -22,113 +24,133 @@ class Example extends Component {
 		super(props);
 		this.state = {
 			tableData: [],
-			actions: []
+			actions: [],
+			mode: graphMode.none
 		};
 		this.circleStyle = "background-color:gray";
+	}
+
+	playActions() {
+		this.setState({
+			mode: graphMode.playing,
+			actions: [
+				new DrawAction(new NumberScaleDrawing()),
+				new DrawAction(new DotDrawing({
+					attrs: {
+						cx: 20,
+						cy: 20
+					}
+				})),
+				new DrawAction(new LineDrawing({
+					attrs: {
+						x1: 50,
+						y1: 50,
+						x2: 100,
+						y2: 100
+					}
+				})),
+				new DrawAction(new LineDrawing({
+					attrs: {
+						x1: 50,
+						y1: 150,
+						x2: 100,
+						y2: 200
+					}
+				})),
+				new DrawAction(new CircleDrawing({
+					id: "circle1",
+					attrs: {
+						cx: 100,
+						cy: 20
+					}
+				})),
+				new DrawAction(new CircleDrawing({
+					id: "circle2",
+					attrs: {
+						cx: 100,
+						cy: 60
+					}
+				})),
+				new DrawAction(new LinkDrawing({
+					sourceId: "circle1",
+					targetId: "circle2"
+				})),
+				new DrawAction(new CircleDrawing({
+					id: "c3",
+					attrs: {
+						cx: 150,
+						cy: 20
+					}
+				})),
+				new DrawAction(new CircleDrawing({
+					id: "c4",
+					attrs: {
+						cx: 150,
+						cy: 60
+					}
+				})),
+				new DrawAction(new ArrowLinkDrawing({
+					sourceId: "c3",
+					targetId: "c4"
+				})),
+				new DrawAction(new DotDrawing({
+					attrs: {
+						cx: Math.random() * 100,
+						cy: Math.random() * 100
+					}
+				})),
+				new DrawAction(new PathDrawing({
+					attrs: {
+						d: "M 100 100 L 150 100 L 130 80 Z"
+					}
+				})),
+				new DrawAction(new TextDrawing({
+					attrs: {
+						x: Math.random() * 100,
+						y: Math.random() * 100
+					},
+					text: "hello text"
+				}))
+			]
+		})
 	}
 
 	render() {
 		return (
 			<div>
-				<div>{JSON.stringify(this.state.tableData)}</div>
-				<InteractionTable tableOption={{
-					firstRow: {
-						renderCell: (text) => <span>{text}</span>,
-						cells: ['a', 'b', 'c']
-					},
-					firstColumn: {
-						renderCell: text => <span>{text}</span>,
-						cells: [1, 2, 3]
-					},
-					renderCell: (data, rowIndex, columnIndex) => {
-						return (
-							<input type="text"
-								   onChange={({target: {value}}) => {
-									   let newState = Object.assign({}, this.state);
-									   setPath(newState, `tableData.${rowIndex}.${columnIndex}`, value);
-									   this.setState(newState);
-								   }}
-								   defaultValue={getPath(this.state, `tableData.${rowIndex}.${columnIndex}`)}/>
-						);
-					},
-					cells: this.state.tableData
-				}}/>
-				<D3Graph
-					original={{x: 20, y: 280}}
-					coordinateType={"math"}
-					mode="playing"
-					actions={[
-						new DrawAction(new NumberScaleDrawing()),
-						new DrawAction(new DotDrawing({
-							attrs: {
-								cx: 20,
-								cy: 20
-							}
-						})),
-						new DrawAction(new LineDrawing({
-							attrs: {
-								x1: 50,
-								y1: 50,
-								x2: 100,
-								y2: 100
-							}
-						})),
-						new DrawAction(new LineDrawing({
-							attrs: {
-								x1: 50,
-								y1: 150,
-								x2: 100,
-								y2: 200
-							}
-						})),
-						new DrawAction(new CircleDrawing({
-							id: "circle1",
-							attrs: {
-								cx: 100,
-								cy: 20
-							}
-						})),
-						new DrawAction(new CircleDrawing({
-							id: "circle2",
-							attrs: {
-								cx: 100,
-								cy: 60
-							}
-						})),
-						new DrawAction(new LinkDrawing({
-							sourceId: "circle1",
-							targetId: "circle2"
-						})),
-						new DrawAction(new CircleDrawing({
-							id: "c3",
-							attrs: {
-								cx: 150,
-								cy: 20
-							}
-						})),
-						new DrawAction(new CircleDrawing({
-							id: "c4",
-							attrs: {
-								cx: 150,
-								cy: 60
-							}
-						})),
-						new DrawAction(new ArrowLinkDrawing({
-							sourceId: "c3",
-							targetId: "c4"
-						})),
-						new DrawAction(new DotDrawing({
-							attrs: {
-								cx: Math.random() * 100,
-								cy: Math.random() * 100
-							}
-						})),
-						new DrawAction(new PathDrawing({
-							attrs: {
-								d: "M 100 100 L 150 100 L 130 80 Z"
-							}
-						}))
-					]}/>
+				<div>
+					<h6>运筹学图形Example</h6>
+					<div>
+						<button type="button" onClick={this.playActions.bind(this)}>play</button>
+					</div>
+					<D3Graph
+						original={{x: 20, y: 280}}
+						coordinateType={"math"}
+						mode={this.state.mode}
+						actions={this.state.actions}/>
+					<InteractionTable tableOption={{
+						firstRow: {
+							renderCell: (text) => <span>{text}</span>,
+							cells: ['a', 'b', 'c']
+						},
+						firstColumn: {
+							renderCell: text => <span>{text}</span>,
+							cells: [1, 2, 3]
+						},
+						renderCell: (data, rowIndex, columnIndex) => {
+							return (
+								<input type="text"
+									   onChange={({target: {value}}) => {
+										   let newState = Object.assign({}, this.state);
+										   setPath(newState, `tableData.${rowIndex}.${columnIndex}`, value);
+										   this.setState(newState);
+									   }}
+									   defaultValue={getPath(this.state, `tableData.${rowIndex}.${columnIndex}`)}/>
+							);
+						},
+						cells: this.state.tableData
+					}}/>
+				</div>
 			</div>
 		);
 	}
