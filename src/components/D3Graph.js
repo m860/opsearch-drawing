@@ -7,6 +7,29 @@ import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
 
 /**
+ * @typedef
+ * */
+type FromDrawingType = {
+	/**
+	 * 对应到绘制的类的名字
+	 * */
+	type: String,
+	/**
+	 * 目前包含两个主要属性就是`attrs`和`text`,`text`是指svg中的嵌套内容,`attrs`是对应到svg元素的attributes,以后可能还会扩展其他属性(svg的标准)
+	 * */
+	option: Object
+}
+type DrawingOptionType = {
+	type: String,
+	option: Object
+};
+
+type ActionOptionType = {
+	type: String,
+	params: Array
+};
+
+/**
  * action枚举
  * @readonly
  * @enum {string}
@@ -19,7 +42,7 @@ import update from 'immutability-helper'
  * @property {string} undo - 撤销
  * @property {string} data - 数据操作
  * */
-const actionTypeEnums = {
+export const actionTypeEnums = {
 	draw: "draw",
 	redraw: "redraw",
 	select: "select",
@@ -42,6 +65,52 @@ const selectModeEnums = {
 	multiple: "multiple"
 };
 
+const graphMode = {
+	none: "none",
+	playing: "playing"
+};
+
+let drawingIndex = {};
+let actionIndex = {};
+
+/**
+ * 注册Drawing绘制类
+ * @param {String} name - name值必须和绘图类的类名保持一致
+ * @param {Function} drawing - 绘图类
+ * */
+function registerDrawing(name, drawing) {
+	drawingIndex[name] = drawing;
+}
+
+/**
+ * 反序列化drawing
+ * */
+export function fromDrawing(drawingOps: DrawingOptionType) {
+	const func = drawingIndex[drawingOps.type];
+	return new func(drawingOps.option);
+}
+
+/**
+ * 反序列化actions
+ * */
+export function fromActions(actions: Array<ActionOptionType>) {
+	return actions.map(action => {
+		const type = action.type;
+		const args = action.params;
+		const func = actionIndex[type];
+		if (!func) {
+			throw new Error(`action ${type} is not defined`);
+		}
+		switch (type) {
+			case actionTypeEnums.draw:
+				return new actionIndex[type](...args.map(arg => fromDrawing(arg)));
+			default:
+				return new actionIndex[type](...args);
+		}
+
+	})
+}
+
 class Point {
 	constructor(x, y) {
 		this.x = x;
@@ -50,52 +119,71 @@ class Point {
 }
 
 /**
- * 绘图action
+ * action基类
  * */
-export class DrawAction {
-	constructor(drawing) {
-		this.params = drawing;
-		this.type = actionTypeEnums.draw
+class Action {
+	static fromActions() {
+
+	}
+
+	constructor(type, params) {
+		this.type = type;
+		this.params = params;
 	}
 }
+
+/**
+ * 绘图action
+ * */
+export class DrawAction extends Action {
+	constructor(drawingOps) {
+		super(actionTypeEnums.draw, drawingOps)
+	}
+}
+
+actionIndex[actionTypeEnums.draw] = DrawAction;
 
 /**
  * 选择action
  * */
-export class SelectAction {
-	constructor(id) {
-		this.params = id;
-		this.type = actionTypeEnums.select;
+export class SelectAction extends Action {
+	constructor(shapeId) {
+		super(actionTypeEnums.select, shapeId)
 	}
 }
+
+actionIndex[actionTypeEnums.select] = SelectAction;
 
 /**
  * 取消选择action
  * */
-export class UnSelectAction {
-	constructor(id) {
-		this.params = id;
-		this.type = actionTypeEnums.unselect;
+export class UnSelectAction extends Action {
+	constructor(shapeId) {
+		super(actionTypeEnums.unselect, shapeId)
 	}
 }
+
+actionIndex[actionTypeEnums.unselect] = UnSelectAction;
 
 /**
  * 重绘action
  * */
-export class ReDrawAction {
-	constructor(id, state) {
-		this.type = actionTypeEnums.redraw;
-		this.params = {
-			id,
-			state
-		}
+export class ReDrawAction extends Action {
+	constructor(shapeId, state) {
+		super(actionTypeEnums.redraw, {
+			id: shapeId,
+			state: state
+		})
 	}
 }
+
+actionIndex[actionTypeEnums.redraw] = ReDrawAction;
 
 /**
  * 绘画接口,所有的绘画类都需要继承这个类并实现相关方法
  * */
 export class Drawing {
+
 	constructor(option) {
 		this.id = getPath(option, "id", guid.raw());
 		this.attrs = getPath(option, "attrs", {});
@@ -262,6 +350,8 @@ export class LineDrawing extends Drawing {
 	// }
 }
 
+registerDrawing("LineDrawing", LineDrawing);
+
 /**
  * 绘画圈
  * */
@@ -300,6 +390,8 @@ export class CircleDrawing extends Drawing {
 
 }
 
+registerDrawing("CircleDrawing", CircleDrawing);
+
 /**
  * 绘制点
  * */
@@ -332,6 +424,8 @@ export class DotDrawing extends Drawing {
 	}
 
 }
+
+registerDrawing("DotDrawing", DotDrawing);
 
 /**
  * 绘画矩形
@@ -399,6 +493,8 @@ class RectDrawing extends Drawing {
 	}
 }
 
+registerDrawing("RectDrawing", RectDrawing);
+
 /**
  * 绘制刻度
  * */
@@ -445,6 +541,8 @@ export class NumberScaleDrawing extends Drawing {
 			.attr("stroke-width", 1)
 	}
 }
+
+registerDrawing("NumberScaleDrawing", NumberScaleDrawing);
 
 /**
  * 绘制带箭头的link
@@ -521,6 +619,8 @@ export class ArrowLinkDrawing extends Drawing {
 	}
 }
 
+registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
+
 /**
  * 绘制link
  * */
@@ -579,6 +679,8 @@ export class LinkDrawing extends Drawing {
 
 }
 
+registerDrawing("LinkDrawing", LinkDrawing);
+
 class TextDrawing extends Drawing {
 	get defaultAttrs() {
 		return {
@@ -610,16 +712,16 @@ class TextDrawing extends Drawing {
  * */
 export default class D3Graph extends PureComponent {
 	/**
-	 * @property {number} width
-	 * @property {number} height
-	 * @property {object} style
+	 * @property {object} attrs - svg的属性
 	 * @property {Array} actions - 所有的操作
 	 * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
+	 * @property {object} original - 坐标原点,默认值{x:0,y:0}
+	 * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
+	 * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
+	 * @property {object} playingOption - mode===playing时有效
 	 * */
 	static propTypes = {
-		width: PropTypes.number,
-		height: PropTypes.number,
-		style: PropTypes.object,
+		attrs: PropTypes.object,
 		//action
 		actions: PropTypes.arrayOf(PropTypes.shape({
 			type: PropTypes.oneOf(Object.keys(actionTypeEnums)).isRequired,
@@ -651,27 +753,35 @@ export default class D3Graph extends PureComponent {
 		selectMode: PropTypes.oneOf(['single', 'multiple']),
 		//自定义绘制类型
 		// customDefinedDrawing: PropTypes.object,
-		onDrawTypeChange: PropTypes.func,
+		// onDrawTypeChange: PropTypes.func,
 		original: PropTypes.shape({
 			x: PropTypes.number,
 			y: PropTypes.number
 		}),
-		coordinateType: PropTypes.oneOf(['screen', 'math'])
+		coordinateType: PropTypes.oneOf(['screen', 'math']),
+		mode: PropTypes.oneOf(Object.keys(graphMode)),
+		playingOption: PropTypes.shape({
+			interval: PropTypes.number
+		})
 	};
 	static defaultProps = {
-		width: 400,
-		height: 300,
-		style: {
-			backgroundColor: "#CCCCCC"
+		attrs: {
+			width: 400,
+			height: 300,
+			viewBox: "0 0 400 300",
+			style: {
+				backgroundColor: "#cccccc"
+			}
 		},
 		selectMode: "single",
-		onDrawTypeChange: () => null,
+		// onDrawTypeChange: () => null,
 		actions: [],
 		original: {
 			x: 0,
 			y: 0
 		},
-		coordinateType: "screen"
+		coordinateType: "screen",
+		mode: graphMode.none
 	}
 
 	constructor(props) {
@@ -785,6 +895,20 @@ export default class D3Graph extends PureComponent {
 		})
 	}
 
+	play() {
+		let actionIndex = 0;
+		const next = () => {
+			if (actionIndex >= this.props.actions.length) {
+				return;
+			}
+			const action = this.props.actions[actionIndex];
+			this.doActions([action]);
+			actionIndex++;
+			setTimeout(next.bind(this), getPath(this.props.playingOption, "interval", 3000));
+		}
+		next();
+	}
+
 	// getLinkPosition(shape) {
 	// 	const drawing = this.definedDrawing[shape.type];
 	// 	if (drawing) {
@@ -817,10 +941,7 @@ export default class D3Graph extends PureComponent {
 	render() {
 		return (
 			<WorkSpace>
-				<svg ref={ref => this.ele = ref}
-					 style={this.props.style}
-					 width={this.props.width}
-					 height={this.props.height}>
+				<svg ref={ref => this.ele = ref} {...this.props.attrs}>
 				</svg>
 			</WorkSpace>
 		);
@@ -831,6 +952,11 @@ export default class D3Graph extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.doActions(this.props.actions);
+		if (this.props.mode === graphMode.none) {
+			this.doActions(this.props.actions);
+		}
+		if (this.props.mode === graphMode.playing) {
+			this.play();
+		}
 	}
 }

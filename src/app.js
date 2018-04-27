@@ -55,6 +55,7 @@ class Example extends Component {
 				<D3Graph
 					original={{x: 20, y: 280}}
 					coordinateType={"math"}
+					mode="playing"
 					actions={[
 						new DrawAction(new NumberScaleDrawing()),
 						new DrawAction(new DotDrawing({
