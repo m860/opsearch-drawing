@@ -521,7 +521,9 @@ export class NumberScaleDrawing extends Drawing {
 			bottom: 20,
 			left: 20,
 			right: 20
-		})
+		});
+		//刻度的间距大小
+		this.scale = getPath(option, "scale", 20);
 	}
 
 	get defaultAttrs() {
@@ -537,22 +539,69 @@ export class NumberScaleDrawing extends Drawing {
 		const width = graph.ele.clientWidth;
 		const height = graph.ele.clientHeight;
 		this.selection = d3.select(graph.ele).append("g");
+		const originalPoint = new Point(this.grid.left, height - this.grid.bottom);
+		const xEndPoint = new Point(width - this.grid.right, height - this.grid.bottom);
+		const yEndPoint = new Point(this.grid.left, this.grid.top)
 		//xAxis
 		this.selection.append("line")
-			.attr("x1", this.grid.left)
-			.attr("y1", height - this.grid.bottom)
-			.attr("x2", width - this.grid.right)
-			.attr("y2", height - this.grid.bottom)
+			.attr("x1", originalPoint.x)
+			.attr("y1", originalPoint.y)
+			.attr("x2", xEndPoint.x)
+			.attr("y2", xEndPoint.y)
 			.attr("stroke", "black")
 			.attr("stroke-width", "1px");
+		//画x轴的箭头
+		this.selection.append("path")
+			.attr("d", `M ${xEndPoint.x} ${xEndPoint.y} L ${xEndPoint.x} ${xEndPoint.y + 5} L ${xEndPoint.x + 15} ${xEndPoint.y} L ${xEndPoint.x} ${xEndPoint.y - 5} Z`)
+		// 画x轴的刻度
+		const xScaleCount = Math.floor(Math.abs(xEndPoint.x - originalPoint.x) / this.scale);
+		Array.apply(null, {length: xScaleCount}).forEach((v, i) => {
+			const p1 = new Point(originalPoint.x + this.scale * i, originalPoint.y);
+			const p2 = new Point(originalPoint.x + this.scale * i, originalPoint.y - 3)
+			this.selection.append("line")
+				.attr("x1", p1.x)
+				.attr("y1", p1.y)
+				.attr("x2", p2.x)
+				.attr("y2", p2.y)
+				.attr("fill", "none")
+				.attr("stroke", "black")
+				.attr("stroke-width", 1);
+			this.selection.append("text")
+				.text(i)
+				.attr("x", p1.x)
+				.attr("y", p1.y + 10)
+				.attr("style", "font-size:10px")
+		})
 		//yAxis
 		this.selection.append("line")
-			.attr("x1", this.grid.left)
-			.attr("y1", height - this.grid.bottom)
-			.attr("x2", this.grid.left)
-			.attr("y2", this.grid.top)
+			.attr("x1", originalPoint.x)
+			.attr("y1", originalPoint.y)
+			.attr("x2", yEndPoint.x)
+			.attr("y2", yEndPoint.y)
 			.attr("stroke", "black")
 			.attr("stroke-width", 1)
+		//画y轴的箭头
+		this.selection.append("path")
+			.attr("d", `M ${yEndPoint.x} ${yEndPoint.y} L ${yEndPoint.x + 5} ${yEndPoint.y} L ${yEndPoint.x} ${yEndPoint.y - 15} L ${yEndPoint.x - 5} ${yEndPoint.y} Z`)
+		//画y轴的刻度
+		const yScaleCount = Math.floor(Math.abs(yEndPoint.y - originalPoint.y) / this.scale);
+		Array.apply(null, {length: yScaleCount}).forEach((v, i) => {
+			const p1 = new Point(originalPoint.x, originalPoint.y - this.scale * i);
+			const p2 = new Point(originalPoint.x + 3, originalPoint.y - this.scale * i)
+			this.selection.append("line")
+				.attr("x1", p1.x)
+				.attr("y1", p1.y)
+				.attr("x2", p2.x)
+				.attr("y2", p2.y)
+				.attr("fill", "none")
+				.attr("stroke", "black")
+				.attr("stroke-width", 1);
+			this.selection.append("text")
+				.text(i)
+				.attr("x", p1.x - 15)
+				.attr("y", p1.y)
+				.attr("style", "font-size:10px")
+		})
 	}
 }
 

@@ -61,8 +61,8 @@ class Example extends Component {
 						new DrawAction(new NumberScaleDrawing()),
 						new DrawAction(new DotDrawing({
 							attrs: {
-								cx: 0,
-								cy: 0
+								cx: 20,
+								cy: 20
 							}
 						})),
 						new DrawAction(new LineDrawing({
