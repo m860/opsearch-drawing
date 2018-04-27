@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.actionTypeEnums = undefined;
+exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.actionTypeEnums = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -93,18 +93,42 @@ var selectModeEnums = {
 	multiple: "multiple"
 };
 
+var graphMode = {
+	none: "none",
+	draw: "draw",
+	playing: "playing"
+};
+
 var drawingIndex = {};
 var actionIndex = {};
 
+/**
+ * 注册Drawing绘制类
+ * @param {String} name - name值必须和绘图类的类名保持一致
+ * @param {Function} drawing - 绘图类
+ * */
 function registerDrawing(name, drawing) {
 	drawingIndex[name] = drawing;
 }
 
+function isNullOrUndefined(value) {
+	if (value === undefined || value === null) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * 反序列化drawing
+ * */
 function fromDrawing(drawingOps) {
 	var func = drawingIndex[drawingOps.type];
 	return new func(drawingOps.option);
 }
 
+/**
+ * 反序列化actions
+ * */
 function fromActions(actions) {
 	return actions.map(function (action) {
 		var type = action.type;
@@ -130,6 +154,11 @@ var Point = function Point(x, y) {
 	this.x = x;
 	this.y = y;
 };
+
+/**
+ * action基类
+ * */
+
 
 var Action = function () {
 	_createClass(Action, null, [{
@@ -255,22 +284,28 @@ var Drawing = exports.Drawing = function () {
    * */
 		value: function render() {
 			var attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
-			if (attrs.x1) {
+			if (!isNullOrUndefined(attrs.x)) {
+				attrs.x = this.graph.getX(attrs.x);
+			}
+			if (!isNullOrUndefined(attrs.y)) {
+				attrs.y = this.graph.getY(attrs.y);
+			}
+			if (!isNullOrUndefined(attrs.x1)) {
 				attrs.x1 = this.graph.getX(attrs.x1);
 			}
-			if (attrs.x2) {
+			if (!isNullOrUndefined(attrs.x2)) {
 				attrs.x2 = this.graph.getX(attrs.x2);
 			}
-			if (attrs.y1) {
+			if (!isNullOrUndefined(attrs.y1)) {
 				attrs.y1 = this.graph.getY(attrs.y1);
 			}
-			if (attrs.y2) {
+			if (!isNullOrUndefined(attrs.y2)) {
 				attrs.y2 = this.graph.getY(attrs.y2);
 			}
-			if (attrs.cx) {
+			if (!isNullOrUndefined(attrs.cx)) {
 				attrs.cx = this.graph.getX(attrs.cx);
 			}
-			if (attrs.cy) {
+			if (!isNullOrUndefined(attrs.cy)) {
 				attrs.cy = this.graph.getY(attrs.cy);
 			}
 			this.updateAttrs(attrs);
@@ -636,20 +671,47 @@ var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
 			left: 20,
 			right: 20
 		});
+		//刻度的间距大小
+		_this12.scale = (0, _objectPath.get)(option, "scale", 20);
 		return _this12;
 	}
 
 	_createClass(NumberScaleDrawing, [{
 		key: 'initialize',
 		value: function initialize(graph) {
+			var _this13 = this;
+
 			_get(NumberScaleDrawing.prototype.__proto__ || Object.getPrototypeOf(NumberScaleDrawing.prototype), 'initialize', this).call(this, graph);
 			var width = graph.ele.clientWidth;
 			var height = graph.ele.clientHeight;
 			this.selection = d3.select(graph.ele).append("g");
+			var originalPoint = new Point(this.grid.left, height - this.grid.bottom);
+			var xEndPoint = new Point(width - this.grid.right, height - this.grid.bottom);
+			var yEndPoint = new Point(this.grid.left, this.grid.top);
 			//xAxis
-			this.selection.append("line").attr("x1", this.grid.left).attr("y1", height - this.grid.bottom).attr("x2", width - this.grid.right).attr("y2", height - this.grid.bottom).attr("stroke", "black").attr("stroke-width", "1px");
+			this.selection.append("line").attr("x1", originalPoint.x).attr("y1", originalPoint.y).attr("x2", xEndPoint.x).attr("y2", xEndPoint.y).attr("stroke", "black").attr("stroke-width", "1px");
+			//画x轴的箭头
+			this.selection.append("path").attr("d", 'M ' + xEndPoint.x + ' ' + xEndPoint.y + ' L ' + xEndPoint.x + ' ' + (xEndPoint.y + 5) + ' L ' + (xEndPoint.x + 15) + ' ' + xEndPoint.y + ' L ' + xEndPoint.x + ' ' + (xEndPoint.y - 5) + ' Z');
+			// 画x轴的刻度
+			var xScaleCount = Math.floor(Math.abs(xEndPoint.x - originalPoint.x) / this.scale);
+			Array.apply(null, { length: xScaleCount }).forEach(function (v, i) {
+				var p1 = new Point(originalPoint.x + _this13.scale * i, originalPoint.y);
+				var p2 = new Point(originalPoint.x + _this13.scale * i, originalPoint.y - 3);
+				_this13.selection.append("line").attr("x1", p1.x).attr("y1", p1.y).attr("x2", p2.x).attr("y2", p2.y).attr("fill", "none").attr("stroke", "black").attr("stroke-width", 1);
+				_this13.selection.append("text").text(i).attr("x", p1.x).attr("y", p1.y + 10).attr("style", "font-size:10px");
+			});
 			//yAxis
-			this.selection.append("line").attr("x1", this.grid.left).attr("y1", height - this.grid.bottom).attr("x2", this.grid.left).attr("y2", this.grid.top).attr("stroke", "black").attr("stroke-width", 1);
+			this.selection.append("line").attr("x1", originalPoint.x).attr("y1", originalPoint.y).attr("x2", yEndPoint.x).attr("y2", yEndPoint.y).attr("stroke", "black").attr("stroke-width", 1);
+			//画y轴的箭头
+			this.selection.append("path").attr("d", 'M ' + yEndPoint.x + ' ' + yEndPoint.y + ' L ' + (yEndPoint.x + 5) + ' ' + yEndPoint.y + ' L ' + yEndPoint.x + ' ' + (yEndPoint.y - 15) + ' L ' + (yEndPoint.x - 5) + ' ' + yEndPoint.y + ' Z');
+			//画y轴的刻度
+			var yScaleCount = Math.floor(Math.abs(yEndPoint.y - originalPoint.y) / this.scale);
+			Array.apply(null, { length: yScaleCount }).forEach(function (v, i) {
+				var p1 = new Point(originalPoint.x, originalPoint.y - _this13.scale * i);
+				var p2 = new Point(originalPoint.x + 3, originalPoint.y - _this13.scale * i);
+				_this13.selection.append("line").attr("x1", p1.x).attr("y1", p1.y).attr("x2", p2.x).attr("y2", p2.y).attr("fill", "none").attr("stroke", "black").attr("stroke-width", 1);
+				_this13.selection.append("text").text(i).attr("x", p1.x - 15).attr("y", p1.y).attr("style", "font-size:10px");
+			});
 		}
 	}, {
 		key: 'defaultAttrs',
@@ -678,33 +740,33 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
 	function ArrowLinkDrawing(option) {
 		_classCallCheck(this, ArrowLinkDrawing);
 
-		var _this13 = _possibleConstructorReturn(this, (ArrowLinkDrawing.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing)).call(this, option));
+		var _this14 = _possibleConstructorReturn(this, (ArrowLinkDrawing.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing)).call(this, option));
 
-		_this13.type = "arrow-link";
-		_this13.sourceId = (0, _objectPath.get)(option, "sourceId");
-		if (!_this13.sourceId) {
+		_this14.type = "arrow-link";
+		_this14.sourceId = (0, _objectPath.get)(option, "sourceId");
+		if (!_this14.sourceId) {
 			throw new Error('ArrowLinkDrawing option require sourceId property');
 		}
-		_this13.targetId = (0, _objectPath.get)(option, "targetId");
-		if (!_this13.targetId) {
+		_this14.targetId = (0, _objectPath.get)(option, "targetId");
+		if (!_this14.targetId) {
 			throw new Error('ArrowLinkDrawing option require targetId property');
 		}
-		_this13.source = null;
-		_this13.target = null;
-		return _this13;
+		_this14.source = null;
+		_this14.target = null;
+		return _this14;
 	}
 
 	_createClass(ArrowLinkDrawing, [{
 		key: 'initialize',
 		value: function initialize(graph) {
-			var _this14 = this;
+			var _this15 = this;
 
 			_get(ArrowLinkDrawing.prototype.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing.prototype), 'initialize', this).call(this, graph);
 			this.source = this.graph.findShapeById(this.sourceId);
 			this.target = this.graph.findShapeById(this.targetId);
 			this.selection = d3.select(graph.ele).append("path");
 			this.selection.on("click", function () {
-				_this14.select();
+				_this15.select();
 			});
 		}
 	}, {
@@ -766,33 +828,33 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
 	function LinkDrawing(option) {
 		_classCallCheck(this, LinkDrawing);
 
-		var _this15 = _possibleConstructorReturn(this, (LinkDrawing.__proto__ || Object.getPrototypeOf(LinkDrawing)).call(this, option));
+		var _this16 = _possibleConstructorReturn(this, (LinkDrawing.__proto__ || Object.getPrototypeOf(LinkDrawing)).call(this, option));
 
-		_this15.type = "link";
-		_this15.sourceId = (0, _objectPath.get)(option, "sourceId");
-		if (!_this15.sourceId) {
+		_this16.type = "link";
+		_this16.sourceId = (0, _objectPath.get)(option, "sourceId");
+		if (!_this16.sourceId) {
 			throw new Error('LinkDrawing option require sourceId property');
 		}
-		_this15.targetId = (0, _objectPath.get)(option, "targetId");
-		if (!_this15.targetId) {
+		_this16.targetId = (0, _objectPath.get)(option, "targetId");
+		if (!_this16.targetId) {
 			throw new Error('LinkDrawing option require targetId property');
 		}
-		_this15.source = null;
-		_this15.target = null;
-		return _this15;
+		_this16.source = null;
+		_this16.target = null;
+		return _this16;
 	}
 
 	_createClass(LinkDrawing, [{
 		key: 'initialize',
 		value: function initialize(graph) {
-			var _this16 = this;
+			var _this17 = this;
 
 			_get(LinkDrawing.prototype.__proto__ || Object.getPrototypeOf(LinkDrawing.prototype), 'initialize', this).call(this, graph);
 			this.source = this.graph.findShapeById(this.sourceId);
 			this.target = this.graph.findShapeById(this.targetId);
 			this.selection = d3.select(graph.ele).append("line");
 			this.selection.on("click", function () {
-				_this16.select();
+				_this17.select();
 			});
 		}
 	}, {
@@ -832,8 +894,52 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
 
 registerDrawing("LinkDrawing", LinkDrawing);
 
-var TextDrawing = function (_Drawing8) {
-	_inherits(TextDrawing, _Drawing8);
+/**
+ * 绘画Path
+ * */
+
+var PathDrawing = exports.PathDrawing = function (_Drawing8) {
+	_inherits(PathDrawing, _Drawing8);
+
+	function PathDrawing(option) {
+		_classCallCheck(this, PathDrawing);
+
+		var _this18 = _possibleConstructorReturn(this, (PathDrawing.__proto__ || Object.getPrototypeOf(PathDrawing)).call(this, option));
+
+		_this18.type = "path";
+		return _this18;
+	}
+
+	_createClass(PathDrawing, [{
+		key: 'initialize',
+		value: function initialize(graph) {
+			var _this19 = this;
+
+			_get(PathDrawing.prototype.__proto__ || Object.getPrototypeOf(PathDrawing.prototype), 'initialize', this).call(this, graph);
+			this.selection = d3.select(graph.ele).append("path");
+			this.selection.on("click", function () {
+				_this19.select();
+			});
+		}
+	}, {
+		key: 'defaultAttrs',
+		get: function get() {
+			return {};
+		}
+	}, {
+		key: 'selectedAttrs',
+		get: function get() {
+			return {};
+		}
+	}]);
+
+	return PathDrawing;
+}(Drawing);
+
+registerDrawing("PathDrawing", PathDrawing);
+
+var TextDrawing = function (_Drawing9) {
+	_inherits(TextDrawing, _Drawing9);
 
 	function TextDrawing() {
 		_classCallCheck(this, TextDrawing);
@@ -886,20 +992,22 @@ var D3Graph = function (_PureComponent) {
   * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
   * @property {object} original - 坐标原点,默认值{x:0,y:0}
   * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
+  * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
+  * @property {object} playingOption - mode===playing时有效
   * */
 	function D3Graph(props) {
 		_classCallCheck(this, D3Graph);
 
-		var _this18 = _possibleConstructorReturn(this, (D3Graph.__proto__ || Object.getPrototypeOf(D3Graph)).call(this, props));
+		var _this21 = _possibleConstructorReturn(this, (D3Graph.__proto__ || Object.getPrototypeOf(D3Graph)).call(this, props));
 
-		_this18.ele = null;
+		_this21.ele = null;
 		//画布中已有的图形
-		_this18.shapes = [];
+		_this21.shapes = [];
 		//已经选中的图形的id
-		_this18.selectedShapes = [];
+		_this21.selectedShapes = [];
 		//绘制类型
 		// this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
-		return _this18;
+		return _this21;
 	}
 
 	_createClass(D3Graph, [{
@@ -910,11 +1018,21 @@ var D3Graph = function (_PureComponent) {
 			});
 			return this.shapes[index];
 		}
+
+		/**
+   * 根据坐标系计算x值
+   * */
+
 	}, {
 		key: 'getX',
 		value: function getX(value) {
 			return this.props.original.x + parseFloat(value);
 		}
+
+		/**
+   * 根据坐标系计算y值
+   * */
+
 	}, {
 		key: 'getY',
 		value: function getY(value) {
@@ -933,7 +1051,7 @@ var D3Graph = function (_PureComponent) {
 	}, {
 		key: 'doActions',
 		value: function doActions(actions) {
-			var _this19 = this;
+			var _this22 = this;
 
 			console.log('do actions ...');
 			//#region draw
@@ -961,12 +1079,12 @@ var D3Graph = function (_PureComponent) {
 				}).join(','));
 				var shapes = [];
 				redrawActions.forEach(function (action) {
-					var index = _this19.shapes.findIndex(function (f) {
+					var index = _this22.shapes.findIndex(function (f) {
 						return f.id === action.params.id;
 					});
 					if (index >= 0) {
-						_this19.shapes[index] = (0, _immutabilityHelper2.default)(_this19.shapes[index], action.params.state);
-						shapes.push(_this19.shapes[index]);
+						_this22.shapes[index] = (0, _immutabilityHelper2.default)(_this22.shapes[index], action.params.state);
+						shapes.push(_this22.shapes[index]);
 					}
 				});
 				this.drawShapes(shapes);
@@ -987,14 +1105,14 @@ var D3Graph = function (_PureComponent) {
 					}));
 					this.selectedShapes = selectActions.map(function (f) {
 						var id = f.params;
-						var shape = _this19.findShapeById(id);
+						var shape = _this22.findShapeById(id);
 						shape.selected = true;
 						return shape;
 					});
 				} else {
 					this.selectedShapes = this.selectedShapes.concat(selectActions.map(function (f) {
 						var id = f.params;
-						var shape = _this19.findShapeById(id);
+						var shape = _this22.findShapeById(id);
 						shape.selected = true;
 						return shape;
 					}));
@@ -1013,7 +1131,7 @@ var D3Graph = function (_PureComponent) {
 				}).join(','));
 				var unSelectShape = unSelectActions.map(function (f) {
 					var id = f.params;
-					var shape = _this19.findShapeById(id);
+					var shape = _this22.findShapeById(id);
 					shape.selected = false;
 					return shape;
 				});
@@ -1029,15 +1147,32 @@ var D3Graph = function (_PureComponent) {
 	}, {
 		key: 'drawShapes',
 		value: function drawShapes(shapes) {
-			var _this20 = this;
+			var _this23 = this;
 
 			shapes.forEach(function (shape) {
 				//初始化
 				if (!shape.ready) {
-					shape.initialize(_this20);
+					shape.initialize(_this23);
 				}
 				shape.render();
 			});
+		}
+	}, {
+		key: 'play',
+		value: function play() {
+			var _this24 = this;
+
+			var actionIndex = 0;
+			var next = function next() {
+				if (actionIndex >= _this24.props.actions.length) {
+					return;
+				}
+				var action = _this24.props.actions[actionIndex];
+				_this24.doActions([action]);
+				actionIndex++;
+				setTimeout(next.bind(_this24), (0, _objectPath.get)(_this24.props.playingOption, "interval", 3000));
+			};
+			next();
 		}
 
 		// getLinkPosition(shape) {
@@ -1072,13 +1207,13 @@ var D3Graph = function (_PureComponent) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this21 = this;
+			var _this25 = this;
 
 			return _react2.default.createElement(
 				_WorkSpace2.default,
 				null,
 				_react2.default.createElement('svg', _extends({ ref: function ref(_ref) {
-						return _this21.ele = _ref;
+						return _this25.ele = _ref;
 					} }, this.props.attrs))
 			);
 		}
@@ -1090,7 +1225,12 @@ var D3Graph = function (_PureComponent) {
 	}, {
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			this.doActions(this.props.actions);
+			if (this.props.mode === graphMode.draw) {
+				this.doActions(this.props.actions);
+			}
+			if (this.props.mode === graphMode.playing) {
+				this.play();
+			}
 		}
 	}]);
 
@@ -1129,12 +1269,16 @@ D3Graph.propTypes = {
 	selectMode: _propTypes2.default.oneOf(['single', 'multiple']),
 	//自定义绘制类型
 	// customDefinedDrawing: PropTypes.object,
-	onDrawTypeChange: _propTypes2.default.func,
+	// onDrawTypeChange: PropTypes.func,
 	original: _propTypes2.default.shape({
 		x: _propTypes2.default.number,
 		y: _propTypes2.default.number
 	}),
-	coordinateType: _propTypes2.default.oneOf(['screen', 'math'])
+	coordinateType: _propTypes2.default.oneOf(['screen', 'math']),
+	mode: _propTypes2.default.oneOf(Object.keys(graphMode)),
+	playingOption: _propTypes2.default.shape({
+		interval: _propTypes2.default.number
+	})
 };
 D3Graph.defaultProps = {
 	attrs: {
@@ -1146,14 +1290,13 @@ D3Graph.defaultProps = {
 		}
 	},
 	selectMode: "single",
-	onDrawTypeChange: function onDrawTypeChange() {
-		return null;
-	},
+	// onDrawTypeChange: () => null,
 	actions: [],
 	original: {
 		x: 0,
 		y: 0
 	},
-	coordinateType: "screen"
+	coordinateType: "screen",
+	mode: graphMode.none
 };
 exports.default = D3Graph;

@@ -744,6 +744,9 @@ export class LinkDrawing extends Drawing {
 
 registerDrawing("LinkDrawing", LinkDrawing);
 
+/**
+ * 绘画Path
+ * */
 export class PathDrawing extends Drawing {
 	constructor(option) {
 		super(option);
