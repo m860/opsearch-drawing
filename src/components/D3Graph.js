@@ -67,6 +67,7 @@ const selectModeEnums = {
 
 const graphMode = {
 	none: "none",
+	draw: "draw",
 	playing: "playing"
 };
 
@@ -681,6 +682,31 @@ export class LinkDrawing extends Drawing {
 
 registerDrawing("LinkDrawing", LinkDrawing);
 
+export class PathDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "path";
+	}
+
+	get defaultAttrs() {
+		return {};
+	}
+
+	get selectedAttrs() {
+		return {};
+	}
+
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("path");
+		this.selection.on("click", () => {
+			this.select();
+		});
+	}
+}
+
+registerDrawing("PathDrawing", PathDrawing)
+
 class TextDrawing extends Drawing {
 	get defaultAttrs() {
 		return {
@@ -952,7 +978,7 @@ export default class D3Graph extends PureComponent {
 	}
 
 	componentDidMount() {
-		if (this.props.mode === graphMode.none) {
+		if (this.props.mode === graphMode.draw) {
 			this.doActions(this.props.actions);
 		}
 		if (this.props.mode === graphMode.playing) {

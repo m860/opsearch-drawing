@@ -10,7 +10,8 @@ import D3Graph, {
 	LinkDrawing,
 	ArrowLinkDrawing,
 	DotDrawing,
-	NumberScaleDrawing
+	NumberScaleDrawing,
+	PathDrawing
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -122,7 +123,11 @@ class Example extends Component {
 								cy: Math.random() * 100
 							}
 						})),
-
+						new DrawAction(new PathDrawing({
+							attrs: {
+								d: "M 100 100 L 150 100 L 130 80 Z"
+							}
+						}))
 					]}/>
 			</div>
 		);
