@@ -444,7 +444,12 @@ registerDrawing("DotDrawing", DotDrawing);
 /**
  * 绘画矩形
  * */
-class RectDrawing extends Drawing {
+export class RectDrawing extends Drawing {
+	constructor(option) {
+		super(option);
+		this.type = "rect"
+	}
+
 	get defaultAttrs() {
 		return {};
 	}
@@ -453,58 +458,62 @@ class RectDrawing extends Drawing {
 		return {};
 	}
 
-	render(svg) {
-		return svg.append('path');
+	initialize(graph) {
+		super.initialize(graph);
+		this.selection = d3.select(graph.ele).append("path");
+		this.selection.on("click", () => {
+			this.select();
+		});
 	}
 
-	renderToolbar(context, drawType, index) {
-		return (
-			<a key={index} href="javascript:void(0)" onClick={() => {
-				d3.select(context.ele)
-					.on('mousedown', function () {
-						this._id = guid.raw();
-						this._mouseDownEvent = d3.event;
-						context.doActions([
-							new DrawAction({
-								id: this._id,
-								type: drawType.type,
-								attrs: Object.assign({
-									d: `M ${d3.event.offsetX} ${d3.event.offsetY} l 0 0 z`
-								}, drawType.defaultAttrs)
-							})
-						])
-					})
-					.on('mousemove', function () {
-						if (this._id
-							&& this._mouseDownEvent
-							&& drawType.type === "rect") {
-							const width = d3.event.offsetX - this._mouseDownEvent.offsetX;
-							const height = d3.event.offsetY - this._mouseDownEvent.offsetY;
-							console.log(`width:${width},height:${height}`)
-							const d = [
-								`M ${this._mouseDownEvent.offsetX} ${this._mouseDownEvent.offsetY}`,
-								`L ${d3.event.offsetX} ${this._mouseDownEvent.offsetY}`,
-								`L ${d3.event.offsetX} ${d3.event.offsetY}`,
-								`L ${this._mouseDownEvent.offsetX} ${d3.event.offsetY}`,
-								'z'
-							]
-							//update
-							context.doActions([
-								new ReDrawAction(this._id, {
-									attrs: {
-										d: {$set: d.join(' ')}
-									}
-								})
-							])
-						}
-					})
-					.on("mouseup", function () {
-						delete this._id;
-						delete this._mouseDownEvent
-					})
-			}}>Rect</a>
-		);
-	}
+	// renderToolbar(context, drawType, index) {
+	// 	return (
+	// 		<a key={index} href="javascript:void(0)" onClick={() => {
+	// 			d3.select(context.ele)
+	// 				.on('mousedown', function () {
+	// 					this._id = guid.raw();
+	// 					this._mouseDownEvent = d3.event;
+	// 					context.doActions([
+	// 						new DrawAction({
+	// 							id: this._id,
+	// 							type: drawType.type,
+	// 							attrs: Object.assign({
+	// 								d: `M ${d3.event.offsetX} ${d3.event.offsetY} l 0 0 z`
+	// 							}, drawType.defaultAttrs)
+	// 						})
+	// 					])
+	// 				})
+	// 				.on('mousemove', function () {
+	// 					if (this._id
+	// 						&& this._mouseDownEvent
+	// 						&& drawType.type === "rect") {
+	// 						const width = d3.event.offsetX - this._mouseDownEvent.offsetX;
+	// 						const height = d3.event.offsetY - this._mouseDownEvent.offsetY;
+	// 						console.log(`width:${width},height:${height}`)
+	// 						const d = [
+	// 							`M ${this._mouseDownEvent.offsetX} ${this._mouseDownEvent.offsetY}`,
+	// 							`L ${d3.event.offsetX} ${this._mouseDownEvent.offsetY}`,
+	// 							`L ${d3.event.offsetX} ${d3.event.offsetY}`,
+	// 							`L ${this._mouseDownEvent.offsetX} ${d3.event.offsetY}`,
+	// 							'z'
+	// 						]
+	// 						//update
+	// 						context.doActions([
+	// 							new ReDrawAction(this._id, {
+	// 								attrs: {
+	// 									d: {$set: d.join(' ')}
+	// 								}
+	// 							})
+	// 						])
+	// 					}
+	// 				})
+	// 				.on("mouseup", function () {
+	// 					delete this._id;
+	// 					delete this._mouseDownEvent
+	// 				})
+	// 		}}>Rect</a>
+	// 	);
+	// }
 }
 
 registerDrawing("RectDrawing", RectDrawing);

@@ -13,7 +13,8 @@ import D3Graph, {
 	NumberScaleDrawing,
 	PathDrawing,
 	graphMode,
-	TextDrawing
+	TextDrawing,
+	RectDrawing
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -27,7 +28,6 @@ class Example extends Component {
 			actions: [],
 			mode: graphMode.none
 		};
-		this.circleStyle = "background-color:gray";
 	}
 
 	playActions() {
@@ -110,6 +110,11 @@ class Example extends Component {
 						y: Math.random() * 100
 					},
 					text: "hello text"
+				})),
+				new DrawAction(new RectDrawing({
+					attrs: {
+						d:"M 80 80 L 120 80 L 120 120 L 80 120 Z"
+					}
 				}))
 			]
 		})
@@ -124,6 +129,7 @@ class Example extends Component {
 						<button type="button" onClick={this.playActions.bind(this)}>play</button>
 					</div>
 					<D3Graph
+						toolbar={["line", "dot"]}
 						original={{x: 20, y: 280}}
 						coordinateType={"math"}
 						mode={this.state.mode}
