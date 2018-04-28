@@ -175,22 +175,25 @@ var Point = function Point(x, y) {
  * */
 
 
-var Action =
-/**
- * playing模式执行下一步时的时间间隔,默认没有
- * */
-function Action(type, params, ops) {
+var Action = function Action(type, params, ops) {
 	_classCallCheck(this, Action);
 
+	/**
+  * action的类型,是一个枚举值
+  * @member {actionTypeEnums}
+  * */
 	this.type = type;
+	/**
+  * action的参数
+  * @member {Array}
+  * */
 	this.params = params;
+	/**
+  * playing模式执行下一步时的时间间隔,默认没有
+  * @member {?Number}
+  * */
 	this.nextInterval = (0, _objectPath.get)(ops, "nextInterval", null);
-}
-
-/**
- * action的类型,是一个枚举值 @link {actionTypeEnums}
- * */
-;
+};
 
 /**
  * 绘图action
@@ -278,18 +281,56 @@ var Drawing = exports.Drawing = function () {
 	function Drawing(option) {
 		_classCallCheck(this, Drawing);
 
+		/**
+   * 图形的id,如果没有提供会生成一个guid
+   * @member {String}
+   * */
 		this.id = (0, _objectPath.get)(option, "id", _guid2.default.raw());
+		/**
+   * 图形的attrs
+   * @member {Object}
+   * */
 		this.attrs = (0, _objectPath.get)(option, "attrs", {});
+		/**
+   * 对应svg元素的text
+   * @member {String|Function}
+   * */
 		this.text = (0, _objectPath.get)(option, "text", "");
+		/**
+   * 图形svg
+   * @member {D3.Selection}
+   * @private
+   * */
 		this.selection = null;
+		/**
+   * 绘图的类型
+   * @member {String}
+   * */
 		this.type = null;
+		/**
+   * graph的实例
+   * @member {React.Component}
+   * @private
+   * */
 		this.graph = null;
+		/**
+   * 是否已经初始化
+   * @member {Boolean}
+   * @protected
+   * */
 		this.ready = false;
+		/**
+   * 当前图形是否被选中
+   * @member {Boolean}
+   * @private
+   * */
 		this.selected = false;
 	}
 
 	/**
   * 默认的attribute
+  * @readonly
+  * @member {Object}
   * */
 
 
@@ -388,6 +429,8 @@ var Drawing = exports.Drawing = function () {
 
 		/**
    * 选中时的attribute
+   * @readonly
+   * @member {Object}
    * */
 
 	}, {
@@ -947,6 +990,7 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
 		var _this19 = _possibleConstructorReturn(this, (PathDrawing.__proto__ || Object.getPrototypeOf(PathDrawing)).call(this, option));
 
 		_this19.type = "path";
+		_this19.d = (0, _objectPath.get)(option, "d", []);
 		return _this19;
 	}
 
@@ -960,6 +1004,19 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
 			this.selection.on("click", function () {
 				_this20.select();
 			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var d = this.d.map(function (point, index) {
+				if (index === 0) {
+					return 'M ' + point.x + ' ' + point.y;
+				}
+				return 'L ' + point.x + ' ' + point.y;
+			});
+			d.push("Z");
+			this.attrs.d = d.join(" ");
+			_get(PathDrawing.prototype.__proto__ || Object.getPrototypeOf(PathDrawing.prototype), 'render', this).call(this);
 		}
 	}, {
 		key: 'defaultAttrs',

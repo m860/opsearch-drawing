@@ -145,19 +145,21 @@ class Point {
  * action基类
  * */
 class Action {
-	/**
-	 * playing模式执行下一步时的时间间隔,默认没有
-	 * */
-	nextInterval: Number
-
-	/**
-	 * action的类型,是一个枚举值 @link {actionTypeEnums}
-	 * */
-	type: String
-
 	constructor(type, params, ops) {
+		/**
+		 * action的类型,是一个枚举值
+		 * @member {actionTypeEnums}
+		 * */
 		this.type = type;
+		/**
+		 * action的参数
+		 * @member {Array}
+		 * */
 		this.params = params;
+		/**
+		 * playing模式执行下一步时的时间间隔,默认没有
+		 * @member {?Number}
+		 * */
 		this.nextInterval = getPath(ops, "nextInterval", null);
 	}
 }
@@ -217,18 +219,56 @@ actionIndex[actionTypeEnums.redraw] = ReDrawAction;
 export class Drawing {
 
 	constructor(option) {
+		/**
+		 * 图形的id,如果没有提供会生成一个guid
+		 * @member {String}
+		 * */
 		this.id = getPath(option, "id", guid.raw());
+		/**
+		 * 图形的attrs
+		 * @member {Object}
+		 * */
 		this.attrs = getPath(option, "attrs", {});
+		/**
+		 * 对应svg元素的text
+		 * @member {String|Function}
+		 * */
 		this.text = getPath(option, "text", "");
+		/**
+		 * 图形svg
+		 * @member {D3.Selection}
+		 * @private
+		 * */
 		this.selection = null;
+		/**
+		 * 绘图的类型
+		 * @member {String}
+		 * */
 		this.type = null;
+		/**
+		 * graph的实例
+		 * @member {React.Component}
+		 * @private
+		 * */
 		this.graph = null;
+		/**
+		 * 是否已经初始化
+		 * @member {Boolean}
+		 * @protected
+		 * */
 		this.ready = false;
+		/**
+		 * 当前图形是否被选中
+		 * @member {Boolean}
+		 * @private
+		 * */
 		this.selected = false;
 	}
 
 	/**
 	 * 默认的attribute
+	 * @readonly
+	 * @member {Object}
 	 * */
 	get defaultAttrs() {
 		throw new Error('property `defaultAttrs` is not implementation');
@@ -236,6 +276,8 @@ export class Drawing {
 
 	/**
 	 * 选中时的attribute
+	 * @readonly
+	 * @member {Object}
 	 * */
 	get selectedAttrs() {
 		throw new Error('property `selectedAttrs` is not implementation');
@@ -784,6 +826,7 @@ export class PathDrawing extends Drawing {
 	constructor(option) {
 		super(option);
 		this.type = "path";
+		this.d = getPath(option, "d", []);
 	}
 
 	get defaultAttrs() {
@@ -800,6 +843,18 @@ export class PathDrawing extends Drawing {
 		this.selection.on("click", () => {
 			this.select();
 		});
+	}
+
+	render() {
+		let d = this.d.map((point, index) => {
+			if (index === 0) {
+				return `M ${point.x} ${point.y}`
+			}
+			return `L ${point.x} ${point.y}`;
+		});
+		d.push("Z");
+		this.attrs.d = d.join(" ");
+		super.render();
 	}
 }
 

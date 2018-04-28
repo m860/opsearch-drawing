@@ -11,13 +11,19 @@
 -   [fromDrawing](#fromdrawing)
 -   [fromActions](#fromactions)
 -   [Action](#action)
-    -   [nextInterval](#nextinterval)
     -   [type](#type-1)
+    -   [params](#params)
+    -   [nextInterval](#nextinterval)
 -   [DrawAction](#drawaction)
 -   [SelectAction](#selectaction)
 -   [UnSelectAction](#unselectaction)
 -   [ReDrawAction](#redrawaction)
 -   [Drawing](#drawing)
+    -   [id](#id)
+    -   [attrs](#attrs)
+    -   [text](#text)
+    -   [type](#type-2)
+    -   [ready](#ready)
     -   [defaultAttrs](#defaultattrs)
     -   [selectedAttrs](#selectedattrs)
     -   [render](#render)
@@ -43,7 +49,7 @@
 
 ## FromDrawingType
 
-[src/components/D3Graph.js:19-28](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L19-L28 "Source code on GitHub")
+[src/components/D3Graph.js:19-28](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L19-L28 "Source code on GitHub")
 
 Type: {type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), option: [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)}
 
@@ -54,19 +60,19 @@ Type: {type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Re
 
 ## type
 
-[src/components/D3Graph.js:23-23](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L23-L23 "Source code on GitHub")
+[src/components/D3Graph.js:23-23](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L23-L23 "Source code on GitHub")
 
 对应到绘制的类的名字
 
 ## option
 
-[src/components/D3Graph.js:27-27](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L27-L27 "Source code on GitHub")
+[src/components/D3Graph.js:27-27](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L27-L27 "Source code on GitHub")
 
 目前包含两个主要属性就是`attrs`和`text`,`text`是指svg中的嵌套内容,`attrs`是对应到svg元素的attributes,以后可能还会扩展其他属性(svg的标准)
 
 ## actionTypeEnums
 
-[src/components/D3Graph.js:53-62](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L53-L62 "Source code on GitHub")
+[src/components/D3Graph.js:53-62](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L53-L62 "Source code on GitHub")
 
 action枚举
 
@@ -83,7 +89,7 @@ action枚举
 
 ## selectModeEnums
 
-[src/components/D3Graph.js:71-74](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L71-L74 "Source code on GitHub")
+[src/components/D3Graph.js:71-74](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L71-L74 "Source code on GitHub")
 
 选择模式枚举
 
@@ -94,7 +100,7 @@ action枚举
 
 ## registerDrawing
 
-[src/components/D3Graph.js:95-97](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L95-L97 "Source code on GitHub")
+[src/components/D3Graph.js:95-97](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L95-L97 "Source code on GitHub")
 
 注册Drawing绘制类
 
@@ -105,7 +111,7 @@ action枚举
 
 ## fromDrawing
 
-[src/components/D3Graph.js:109-112](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L109-L112 "Source code on GitHub")
+[src/components/D3Graph.js:109-112](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L109-L112 "Source code on GitHub")
 
 反序列化drawing
 
@@ -115,7 +121,7 @@ action枚举
 
 ## fromActions
 
-[src/components/D3Graph.js:117-134](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L117-L134 "Source code on GitHub")
+[src/components/D3Graph.js:117-134](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L117-L134 "Source code on GitHub")
 
 反序列化actions
 
@@ -125,7 +131,7 @@ action枚举
 
 ## Action
 
-[src/components/D3Graph.js:147-163](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L147-L163 "Source code on GitHub")
+[src/components/D3Graph.js:147-165](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L147-L165 "Source code on GitHub")
 
 action基类
 
@@ -135,25 +141,33 @@ action基类
 -   `params`  
 -   `ops`  
 
+### type
+
+[src/components/D3Graph.js:153-153](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L153-L153 "Source code on GitHub")
+
+action的类型,是一个枚举值
+
+Type: [actionTypeEnums](#actiontypeenums)
+
+### params
+
+[src/components/D3Graph.js:158-158](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L158-L158 "Source code on GitHub")
+
+action的参数
+
+Type: [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+
 ### nextInterval
 
-[src/components/D3Graph.js:151-151](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L151-L151 "Source code on GitHub")
+[src/components/D3Graph.js:163-163](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L163-L163 "Source code on GitHub")
 
 playing模式执行下一步时的时间间隔,默认没有
 
-Type: [Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
-
-### type
-
-[src/components/D3Graph.js:156-156](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L156-L156 "Source code on GitHub")
-
-action的类型,是一个枚举值 @link {actionTypeEnums}
-
-Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+Type: [Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?
 
 ## DrawAction
 
-[src/components/D3Graph.js:168-172](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L168-L172 "Source code on GitHub")
+[src/components/D3Graph.js:170-174](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L170-L174 "Source code on GitHub")
 
 **Extends Action**
 
@@ -166,7 +180,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## SelectAction
 
-[src/components/D3Graph.js:179-183](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L179-L183 "Source code on GitHub")
+[src/components/D3Graph.js:181-185](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L181-L185 "Source code on GitHub")
 
 **Extends Action**
 
@@ -179,7 +193,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## UnSelectAction
 
-[src/components/D3Graph.js:190-194](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L190-L194 "Source code on GitHub")
+[src/components/D3Graph.js:192-196](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L192-L196 "Source code on GitHub")
 
 **Extends Action**
 
@@ -192,7 +206,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## ReDrawAction
 
-[src/components/D3Graph.js:201-208](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L201-L208 "Source code on GitHub")
+[src/components/D3Graph.js:203-210](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L203-L210 "Source code on GitHub")
 
 **Extends Action**
 
@@ -206,7 +220,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## Drawing
 
-[src/components/D3Graph.js:217-317](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L217-L317 "Source code on GitHub")
+[src/components/D3Graph.js:219-359](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L219-L359 "Source code on GitHub")
 
 绘画接口,所有的绘画类都需要继承这个类并实现相关方法
 
@@ -214,33 +228,77 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 -   `option`  
 
+### id
+
+[src/components/D3Graph.js:226-226](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L226-L226 "Source code on GitHub")
+
+图形的id,如果没有提供会生成一个guid
+
+Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### attrs
+
+[src/components/D3Graph.js:231-231](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L231-L231 "Source code on GitHub")
+
+图形的attrs
+
+Type: [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+### text
+
+[src/components/D3Graph.js:236-236](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L236-L236 "Source code on GitHub")
+
+对应svg元素的text
+
+Type: ([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function))
+
+### type
+
+[src/components/D3Graph.js:247-247](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L247-L247 "Source code on GitHub")
+
+绘图的类型
+
+Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### ready
+
+[src/components/D3Graph.js:259-259](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L259-L259 "Source code on GitHub")
+
+是否已经初始化
+
+Type: [Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
 ### defaultAttrs
 
-[src/components/D3Graph.js:233-235](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L233-L235 "Source code on GitHub")
+[src/components/D3Graph.js:273-275](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L273-L275 "Source code on GitHub")
 
 默认的attribute
 
+Type: [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
 ### selectedAttrs
 
-[src/components/D3Graph.js:240-242](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L240-L242 "Source code on GitHub")
+[src/components/D3Graph.js:282-284](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L282-L284 "Source code on GitHub")
 
 选中时的attribute
 
+Type: [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
 ### render
 
-[src/components/D3Graph.js:247-277](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L247-L277 "Source code on GitHub")
+[src/components/D3Graph.js:289-319](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L289-L319 "Source code on GitHub")
 
 绘制,更新selection相关
 
 ### getLinkPoint
 
-[src/components/D3Graph.js:282-284](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L282-L284 "Source code on GitHub")
+[src/components/D3Graph.js:324-326](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L324-L326 "Source code on GitHub")
 
 获取link的点的位置信息
 
 ### initialize
 
-[src/components/D3Graph.js:289-292](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L289-L292 "Source code on GitHub")
+[src/components/D3Graph.js:331-334](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L331-L334 "Source code on GitHub")
 
 初始化drawing,创建selection,监听事件需要在里面实现
 
@@ -250,7 +308,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### updateAttrs
 
-[src/components/D3Graph.js:297-305](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L297-L305 "Source code on GitHub")
+[src/components/D3Graph.js:339-347](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L339-L347 "Source code on GitHub")
 
 批量更新attrs
 
@@ -260,13 +318,13 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### select
 
-[src/components/D3Graph.js:310-316](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L310-L316 "Source code on GitHub")
+[src/components/D3Graph.js:352-358](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L352-L358 "Source code on GitHub")
 
 选中当前图形
 
 ## LineDrawing
 
-[src/components/D3Graph.js:322-389](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L322-L389 "Source code on GitHub")
+[src/components/D3Graph.js:364-431](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L364-L431 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -278,7 +336,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## CircleDrawing
 
-[src/components/D3Graph.js:396-429](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L396-L429 "Source code on GitHub")
+[src/components/D3Graph.js:438-471](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L438-L471 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -290,7 +348,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## DotDrawing
 
-[src/components/D3Graph.js:436-464](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L436-L464 "Source code on GitHub")
+[src/components/D3Graph.js:478-506](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L478-L506 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -302,7 +360,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## RectDrawing
 
-[src/components/D3Graph.js:471-541](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L471-L541 "Source code on GitHub")
+[src/components/D3Graph.js:513-583](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L513-L583 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -314,7 +372,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## NumberScaleDrawing
 
-[src/components/D3Graph.js:548-639](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L548-L639 "Source code on GitHub")
+[src/components/D3Graph.js:590-681](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L590-L681 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -326,7 +384,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## ArrowLinkDrawing
 
-[src/components/D3Graph.js:646-716](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L646-L716 "Source code on GitHub")
+[src/components/D3Graph.js:688-758](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L688-L758 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -338,7 +396,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## LinkDrawing
 
-[src/components/D3Graph.js:723-776](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L723-L776 "Source code on GitHub")
+[src/components/D3Graph.js:765-818](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L765-L818 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -350,7 +408,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## PathDrawing
 
-[src/components/D3Graph.js:783-804](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L783-L804 "Source code on GitHub")
+[src/components/D3Graph.js:825-859](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L825-L859 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -362,7 +420,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## TextDrawing
 
-[src/components/D3Graph.js:811-837](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L811-L837 "Source code on GitHub")
+[src/components/D3Graph.js:866-892](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L866-L892 "Source code on GitHub")
 
 **Extends Drawing**
 
@@ -374,7 +432,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ## D3Graph
 
-[src/components/D3Graph.js:992-1224](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L992-L1224 "Source code on GitHub")
+[src/components/D3Graph.js:1047-1279](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1047-L1279 "Source code on GitHub")
 
 **Extends PureComponent**
 
@@ -386,7 +444,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### findShapeById
 
-[src/components/D3Graph.js:1071-1074](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L1071-L1074 "Source code on GitHub")
+[src/components/D3Graph.js:1126-1129](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1126-L1129 "Source code on GitHub")
 
 根据id查找对应的图形
 
@@ -396,7 +454,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### getX
 
-[src/components/D3Graph.js:1079-1081](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L1079-L1081 "Source code on GitHub")
+[src/components/D3Graph.js:1134-1136](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1134-L1136 "Source code on GitHub")
 
 根据坐标系计算x值
 
@@ -406,7 +464,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### getY
 
-[src/components/D3Graph.js:1086-1091](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L1086-L1091 "Source code on GitHub")
+[src/components/D3Graph.js:1141-1146](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1141-L1146 "Source code on GitHub")
 
 根据坐标系计算y值
 
@@ -416,7 +474,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### getPointFromScreen
 
-[src/components/D3Graph.js:1096-1104](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L1096-L1104 "Source code on GitHub")
+[src/components/D3Graph.js:1151-1159](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1151-L1159 "Source code on GitHub")
 
 将屏幕坐标转换成对应坐标系坐标
 
@@ -427,7 +485,7 @@ Type: [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 
 ### propTypes
 
-[src/components/D3Graph.js:1002-1036](https://github.com/m860/opserarch-drawing/blob/6907e07724cddd7d05f9bc5b819c5fb4c51d092a/src/components/D3Graph.js#L1002-L1036 "Source code on GitHub")
+[src/components/D3Graph.js:1057-1091](https://github.com/m860/opserarch-drawing/blob/7289758931f6763bae817cbc634cf77ac1823c37/src/components/D3Graph.js#L1057-L1091 "Source code on GitHub")
 
 **Properties**
 
