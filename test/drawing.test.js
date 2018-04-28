@@ -2,6 +2,7 @@
  * Created by jean.h.ma on 26/04/2018.
  */
 import {fromDrawing, actionTypeEnums, fromActions} from '../src/components/D3Graph'
+import drawData from './drawing-data'
 
 test('fromDrawing', () => {
 	const drawingOption = {
@@ -42,4 +43,11 @@ test('fromActions', () => {
 	const ins = fromActions(actions);
 	expect(ins.length).toBe(actions.length);
 	expect(ins[0].constructor.name).toBe("DrawAction");
+})
+
+test('fromActions from drawing-data.json', () => {
+	const options = drawData.step.data;
+	const actions=fromActions(options)
+	console.log(actions);
+	expect(1)
 })

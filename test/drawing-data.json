@@ -1,0 +1,112 @@
+{
+  "exam": [
+    "min 2 1",
+    "2 4 > 20",
+    "3 > 15",
+    "0 1 > 2"
+  ],
+  "input": {
+    "x": 0,
+    "y": 0,
+    "z": 12.5
+  },
+  "formula": {
+    "x": [
+      2,
+      3,
+      0
+    ],
+    "y": [
+      4,
+      0,
+      1
+    ],
+    "z": [
+      20,
+      15,
+      2
+    ],
+    "symbol": [
+      ">",
+      ">",
+      ">"
+    ]
+  },
+  "step": {
+    "index": 8,
+    "data": [
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "DotDrawing",
+            "option": {
+              "attrs": {
+                "cx": 5,
+                "cy": 2.5
+              },
+              "id": "dot1"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "LineDrawing",
+            "option": {
+              "attrs": {
+                "x1": 10,
+                "y1": 0,
+                "x2": 0,
+                "y2": 5
+              },
+              "id": "line2"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "DotDrawing",
+            "option": {
+              "attrs": {
+                "cx": 5,
+                "cy": 2.5
+              },
+              "id": "dot5"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "LineDrawing",
+            "option": {
+              "attrs": {
+                "x1": 5,
+                "y1": 0,
+                "x2": 5,
+                "y2": 999
+              },
+              "id": "line6"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "error": "",
+  "Anser": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "IsAuto": 1
+}
+
