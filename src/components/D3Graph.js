@@ -143,13 +143,20 @@ class Point {
  * action基类
  * */
 class Action {
-	static fromActions() {
+	/**
+	 * playing模式执行下一步时的时间间隔,默认没有
+	 * */
+	nextInterval: Number
 
-	}
+	/**
+	 * action的类型,是一个枚举值 @link {actionTypeEnums}
+	 * */
+	type: String
 
-	constructor(type, params) {
+	constructor(type, params, ops) {
 		this.type = type;
 		this.params = params;
+		this.nextInterval = getPath(ops, "nextInterval", null);
 	}
 }
 
@@ -157,8 +164,8 @@ class Action {
  * 绘图action
  * */
 export class DrawAction extends Action {
-	constructor(drawingOps) {
-		super(actionTypeEnums.draw, drawingOps)
+	constructor(drawingOps, ops) {
+		super(actionTypeEnums.draw, drawingOps, ops)
 	}
 }
 
@@ -168,8 +175,8 @@ actionIndex[actionTypeEnums.draw] = DrawAction;
  * 选择action
  * */
 export class SelectAction extends Action {
-	constructor(shapeId) {
-		super(actionTypeEnums.select, shapeId)
+	constructor(shapeId, ops) {
+		super(actionTypeEnums.select, shapeId, ops)
 	}
 }
 
@@ -179,8 +186,8 @@ actionIndex[actionTypeEnums.select] = SelectAction;
  * 取消选择action
  * */
 export class UnSelectAction extends Action {
-	constructor(shapeId) {
-		super(actionTypeEnums.unselect, shapeId)
+	constructor(shapeId, ops) {
+		super(actionTypeEnums.unselect, shapeId, ops)
 	}
 }
 
@@ -190,11 +197,11 @@ actionIndex[actionTypeEnums.unselect] = UnSelectAction;
  * 重绘action
  * */
 export class ReDrawAction extends Action {
-	constructor(shapeId, state) {
+	constructor(shapeId, state, ops) {
 		super(actionTypeEnums.redraw, {
 			id: shapeId,
 			state: state
-		})
+		}, ops)
 	}
 }
 
@@ -995,17 +1002,7 @@ export default class D3Graph extends PureComponent {
 		//action
 		actions: PropTypes.arrayOf(PropTypes.shape({
 			type: PropTypes.oneOf(Object.keys(actionTypeEnums)).isRequired,
-			params: PropTypes.oneOfType([
-				//draw
-				PropTypes.shape({
-					id: PropTypes.string.isRequired,
-					type: PropTypes.string.isRequired,
-					attrs: PropTypes.object,
-					text: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
-				}),
-				//select
-				PropTypes.string
-			])
+			params: PropTypes.any
 		})),
 		// //默认的图形的样式
 		// defaultAttrs: PropTypes.shape({
@@ -1020,7 +1017,7 @@ export default class D3Graph extends PureComponent {
 		// 	dot: PropTypes.object,
 		// }),
 		//选择模式,是多选还是单选
-		selectMode: PropTypes.oneOf(['single', 'multiple']),
+		selectMode: PropTypes.oneOf(Object.keys(selectModeEnums)),
 		//自定义绘制类型
 		// customDefinedDrawing: PropTypes.object,
 		// onDrawTypeChange: PropTypes.func,
@@ -1044,14 +1041,13 @@ export default class D3Graph extends PureComponent {
 				backgroundColor: "#cccccc"
 			}
 		},
-		selectMode: "single",
-		// onDrawTypeChange: () => null,
+		selectMode: selectModeEnums.single,
 		actions: [],
 		original: {
 			x: 0,
 			y: 0
 		},
-		coordinateType: "screen",
+		coordinateType: coordinateTypeEnum.screen,
 		mode: graphModeEnum.none,
 		renderToolbar: () => null
 	}
@@ -1086,7 +1082,7 @@ export default class D3Graph extends PureComponent {
 	 * 根据坐标系计算y值
 	 * */
 	getY(value) {
-		if (this.props.coordinateType === "screen") {
+		if (this.props.coordinateType === coordinateTypeEnum.screen) {
 			return this.props.original.y + parseFloat(value);
 		}
 		return this.props.original.y - parseFloat(value);
@@ -1192,7 +1188,7 @@ export default class D3Graph extends PureComponent {
 			const action = actions[actionIndex];
 			this.doActions([action]);
 			actionIndex++;
-			setTimeout(next.bind(this), getPath(playingOps, "interval", 1000));
+			setTimeout(next.bind(this), action.nextInterval ? action.nextInterval : getPath(playingOps, "interval", 1000));
 		}
 		next();
 	}
