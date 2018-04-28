@@ -5,6 +5,13 @@ import guid from 'guid'
 import WorkSpace from './WorkSpace'
 import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
+import {EventEmitter} from 'fbemitter'
+
+//#region event
+const emitter = new EventEmitter();
+//toolbar 按钮切换
+const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
+//#endregion
 
 /**
  * @typedef
@@ -23,12 +30,12 @@ type DrawingOptionType = {
 	type: String,
 	option: Object
 };
-
 type ActionOptionType = {
 	type: String,
 	params: Array
 };
 
+//#region enums
 /**
  * action枚举
  * @readonly
@@ -65,11 +72,16 @@ const selectModeEnums = {
 	multiple: "multiple"
 };
 
-export const graphMode = {
+export const graphModeEnum = {
 	none: "none",
 	draw: "draw",
 	playing: "playing"
 };
+export const coordinateTypeEnum = {
+	"screen": "screen",
+	"math": "math"
+}
+//#endregion
 
 let drawingIndex = {};
 let actionIndex = {};
@@ -126,6 +138,7 @@ class Point {
 	}
 }
 
+//#region Action
 /**
  * action基类
  * */
@@ -186,7 +199,9 @@ export class ReDrawAction extends Action {
 }
 
 actionIndex[actionTypeEnums.redraw] = ReDrawAction;
+//#endregion
 
+//#region Drawing
 /**
  * 绘画接口,所有的绘画类都需要继承这个类并实现相关方法
  * */
@@ -525,12 +540,12 @@ export class NumberScaleDrawing extends Drawing {
 	constructor(option) {
 		super(option);
 		this.type = "number-scale";
-		this.grid = getPath(option, "grid", {
-			top: 20,
-			bottom: 20,
-			left: 20,
-			right: 20
+		this.original = getPath(option, "original", {
+			x: 20,
+			y: 280
 		});
+		this.xAxisLength = getPath(option, "xAxisLength", 360);
+		this.yAxisLength = getPath(option, "yAxisLength", 260);
 		//刻度的间距大小
 		this.scale = getPath(option, "scale", 20);
 	}
@@ -545,12 +560,12 @@ export class NumberScaleDrawing extends Drawing {
 
 	initialize(graph) {
 		super.initialize(graph);
-		const width = graph.ele.clientWidth;
-		const height = graph.ele.clientHeight;
+		// const width = graph.ele.clientWidth;
+		// const height = graph.ele.clientHeight;
 		this.selection = d3.select(graph.ele).append("g");
-		const originalPoint = new Point(this.grid.left, height - this.grid.bottom);
-		const xEndPoint = new Point(width - this.grid.right, height - this.grid.bottom);
-		const yEndPoint = new Point(this.grid.left, this.grid.top)
+		const originalPoint = Object.assign({}, this.original);
+		const xEndPoint = new Point(this.original.x + this.xAxisLength, this.original.y);
+		const yEndPoint = new Point(this.original.x, this.original.y - this.yAxisLength)
 		//xAxis
 		this.selection.append("line")
 			.attr("x1", originalPoint.x)
@@ -813,18 +828,125 @@ export class TextDrawing extends Drawing {
 }
 
 registerDrawing("TextDrawing", TextDrawing)
+//#endregion
 
-// const builtinDefinedDrawing = {
-// 	line: new LineDrawing(),
-// 	circle: new CircleDrawing(),
-// 	rect: new RectDrawing(),
-// 	link: new LinkDrawing(),
-// 	text: new TextDrawing(),
-// 	xAxis: new HorizontalScaleDrawing(),
-// 	yAxis: new VerticalScaleDrawing(),
-// 	arrowLink: new ArrowLinkDrawing()
-// };
+//#region Toolbar
+export class Toolbar extends PureComponent {
+	static propTypes = {
+		children: PropTypes.any,
+		onClick: PropTypes.func,
+		//绘制的类型:如LineDrawing
+		type: PropTypes.string.isRequired,
+		style: PropTypes.object
+	};
 
+	constructor(props) {
+		super(props);
+		this.listener = null;
+		this.state = {
+			selected: false
+		};
+	}
+
+	get attrs() {
+		return {
+			width: 40,
+			height: 40
+		};
+	}
+
+	render() {
+		return (
+			<svg {...this.attrs} onClick={(...args) => {
+				emitter.emit(EVENT_TOOLBAR_CHANGE, this.props.type);
+				this.props.onClick && this.props.onClick(...args)
+			}} style={Object.assign({}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}>
+				{this.props.children}
+			</svg>
+		);
+	}
+
+	componentDidMount() {
+		this.listener = emitter.addListener(EVENT_TOOLBAR_CHANGE, (type) => {
+			this.setState({
+				selected: type === this.props.type
+			})
+		})
+	}
+
+	componentWillUnmount() {
+		if (this.listener) {
+			this.listener.remove();
+		}
+	}
+}
+
+export class LineToolbar extends PureComponent {
+	static propTypes = {
+		onClick: PropTypes.func,
+		style: PropTypes.object,
+		graph: PropTypes.object.isRequired
+	};
+
+	get type() {
+		return "LineDrawing"
+	}
+
+	render() {
+		return (
+			<Toolbar style={this.props.style}
+					 onClick={() => {
+						 const {graph} = this.props;
+						 const svg = d3.select(graph.ele);
+						 svg.on("mousedown", () => {
+							 console.log("draw line")
+						 })
+					 }}
+					 type={this.type}>
+				<line x1={10} y1={10} x2={30} y2={30} stroke={"#888888"}></line>
+			</Toolbar>
+		);
+	}
+}
+
+export class CircleToolbar extends PureComponent {
+	static propTypes = {
+		onClick: PropTypes.func,
+		style: PropTypes.object,
+		graph: PropTypes.object.isRequired
+	};
+
+	get type() {
+		return "CircleDrawing";
+	}
+
+	render() {
+		return (
+			<Toolbar style={this.props.style}
+					 onClick={() => {
+						 const {graph} = this.props;
+						 const svg = d3.select(this.props.graph.ele);
+						 svg.on("mousedown", () => {
+							 graph.doActions([
+								 new DrawAction(new CircleDrawing({
+									 attrs: {
+										 cx: d3.event.offsetX,
+										 cy: d3.event.offsetY
+									 }
+								 }))
+							 ])
+						 })
+					 }}
+					 type={this.type}>
+				<circle cx={20} cy={20} r={8} stroke={"#888888"} fill={"#888888"}></circle>
+			</Toolbar>
+		);
+	}
+}
+
+//#endregion
+
+//#region D3Graph
 /**
  * 运筹学图形D3
  * */
@@ -876,11 +998,12 @@ export default class D3Graph extends PureComponent {
 			x: PropTypes.number,
 			y: PropTypes.number
 		}),
-		coordinateType: PropTypes.oneOf(['screen', 'math']),
-		mode: PropTypes.oneOf(Object.keys(graphMode)),
+		coordinateType: PropTypes.oneOf(Object.keys(coordinateTypeEnum)),
+		mode: PropTypes.oneOf(Object.keys(graphModeEnum)),
 		playingOption: PropTypes.shape({
 			interval: PropTypes.number
-		})
+		}),
+		renderToolbar: PropTypes.func
 	};
 	static defaultProps = {
 		attrs: {
@@ -899,7 +1022,8 @@ export default class D3Graph extends PureComponent {
 			y: 0
 		},
 		coordinateType: "screen",
-		mode: graphMode.none
+		mode: graphModeEnum.none,
+		renderToolbar: () => null
 	}
 
 	constructor(props) {
@@ -936,6 +1060,19 @@ export default class D3Graph extends PureComponent {
 			return this.props.original.y + parseFloat(value);
 		}
 		return this.props.original.y - parseFloat(value);
+	}
+
+	/**
+	 * 将x,y转换成屏幕坐标
+	 * */
+	getScreenPoint(x, y) {
+		if (this.props.coordinateType === coordinateTypeEnum.math) {
+			return {
+				x,
+				y: y
+			}
+		}
+		return {x, y};
 	}
 
 	doActions(actions) {
@@ -1032,7 +1169,7 @@ export default class D3Graph extends PureComponent {
 
 	render() {
 		return (
-			<WorkSpace>
+			<WorkSpace actions={this.props.renderToolbar(this)}>
 				<svg ref={ref => this.ele = ref} {...this.props.attrs}>
 				</svg>
 			</WorkSpace>
@@ -1040,20 +1177,21 @@ export default class D3Graph extends PureComponent {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.mode === graphMode.draw) {
+		if (nextProps.mode === graphModeEnum.draw) {
 			this.doActions(nextProps.actions);
 		}
-		if (nextProps.mode === graphMode.playing) {
+		if (nextProps.mode === graphModeEnum.playing) {
 			this.play(nextProps.actions, nextProps.playingOption);
 		}
 	}
 
 	componentDidMount() {
-		if (this.props.mode === graphMode.draw) {
+		if (this.props.mode === graphModeEnum.draw) {
 			this.doActions(this.props.actions);
 		}
-		if (this.props.mode === graphMode.playing) {
+		if (this.props.mode === graphModeEnum.playing) {
 			this.play(this.props.actions);
 		}
 	}
 }
+//#endregion

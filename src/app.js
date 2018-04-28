@@ -12,9 +12,11 @@ import D3Graph, {
 	DotDrawing,
 	NumberScaleDrawing,
 	PathDrawing,
-	graphMode,
+	graphModeEnum,
 	TextDrawing,
-	RectDrawing
+	RectDrawing,
+	LineToolbar,
+	CircleToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -23,18 +25,26 @@ import * as d3 from 'd3'
 class Example extends Component {
 	constructor(props) {
 		super(props);
+		this.original = {
+			x: 20,
+			y: 280
+		};
 		this.state = {
 			tableData: [],
 			actions: [],
-			mode: graphMode.none
+			mode: graphModeEnum.none
 		};
 	}
 
 	playActions() {
 		this.setState({
-			mode: graphMode.playing,
+			mode: graphModeEnum.playing,
 			actions: [
-				new DrawAction(new NumberScaleDrawing()),
+				new DrawAction(new NumberScaleDrawing({
+					original:this.original,
+					xAxisLength:360,
+					yAxisLength:260
+				})),
 				new DrawAction(new DotDrawing({
 					attrs: {
 						cx: 20,
@@ -113,7 +123,7 @@ class Example extends Component {
 				})),
 				new DrawAction(new RectDrawing({
 					attrs: {
-						d:"M 80 80 L 120 80 L 120 120 L 80 120 Z"
+						d: "M 80 80 L 120 80 L 120 120 L 80 120 Z"
 					}
 				}))
 			]
@@ -129,8 +139,15 @@ class Example extends Component {
 						<button type="button" onClick={this.playActions.bind(this)}>play</button>
 					</div>
 					<D3Graph
-						toolbar={["line", "dot"]}
-						original={{x: 20, y: 280}}
+						renderToolbar={(graph) => {
+							return (
+								<div>
+									<LineToolbar graph={graph}></LineToolbar>
+									<CircleToolbar graph={graph}></CircleToolbar>
+								</div>
+							);
+						}}
+						original={this.original}
 						coordinateType={"math"}
 						mode={this.state.mode}
 						actions={this.state.actions}/>

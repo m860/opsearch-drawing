@@ -62,9 +62,9 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "d3": "^5.0.0",
+    "fbemitter": "^2.1.1",
     "guid": "0.0.12",
     "immutability-helper": "^2.6.6",
-    "merge": "^1.2.0",
     "object-path": "^0.11.4"
   }
 }
