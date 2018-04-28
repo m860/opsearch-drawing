@@ -32,7 +32,8 @@ type DrawingOptionType = {
 };
 type ActionOptionType = {
 	type: String,
-	params: Array
+	params: Array,
+	ops: ?Object
 };
 
 //#region enums
@@ -117,15 +118,16 @@ export function fromActions(actions: Array<ActionOptionType>) {
 	return actions.map(action => {
 		const type = action.type;
 		const args = action.params;
+		const ops = action.ops;
 		const func = actionIndex[type];
 		if (!func) {
 			throw new Error(`action ${type} is not defined`);
 		}
 		switch (type) {
 			case actionTypeEnums.draw:
-				return new actionIndex[type](...args.map(arg => fromDrawing(arg)));
+				return new actionIndex[type](...args.map(arg => fromDrawing(arg), ops));
 			default:
-				return new actionIndex[type](...args);
+				return new actionIndex[type](...args, ops);
 		}
 
 	})

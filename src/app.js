@@ -41,9 +41,9 @@ class Example extends Component {
 			mode: graphModeEnum.playing,
 			actions: [
 				new DrawAction(new NumberScaleDrawing({
-					original:this.original,
-					xAxisLength:360,
-					yAxisLength:260
+					original: this.original,
+					xAxisLength: 360,
+					yAxisLength: 260
 				})),
 				new DrawAction(new DotDrawing({
 					attrs: {
@@ -80,7 +80,9 @@ class Example extends Component {
 						cx: 100,
 						cy: 60
 					}
-				})),
+				}), {
+					nextInterval: 1
+				}),
 				new DrawAction(new LinkDrawing({
 					sourceId: "circle1",
 					targetId: "circle2"
@@ -102,7 +104,9 @@ class Example extends Component {
 				new DrawAction(new ArrowLinkDrawing({
 					sourceId: "c3",
 					targetId: "c4"
-				})),
+				}), {
+					nextInterval: 1
+				}),
 				new DrawAction(new DotDrawing({
 					attrs: {
 						cx: Math.random() * 100,
