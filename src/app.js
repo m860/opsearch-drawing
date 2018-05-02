@@ -18,7 +18,10 @@ import D3Graph, {
 	LineToolbar,
 	CircleToolbar,
 	fromActions,
-	DeleteAction
+	DeleteAction,
+	Toolbar,
+	TextToolbar,
+	ClearAction
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -170,9 +173,24 @@ class Example extends Component {
 					<D3Graph
 						renderToolbar={(graph) => {
 							return (
-								<div>
+								<div style={{display: "flex", flexDirection: "row"}}>
 									<LineToolbar graph={graph}></LineToolbar>
 									<CircleToolbar graph={graph}></CircleToolbar>
+									<div style={{
+										display: "flex",
+										justifyContent: "center",
+										alignItems: "center",
+										width: 40,
+										height: 40,
+										cursor: "pointer"
+									}}
+										 onClick={() => {
+											 graph.doActions([
+												 new ClearAction()
+											 ])
+										 }}>
+										清除
+									</div>
 								</div>
 							);
 						}}

@@ -46,7 +46,7 @@ type ActionOptionType = {
  * @property {string} select - 选择
  * @property {string} unselect - 反选
  * @property {string} delete - 删除
- * @property {string} move - 移动
+ * @property {string} clear - 清除所有图形
  * @property {string} undo - 撤销
  * @property {string} data - 数据操作
  * */
@@ -56,8 +56,9 @@ export const actionTypeEnums = {
 	select: "select",
 	unselect: "unselect",
 	delete: "delete",
-	move: "move",
-	undo: "undo",
+	clear: "clear",
+	// move: "move",
+	// undo: "undo",
 	data: "data",
 };
 
@@ -113,6 +114,29 @@ export function fromDrawing(drawingOps: DrawingOptionType) {
 
 /**
  * 反序列化actions
+ *
+ * @example
+ *
+ * const actions=fromActions([{
+ * 	type:"draw",
+ * 	params:[{
+ * 		type:"LineDrawing",
+ * 		option:{
+ * 			id:"line1",
+ * 			attrs:{}
+ * 		}
+ * 	}]
+ * },{
+ * 	type:"draw",
+ * 	params:[{
+ * 		type:"DotDrawing",
+ * 		option:{
+ * 			id:"dot1",
+ * 			attrs:{}
+ * 		}
+ * 	}]
+ * }])
+ *
  * */
 export function fromActions(actions: Array<ActionOptionType>) {
 	return actions.map(action => {
@@ -166,6 +190,14 @@ class Action {
 
 /**
  * 绘图action
+ *
+ * @example
+ *
+ * <D3Graph actions={[
+ * 	new DrawAction(new LineDrawing({id:"line1",attrs:{x1:0,y1:0,x2:100,y2:100}})),
+ * 	new DrawAction(new DotAction({id:"dot1",attrs:{cx:100,cy:100}}))
+ * ]}/>
+ *
  * */
 export class DrawAction extends Action {
 	constructor(drawingOps, ops) {
@@ -177,6 +209,11 @@ actionIndex[actionTypeEnums.draw] = DrawAction;
 
 /**
  * 选择action
+ *
+ * @example
+ *
+ * <D3Graph actions={[new SelectAction('SHAPE_ID')]}/>
+ *
  * */
 export class SelectAction extends Action {
 	constructor(shapeId, ops) {
@@ -188,6 +225,11 @@ actionIndex[actionTypeEnums.select] = SelectAction;
 
 /**
  * 取消选择action
+ *
+ * @example
+ *
+ * <D3Graph actions={[new UnSelectAction('SHAPE_ID')]}/>
+ *
  * */
 export class UnSelectAction extends Action {
 	constructor(shapeId, ops) {
@@ -199,6 +241,11 @@ actionIndex[actionTypeEnums.unselect] = UnSelectAction;
 
 /**
  * 删除图形action
+ *
+ * @example
+ *
+ * <D3Graph actions={[new DeleteAction('SHAPE_ID')]}/>
+ *
  * */
 export class DeleteAction extends Action {
 	constructor(shapeId, ops) {
@@ -207,6 +254,22 @@ export class DeleteAction extends Action {
 }
 
 actionIndex[actionTypeEnums.delete] = DeleteAction;
+
+/**
+ * 清除所有的图形action
+ *
+ * @example
+ *
+ * <D3Graph actions={[new ClearAction()]}/>
+ *
+ * */
+export class ClearAction extends Action {
+	constructor(ops) {
+		super(actionTypeEnums.clear, null, ops);
+	}
+}
+
+actionIndex[actionTypeEnums.clear] = ClearAction;
 
 
 /**
@@ -914,8 +977,34 @@ export class Toolbar extends PureComponent {
 	static propTypes = {
 		children: PropTypes.any,
 		onClick: PropTypes.func,
+		style: PropTypes.object
+	};
+
+
+	get attrs() {
+		return {
+			width: 40,
+			height: 40
+		};
+	}
+
+	render() {
+		return (
+			<svg {...this.attrs}
+				 onClick={this.props.onClick}
+				 style={this.props.style}>
+				{this.props.children}
+			</svg>
+		);
+	}
+}
+
+export class DrawingToolbar extends PureComponent {
+	static propTypes = {
+		children: PropTypes.any,
+		onClick: PropTypes.func,
 		//绘制的类型:如LineDrawing
-		type: PropTypes.string.isRequired,
+		type: PropTypes.string,
 		style: PropTypes.object
 	};
 
@@ -927,21 +1016,17 @@ export class Toolbar extends PureComponent {
 		};
 	}
 
-	get attrs() {
-		return {
-			width: 40,
-			height: 40
-		};
-	}
-
 	render() {
 		return (
-			<svg {...this.attrs} onClick={(...args) => {
-				emitter.emit(EVENT_TOOLBAR_CHANGE, this.props.type);
-				this.props.onClick && this.props.onClick(...args)
-			}} style={Object.assign({}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}>
+			<Toolbar
+				style={Object.assign({}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}
+				type={this.props.type}
+				onClick={(...args) => {
+					emitter.emit(EVENT_TOOLBAR_CHANGE, this.props.type);
+					this.props.onClick && this.props.onClick(...args)
+				}}>
 				{this.props.children}
-			</svg>
+			</Toolbar>
 		);
 	}
 
@@ -973,45 +1058,45 @@ export class LineToolbar extends PureComponent {
 
 	render() {
 		return (
-			<Toolbar style={this.props.style}
-					 onClick={() => {
-						 const {graph} = this.props;
-						 const svg = d3.select(graph.ele);
-						 svg.on("mousedown", () => {
-							 const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-							 const drawing = new LineDrawing({
-								 attrs: {
-									 x1: point.x,
-									 y1: point.y,
-									 x2: point.x,
-									 y2: point.y
-								 }
-							 });
-							 this._id = drawing.id;
-							 graph.doActions([
-								 new DrawAction(drawing)
-							 ])
-						 })
-							 .on("mousemove", () => {
-								 if (this._id) {
-									 const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-									 graph.doActions([
-										 new ReDrawAction(this._id, {
-											 attrs: {
-												 x2: {$set: point.x},
-												 y2: {$set: point.y}
-											 }
-										 })
-									 ])
-								 }
-							 })
-							 .on("mouseup", () => {
-								 delete this._id;
-							 })
-					 }}
-					 type={this.type}>
+			<DrawingToolbar style={this.props.style}
+							onClick={() => {
+								const {graph} = this.props;
+								const svg = d3.select(graph.ele);
+								svg.on("mousedown", () => {
+									const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+									const drawing = new LineDrawing({
+										attrs: {
+											x1: point.x,
+											y1: point.y,
+											x2: point.x,
+											y2: point.y
+										}
+									});
+									this._id = drawing.id;
+									graph.doActions([
+										new DrawAction(drawing)
+									])
+								})
+									.on("mousemove", () => {
+										if (this._id) {
+											const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+											graph.doActions([
+												new ReDrawAction(this._id, {
+													attrs: {
+														x2: {$set: point.x},
+														y2: {$set: point.y}
+													}
+												})
+											])
+										}
+									})
+									.on("mouseup", () => {
+										delete this._id;
+									})
+							}}
+							type={this.type}>
 				<line x1={10} y1={10} x2={30} y2={30} stroke={"#888888"}></line>
-			</Toolbar>
+			</DrawingToolbar>
 		);
 	}
 }
@@ -1029,26 +1114,26 @@ export class CircleToolbar extends PureComponent {
 
 	render() {
 		return (
-			<Toolbar style={this.props.style}
-					 onClick={() => {
-						 const {graph} = this.props;
-						 const svg = d3.select(this.props.graph.ele);
-						 svg.on("mousedown", () => {
-							 const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-							 const drawing = new CircleDrawing({
-								 attrs: {
-									 cx: point.x,
-									 cy: point.y
-								 }
-							 })
-							 graph.doActions([
-								 new DrawAction(drawing)
-							 ])
-						 })
-					 }}
-					 type={this.type}>
+			<DrawingToolbar style={this.props.style}
+							onClick={() => {
+								const {graph} = this.props;
+								const svg = d3.select(this.props.graph.ele);
+								svg.on("mousedown", () => {
+									const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+									const drawing = new CircleDrawing({
+										attrs: {
+											cx: point.x,
+											cy: point.y
+										}
+									})
+									graph.doActions([
+										new DrawAction(drawing)
+									])
+								})
+							}}
+							type={this.type}>
 				<circle cx={20} cy={20} r={8} stroke={"#888888"} fill={"#888888"}></circle>
-			</Toolbar>
+			</DrawingToolbar>
 		);
 	}
 }
@@ -1170,11 +1255,11 @@ export default class D3Graph extends PureComponent {
 	getPointFromScreen(screenX, screenY) {
 		if (this.props.coordinateType === coordinateTypeEnum.math) {
 			return {
-				x: screenX - this.props.original.x,
-				y: this.props.original.y - screenY
+				x: (screenX - this.props.original.x) / this.props.scale,
+				y: (this.props.original.y - screenY) / this.props.scale
 			}
 		}
-		return {x: screenX, y: screenY};
+		return {x: screenX / this.props.scale, y: screenY / this.props.scale};
 	}
 
 	doActions(actions) {
@@ -1260,6 +1345,13 @@ export default class D3Graph extends PureComponent {
 					delete s.selection;
 				}
 			})
+		}
+		//#endregion
+
+		//#region clear
+		const clearActions = actions.filter(f => f.type === actionTypeEnums.clear);
+		if (clearActions.length > 0) {
+			this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
 		}
 		//#endregion
 	}
