@@ -42,7 +42,7 @@ test('fromActions', () => {
 	}, {
 		type: "draw",
 		params: [{
-			type: "PathDrawing",
+			type: "PathDrawing",//绘制path,阴影也使用此Drawing
 			option: {
 				id: "path1",
 				d: [{x: 0, y: 0}, {x: 80, y: 80}, {x: 120, y: 90}]
@@ -57,6 +57,5 @@ test('fromActions', () => {
 test('fromActions from drawing-data.json', () => {
 	const options = drawData.step.data;
 	const actions = fromActions(options)
-	console.log(actions);
-	expect(1)
+	expect(options.length).toBe(actions.length);
 })

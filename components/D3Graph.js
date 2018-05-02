@@ -1295,6 +1295,8 @@ var D3Graph = function (_PureComponent4) {
   * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
   * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
   * @property {object} playingOption - mode===playing时有效
+  * @property {Function} renderToolbar - 绘图的工具栏
+  * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
   * */
 	function D3Graph(props) {
 		_classCallCheck(this, D3Graph);
@@ -1332,7 +1334,7 @@ var D3Graph = function (_PureComponent4) {
 	}, {
 		key: 'getX',
 		value: function getX(value) {
-			return this.props.original.x + parseFloat(value);
+			return this.props.original.x + parseFloat(value) * this.props.scale;
 		}
 
 		/**
@@ -1343,9 +1345,9 @@ var D3Graph = function (_PureComponent4) {
 		key: 'getY',
 		value: function getY(value) {
 			if (this.props.coordinateType === coordinateTypeEnum.screen) {
-				return this.props.original.y + parseFloat(value);
+				return this.props.original.y + parseFloat(value) * this.props.scale;
 			}
-			return this.props.original.y - parseFloat(value);
+			return this.props.original.y - parseFloat(value) * this.props.scale;
 		}
 
 		/**
@@ -1354,14 +1356,14 @@ var D3Graph = function (_PureComponent4) {
 
 	}, {
 		key: 'getPointFromScreen',
-		value: function getPointFromScreen(x, y) {
+		value: function getPointFromScreen(screenX, screenY) {
 			if (this.props.coordinateType === coordinateTypeEnum.math) {
 				return {
-					x: x - this.props.original.x,
-					y: this.props.original.y - y
+					x: screenX - this.props.original.x,
+					y: this.props.original.y - screenY
 				};
 			}
-			return { x: x, y: y };
+			return { x: screenX, y: screenY };
 		}
 	}, {
 		key: 'doActions',
@@ -1561,7 +1563,8 @@ D3Graph.propTypes = {
 	playingOption: _propTypes2.default.shape({
 		interval: _propTypes2.default.number
 	}),
-	renderToolbar: _propTypes2.default.func
+	renderToolbar: _propTypes2.default.func,
+	scale: _propTypes2.default.number
 };
 D3Graph.defaultProps = {
 	attrs: {
@@ -1582,6 +1585,7 @@ D3Graph.defaultProps = {
 	mode: graphModeEnum.none,
 	renderToolbar: function renderToolbar() {
 		return null;
-	}
+	},
+	scale: 1
 };
 exports.default = D3Graph;

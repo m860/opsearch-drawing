@@ -1054,6 +1054,7 @@ export default class D3Graph extends PureComponent {
 	 * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
 	 * @property {object} playingOption - mode===playing时有效
 	 * @property {Function} renderToolbar - 绘图的工具栏
+	 * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
 	 * */
 	static propTypes = {
 		attrs: PropTypes.object,
