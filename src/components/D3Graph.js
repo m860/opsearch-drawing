@@ -1053,6 +1053,7 @@ export default class D3Graph extends PureComponent {
 	 * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
 	 * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
 	 * @property {object} playingOption - mode===playing时有效
+	 * @property {Function} renderToolbar - 绘图的工具栏
 	 * */
 	static propTypes = {
 		attrs: PropTypes.object,
@@ -1087,7 +1088,8 @@ export default class D3Graph extends PureComponent {
 		playingOption: PropTypes.shape({
 			interval: PropTypes.number
 		}),
-		renderToolbar: PropTypes.func
+		renderToolbar: PropTypes.func,
+		scale: PropTypes.number
 	};
 	static defaultProps = {
 		attrs: {
@@ -1106,7 +1108,8 @@ export default class D3Graph extends PureComponent {
 		},
 		coordinateType: coordinateTypeEnum.screen,
 		mode: graphModeEnum.none,
-		renderToolbar: () => null
+		renderToolbar: () => null,
+		scale: 1
 	}
 
 	constructor(props) {
@@ -1132,7 +1135,7 @@ export default class D3Graph extends PureComponent {
 	 * 根据坐标系计算x值
 	 * */
 	getX(value) {
-		return this.props.original.x + parseFloat(value);
+		return this.props.original.x + parseFloat(value) * this.props.scale;
 	}
 
 	/**
@@ -1140,22 +1143,22 @@ export default class D3Graph extends PureComponent {
 	 * */
 	getY(value) {
 		if (this.props.coordinateType === coordinateTypeEnum.screen) {
-			return this.props.original.y + parseFloat(value);
+			return this.props.original.y + parseFloat(value) * this.props.scale;
 		}
-		return this.props.original.y - parseFloat(value);
+		return this.props.original.y - parseFloat(value) * this.props.scale;
 	}
 
 	/**
 	 * 将屏幕坐标转换成对应坐标系坐标
 	 * */
-	getPointFromScreen(x, y) {
+	getPointFromScreen(screenX, screenY) {
 		if (this.props.coordinateType === coordinateTypeEnum.math) {
 			return {
-				x: x - this.props.original.x,
-				y: this.props.original.y - y
+				x: screenX - this.props.original.x,
+				y: this.props.original.y - screenY
 			}
 		}
-		return {x, y};
+		return {x: screenX, y: screenY};
 	}
 
 	doActions(actions) {

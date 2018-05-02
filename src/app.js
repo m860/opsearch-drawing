@@ -16,11 +16,13 @@ import D3Graph, {
 	TextDrawing,
 	RectDrawing,
 	LineToolbar,
-	CircleToolbar
+	CircleToolbar,
+	fromActions
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
 import * as d3 from 'd3'
+import data from '../test/drawing-data'
 
 class Example extends Component {
 	constructor(props) {
@@ -32,7 +34,8 @@ class Example extends Component {
 		this.state = {
 			tableData: [],
 			actions: [],
-			mode: graphModeEnum.none
+			mode: graphModeEnum.none,
+			scale: 20
 		};
 	}
 
@@ -134,6 +137,22 @@ class Example extends Component {
 		})
 	}
 
+	playDataActions() {
+		const actions = fromActions(data.step.data);
+		this.setState({
+			mode: graphModeEnum.playing,
+			actions: [
+				new DrawAction(new NumberScaleDrawing({
+					original: this.original,
+					xAxisLength: 360,
+					yAxisLength: 260,
+					scale: this.state.scale
+				})),
+				...actions
+			]
+		});
+	}
+
 	render() {
 		return (
 			<div>
@@ -141,6 +160,7 @@ class Example extends Component {
 					<h6>运筹学图形Example</h6>
 					<div>
 						<button type="button" onClick={this.playActions.bind(this)}>play</button>
+						<button type="button" onClick={this.playDataActions.bind(this)}>play data</button>
 					</div>
 					<D3Graph
 						renderToolbar={(graph) => {
@@ -151,6 +171,7 @@ class Example extends Component {
 								</div>
 							);
 						}}
+						scale={this.state.scale}
 						original={this.original}
 						coordinateType={"math"}
 						mode={this.state.mode}
