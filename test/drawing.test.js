@@ -50,13 +50,16 @@ test('fromActions', () => {
 		}]
 	}, {
 		type: "delete",//删除
-		params: ["line1"] // 参数是对应图形的ID
+		params: ["line1", {
+			nextInterval: 1 //有时候需要快速执行下一个操作,可以设置nextInterval=1,保证操作的连续性
+		}] // 参数是对应图形的ID
 	}];
 	const ins = fromActions(actions);
 	expect(ins.length).toBe(actions.length);
 	expect(ins[0].constructor.name).toBe("DrawAction");
 	expect(ins[3].constructor.name).toBe("DeleteAction");
 	expect(ins[3].params).toBe(actions[3].params[0]);
+	expect(ins[3].nextInterval).toBe(1);
 })
 
 test('fromActions from drawing-data.json', () => {
