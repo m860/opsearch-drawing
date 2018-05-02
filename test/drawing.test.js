@@ -39,6 +39,15 @@ test('fromActions', () => {
 				}
 			}
 		}]
+	}, {
+		type: "draw",
+		params: [{
+			type: "PathDrawing",
+			option: {
+				id: "path1",
+				d: [{x: 0, y: 0}, {x: 80, y: 80}, {x: 120, y: 90}]
+			}
+		}]
 	}];
 	const ins = fromActions(actions);
 	expect(ins.length).toBe(actions.length);
@@ -47,7 +56,7 @@ test('fromActions', () => {
 
 test('fromActions from drawing-data.json', () => {
 	const options = drawData.step.data;
-	const actions=fromActions(options)
+	const actions = fromActions(options)
 	console.log(actions);
 	expect(1)
 })
