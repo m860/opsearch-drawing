@@ -48,10 +48,15 @@ test('fromActions', () => {
 				d: [{x: 0, y: 0}, {x: 80, y: 80}, {x: 120, y: 90}]
 			}
 		}]
+	}, {
+		type: "delete",//删除
+		params: ["line1"] // 参数是对应图形的ID
 	}];
 	const ins = fromActions(actions);
 	expect(ins.length).toBe(actions.length);
 	expect(ins[0].constructor.name).toBe("DrawAction");
+	expect(ins[3].constructor.name).toBe("DeleteAction");
+	expect(ins[3].params).toBe(actions[3].params[0]);
 })
 
 test('fromActions from drawing-data.json', () => {

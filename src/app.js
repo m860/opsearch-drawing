@@ -17,7 +17,8 @@ import D3Graph, {
 	RectDrawing,
 	LineToolbar,
 	CircleToolbar,
-	fromActions
+	fromActions,
+	DeleteAction
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -41,6 +42,7 @@ class Example extends Component {
 
 	playActions() {
 		this.setState({
+			scale: 1,
 			mode: graphModeEnum.playing,
 			actions: [
 				new DrawAction(new NumberScaleDrawing({
@@ -55,6 +57,7 @@ class Example extends Component {
 					}
 				})),
 				new DrawAction(new LineDrawing({
+					id: "line1",
 					attrs: {
 						x1: 50,
 						y1: 50,
@@ -132,7 +135,8 @@ class Example extends Component {
 					attrs: {
 						d: "M 80 80 L 120 80 L 120 120 L 80 120 Z"
 					}
-				}))
+				})),
+				new DeleteAction("line1")
 			]
 		})
 	}
@@ -140,6 +144,7 @@ class Example extends Component {
 	playDataActions() {
 		const actions = fromActions(data.step.data);
 		this.setState({
+			scale: 20,
 			mode: graphModeEnum.playing,
 			actions: [
 				new DrawAction(new NumberScaleDrawing({

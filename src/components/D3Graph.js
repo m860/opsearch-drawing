@@ -198,6 +198,18 @@ export class UnSelectAction extends Action {
 actionIndex[actionTypeEnums.unselect] = UnSelectAction;
 
 /**
+ * 删除图形action
+ * */
+export class DeleteAction extends Action {
+	constructor(shapeId, ops) {
+		super(actionTypeEnums.delete, shapeId, ops);
+	}
+}
+
+actionIndex[actionTypeEnums.delete] = DeleteAction;
+
+
+/**
  * 重绘action
  * */
 export class ReDrawAction extends Action {
@@ -846,14 +858,17 @@ export class PathDrawing extends Drawing {
 	}
 
 	render() {
-		let d = this.d.map((point, index) => {
-			if (index === 0) {
-				return `M ${point.x} ${point.y}`
-			}
-			return `L ${point.x} ${point.y}`;
-		});
-		d.push("Z");
-		this.attrs.d = d.join(" ");
+		if (!this.attrs.d) {
+			let d = this.d.map((point, index) => {
+				if (index === 0) {
+					return `M ${point.x} ${point.y}`
+				}
+				return `L ${point.x} ${point.y}`;
+			});
+			d.push("Z");
+			this.attrs.d = d.join(" ");
+		}
+		console.log(this.attrs.d);
 		super.render();
 	}
 }
@@ -1167,7 +1182,7 @@ export default class D3Graph extends PureComponent {
 		//#region draw
 		const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
 		if (drawActions.length > 0) {
-			console.log(`draw : ${drawActions.map(f => f.params.type).join(',')}`)
+			console.log(`draw : ${drawActions.map(f => `${f.params.type}(id=${f.params.id})`).join(',')}`)
 			this.shapes = this.shapes.concat(drawActions.map(data => data.params));
 			this.drawShapes(this.shapes);
 		}
@@ -1226,6 +1241,25 @@ export default class D3Graph extends PureComponent {
 			});
 			this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
 			this.drawShapes(unSelectShape);
+		}
+		//#endregion
+
+		//#region delete
+		const deleteActions = actions.filter(f => f.type === actionTypeEnums.delete);
+		if (deleteActions.length > 0) {
+			const ids = deleteActions.map(f => f.params);
+			console.log(`delete : ${ids.join(",")}`);
+			//删除的图形
+			const deletedShapes = this.shapes.filter(s => ids.indexOf(s.id) >= 0);
+			//删除后的图形
+			this.shapes = this.shapes.filter(s => ids.indexOf(s.id) <= 0);
+			deletedShapes.forEach(s => {
+				if (s.selection) {
+					//删除图形
+					s.selection.remove();
+					delete s.selection;
+				}
+			})
 		}
 		//#endregion
 	}
