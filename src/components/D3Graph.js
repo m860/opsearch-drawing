@@ -293,6 +293,15 @@ actionIndex[actionTypeEnums.redraw] = ReDrawAction;
  * */
 export class Drawing {
 
+	/**
+	 * @constructor
+	 *
+	 * @param {Object} option
+	 * @param {?String} option.id - 默认是guid
+	 * @param {?Object} option.attrs
+	 * @param {?Function|?String} option.text
+	 *
+	 * */
 	constructor(option) {
 		/**
 		 * 图形的id,如果没有提供会生成一个guid
@@ -362,7 +371,9 @@ export class Drawing {
 	 * 绘制,更新selection相关
 	 * */
 	render() {
-		let attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
+		let attrs = Object.assign({
+			"shape-id": this.id
+		}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
 		if (!isNullOrUndefined(attrs.x)) {
 			attrs.x = this.graph.getX(attrs.x);
 		}
@@ -838,6 +849,14 @@ registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
  * 绘制link
  * */
 export class LinkDrawing extends Drawing {
+	/**
+	 * @constructor
+	 *
+	 * @param {Object} option
+	 * @param {String} option.sourceId
+	 * @param {String} option.targetId
+	 *
+	 * */
 	constructor(option) {
 		super(option);
 		this.type = "link";
@@ -1045,6 +1064,34 @@ export class DrawingToolbar extends PureComponent {
 	}
 }
 
+export class NoneToolbar extends PureComponent {
+	static propTypes = {
+		onClick: PropTypes.func,
+		style: PropTypes.object,
+		graph: PropTypes.object.isRequired
+	};
+
+	get type() {
+		return ""
+	}
+
+	render() {
+		return (
+			<DrawingToolbar style={this.props.style}
+							onClick={() => {
+								const {graph} = this.props;
+								const svg = d3.select(graph.ele);
+								svg.on("mousedown", null)
+									.on("mousemove", null)
+									.on("mouseup", null)
+							}}
+							type={this.type}>
+				<text y={20} fontSize={12}>none</text>
+			</DrawingToolbar>
+		);
+	}
+}
+
 export class LineToolbar extends PureComponent {
 	static propTypes = {
 		onClick: PropTypes.func,
@@ -1133,6 +1180,58 @@ export class CircleToolbar extends PureComponent {
 							}}
 							type={this.type}>
 				<circle cx={20} cy={20} r={8} stroke={"#888888"} fill={"#888888"}></circle>
+			</DrawingToolbar>
+		);
+	}
+}
+
+export class LinkToolbar extends PureComponent {
+	static propTypes = {
+		onClick: PropTypes.func,
+		style: PropTypes.object,
+		graph: PropTypes.object.isRequired
+	};
+
+	get type() {
+		return "LinkDrawing";
+	}
+
+	getShapeID(ele) {
+		try {
+			return ele.attributes['shape-id'].nodeValue;
+		}
+		catch (ex) {
+			return null;
+		}
+	}
+
+	render() {
+		return (
+			<DrawingToolbar style={this.props.style}
+							onClick={() => {
+								const {graph} = this.props;
+								const svg = d3.select(graph.ele);
+								svg.on("mousedown", () => {
+									const event = d3.event;
+									this._sourceID = this.getShapeID(event.target);
+								}).on("mouseup", () => {
+									const event = d3.event;
+									const targetID = this.getShapeID(event.target);
+									if (this._sourceID && targetID) {
+										graph.doActions([
+											new DrawAction(new LinkDrawing({
+												sourceId: this._sourceID,
+												targetId: targetID
+											}))
+										])
+									}
+									delete this._sourceID;
+								})
+							}}
+							type={this.type}>
+				<circle cx={10} cy={10} r={2} stroke={"#888888"} fill={"#888888"}></circle>
+				<circle cx={30} cy={30} r={2} stroke={"#888888"} fill={"#888888"}></circle>
+				<line x1={10} y1={10} x2={30} y2={30} stroke={"#888888"} fill={"#888888"}></line>
 			</DrawingToolbar>
 		);
 	}

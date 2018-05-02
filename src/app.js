@@ -21,7 +21,9 @@ import D3Graph, {
 	DeleteAction,
 	Toolbar,
 	TextToolbar,
-	ClearAction
+	ClearAction,
+	NoneToolbar,
+	LinkToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -174,8 +176,10 @@ class Example extends Component {
 						renderToolbar={(graph) => {
 							return (
 								<div style={{display: "flex", flexDirection: "row"}}>
-									<LineToolbar graph={graph}></LineToolbar>
-									<CircleToolbar graph={graph}></CircleToolbar>
+									<NoneToolbar graph={graph}/>
+									<LineToolbar graph={graph}/>
+									<CircleToolbar graph={graph}/>
+									<LinkToolbar graph={graph}/>
 									<div style={{
 										display: "flex",
 										justifyContent: "center",

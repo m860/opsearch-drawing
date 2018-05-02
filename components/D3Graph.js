@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.CircleToolbar = exports.LineToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
+exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -366,6 +366,16 @@ actionIndex[actionTypeEnums.redraw] = ReDrawAction;
  * */
 
 var Drawing = exports.Drawing = function () {
+
+	/**
+  * @constructor
+  *
+  * @param {Object} option
+  * @param {?String} option.id - 默认是guid
+  * @param {?Object} option.attrs
+  * @param {?Function|?String} option.text
+  *
+  * */
 	function Drawing(option) {
 		_classCallCheck(this, Drawing);
 
@@ -430,7 +440,9 @@ var Drawing = exports.Drawing = function () {
    * 绘制,更新selection相关
    * */
 		value: function render() {
-			var attrs = Object.assign({}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
+			var attrs = Object.assign({
+				"shape-id": this.id
+			}, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
 			if (!isNullOrUndefined(attrs.x)) {
 				attrs.x = this.graph.getX(attrs.x);
 			}
@@ -996,6 +1008,14 @@ registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
 var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
 	_inherits(LinkDrawing, _Drawing7);
 
+	/**
+  * @constructor
+  *
+  * @param {Object} option
+  * @param {String} option.sourceId
+  * @param {String} option.targetId
+  *
+  * */
 	function LinkDrawing(option) {
 		_classCallCheck(this, LinkDrawing);
 
@@ -1282,8 +1302,55 @@ DrawingToolbar.propTypes = {
 	style: _propTypes2.default.object
 };
 
-var LineToolbar = exports.LineToolbar = function (_PureComponent3) {
-	_inherits(LineToolbar, _PureComponent3);
+var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
+	_inherits(NoneToolbar, _PureComponent3);
+
+	function NoneToolbar() {
+		_classCallCheck(this, NoneToolbar);
+
+		return _possibleConstructorReturn(this, (NoneToolbar.__proto__ || Object.getPrototypeOf(NoneToolbar)).apply(this, arguments));
+	}
+
+	_createClass(NoneToolbar, [{
+		key: 'render',
+		value: function render() {
+			var _this30 = this;
+
+			return _react2.default.createElement(
+				DrawingToolbar,
+				{ style: this.props.style,
+					onClick: function onClick() {
+						var graph = _this30.props.graph;
+
+						var svg = d3.select(graph.ele);
+						svg.on("mousedown", null).on("mousemove", null).on("mouseup", null);
+					},
+					type: this.type },
+				_react2.default.createElement(
+					'text',
+					{ y: 20, fontSize: 12 },
+					'none'
+				)
+			);
+		}
+	}, {
+		key: 'type',
+		get: function get() {
+			return "";
+		}
+	}]);
+
+	return NoneToolbar;
+}(_react.PureComponent);
+
+NoneToolbar.propTypes = {
+	onClick: _propTypes2.default.func,
+	style: _propTypes2.default.object,
+	graph: _propTypes2.default.object.isRequired
+};
+
+var LineToolbar = exports.LineToolbar = function (_PureComponent4) {
+	_inherits(LineToolbar, _PureComponent4);
 
 	function LineToolbar() {
 		_classCallCheck(this, LineToolbar);
@@ -1294,13 +1361,13 @@ var LineToolbar = exports.LineToolbar = function (_PureComponent3) {
 	_createClass(LineToolbar, [{
 		key: 'render',
 		value: function render() {
-			var _this30 = this;
+			var _this32 = this;
 
 			return _react2.default.createElement(
 				DrawingToolbar,
 				{ style: this.props.style,
 					onClick: function onClick() {
-						var graph = _this30.props.graph;
+						var graph = _this32.props.graph;
 
 						var svg = d3.select(graph.ele);
 						svg.on("mousedown", function () {
@@ -1313,12 +1380,12 @@ var LineToolbar = exports.LineToolbar = function (_PureComponent3) {
 									y2: point.y
 								}
 							});
-							_this30._id = drawing.id;
+							_this32._id = drawing.id;
 							graph.doActions([new DrawAction(drawing)]);
 						}).on("mousemove", function () {
-							if (_this30._id) {
+							if (_this32._id) {
 								var point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-								graph.doActions([new ReDrawAction(_this30._id, {
+								graph.doActions([new ReDrawAction(_this32._id, {
 									attrs: {
 										x2: { $set: point.x },
 										y2: { $set: point.y }
@@ -1326,7 +1393,7 @@ var LineToolbar = exports.LineToolbar = function (_PureComponent3) {
 								})]);
 							}
 						}).on("mouseup", function () {
-							delete _this30._id;
+							delete _this32._id;
 						});
 					},
 					type: this.type },
@@ -1349,8 +1416,8 @@ LineToolbar.propTypes = {
 	graph: _propTypes2.default.object.isRequired
 };
 
-var CircleToolbar = exports.CircleToolbar = function (_PureComponent4) {
-	_inherits(CircleToolbar, _PureComponent4);
+var CircleToolbar = exports.CircleToolbar = function (_PureComponent5) {
+	_inherits(CircleToolbar, _PureComponent5);
 
 	function CircleToolbar() {
 		_classCallCheck(this, CircleToolbar);
@@ -1361,15 +1428,15 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent4) {
 	_createClass(CircleToolbar, [{
 		key: 'render',
 		value: function render() {
-			var _this32 = this;
+			var _this34 = this;
 
 			return _react2.default.createElement(
 				DrawingToolbar,
 				{ style: this.props.style,
 					onClick: function onClick() {
-						var graph = _this32.props.graph;
+						var graph = _this34.props.graph;
 
-						var svg = d3.select(_this32.props.graph.ele);
+						var svg = d3.select(_this34.props.graph.ele);
 						svg.on("mousedown", function () {
 							var point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
 							var drawing = new CircleDrawing({
@@ -1395,6 +1462,73 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent4) {
 	return CircleToolbar;
 }(_react.PureComponent);
 
+CircleToolbar.propTypes = {
+	onClick: _propTypes2.default.func,
+	style: _propTypes2.default.object,
+	graph: _propTypes2.default.object.isRequired
+};
+
+var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
+	_inherits(LinkToolbar, _PureComponent6);
+
+	function LinkToolbar() {
+		_classCallCheck(this, LinkToolbar);
+
+		return _possibleConstructorReturn(this, (LinkToolbar.__proto__ || Object.getPrototypeOf(LinkToolbar)).apply(this, arguments));
+	}
+
+	_createClass(LinkToolbar, [{
+		key: 'getShapeID',
+		value: function getShapeID(ele) {
+			try {
+				return ele.attributes['shape-id'].nodeValue;
+			} catch (ex) {
+				return null;
+			}
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this36 = this;
+
+			return _react2.default.createElement(
+				DrawingToolbar,
+				{ style: this.props.style,
+					onClick: function onClick() {
+						var graph = _this36.props.graph;
+
+						var svg = d3.select(graph.ele);
+						svg.on("mousedown", function () {
+							var event = d3.event;
+							_this36._sourceID = _this36.getShapeID(event.target);
+						}).on("mouseup", function () {
+							var event = d3.event;
+							var targetID = _this36.getShapeID(event.target);
+							if (_this36._sourceID && targetID) {
+								graph.doActions([new DrawAction(new LinkDrawing({
+									sourceId: _this36._sourceID,
+									targetId: targetID
+								}))]);
+							}
+							delete _this36._sourceID;
+						});
+					},
+					type: this.type },
+				_react2.default.createElement('circle', { cx: 10, cy: 10, r: 2, stroke: "#888888", fill: "#888888" }),
+				_react2.default.createElement('circle', { cx: 30, cy: 30, r: 2, stroke: "#888888", fill: "#888888" }),
+				_react2.default.createElement('line', { x1: 10, y1: 10, x2: 30, y2: 30, stroke: "#888888", fill: "#888888" })
+			);
+		}
+	}, {
+		key: 'type',
+		get: function get() {
+			return "LinkDrawing";
+		}
+	}]);
+
+	return LinkToolbar;
+}(_react.PureComponent);
+
 //#endregion
 
 //#region D3Graph
@@ -1403,14 +1537,14 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent4) {
  * */
 
 
-CircleToolbar.propTypes = {
+LinkToolbar.propTypes = {
 	onClick: _propTypes2.default.func,
 	style: _propTypes2.default.object,
 	graph: _propTypes2.default.object.isRequired
 };
 
-var D3Graph = function (_PureComponent5) {
-	_inherits(D3Graph, _PureComponent5);
+var D3Graph = function (_PureComponent7) {
+	_inherits(D3Graph, _PureComponent7);
 
 	/**
   * @property {object} attrs - svg的属性
@@ -1426,16 +1560,16 @@ var D3Graph = function (_PureComponent5) {
 	function D3Graph(props) {
 		_classCallCheck(this, D3Graph);
 
-		var _this33 = _possibleConstructorReturn(this, (D3Graph.__proto__ || Object.getPrototypeOf(D3Graph)).call(this, props));
+		var _this37 = _possibleConstructorReturn(this, (D3Graph.__proto__ || Object.getPrototypeOf(D3Graph)).call(this, props));
 
-		_this33.ele = null;
+		_this37.ele = null;
 		//画布中已有的图形
-		_this33.shapes = [];
+		_this37.shapes = [];
 		//已经选中的图形的id
-		_this33.selectedShapes = [];
+		_this37.selectedShapes = [];
 		//绘制类型
 		// this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
-		return _this33;
+		return _this37;
 	}
 
 	/**
@@ -1493,7 +1627,7 @@ var D3Graph = function (_PureComponent5) {
 	}, {
 		key: 'doActions',
 		value: function doActions(actions) {
-			var _this34 = this;
+			var _this38 = this;
 
 			//#region draw
 			var drawActions = actions.filter(function (f) {
@@ -1520,12 +1654,12 @@ var D3Graph = function (_PureComponent5) {
 				}).join(','));
 				var shapes = [];
 				redrawActions.forEach(function (action) {
-					var index = _this34.shapes.findIndex(function (f) {
+					var index = _this38.shapes.findIndex(function (f) {
 						return f.id === action.params.id;
 					});
 					if (index >= 0) {
-						_this34.shapes[index] = (0, _immutabilityHelper2.default)(_this34.shapes[index], action.params.state);
-						shapes.push(_this34.shapes[index]);
+						_this38.shapes[index] = (0, _immutabilityHelper2.default)(_this38.shapes[index], action.params.state);
+						shapes.push(_this38.shapes[index]);
 					}
 				});
 				this.drawShapes(shapes);
@@ -1546,14 +1680,14 @@ var D3Graph = function (_PureComponent5) {
 					}));
 					this.selectedShapes = selectActions.map(function (f) {
 						var id = f.params;
-						var shape = _this34.findShapeById(id);
+						var shape = _this38.findShapeById(id);
 						shape.selected = true;
 						return shape;
 					});
 				} else {
 					this.selectedShapes = this.selectedShapes.concat(selectActions.map(function (f) {
 						var id = f.params;
-						var shape = _this34.findShapeById(id);
+						var shape = _this38.findShapeById(id);
 						shape.selected = true;
 						return shape;
 					}));
@@ -1572,7 +1706,7 @@ var D3Graph = function (_PureComponent5) {
 				}).join(','));
 				var unSelectShape = unSelectActions.map(function (f) {
 					var id = f.params;
-					var shape = _this34.findShapeById(id);
+					var shape = _this38.findShapeById(id);
 					shape.selected = false;
 					return shape;
 				});
@@ -1626,12 +1760,12 @@ var D3Graph = function (_PureComponent5) {
 	}, {
 		key: 'drawShapes',
 		value: function drawShapes(shapes) {
-			var _this35 = this;
+			var _this39 = this;
 
 			shapes.forEach(function (shape) {
 				//初始化
 				if (!shape.ready) {
-					shape.initialize(_this35);
+					shape.initialize(_this39);
 				}
 				shape.render();
 			});
@@ -1639,7 +1773,7 @@ var D3Graph = function (_PureComponent5) {
 	}, {
 		key: 'play',
 		value: function play(actions, playingOps) {
-			var _this36 = this;
+			var _this40 = this;
 
 			var actionIndex = 0;
 			var next = function next() {
@@ -1647,22 +1781,22 @@ var D3Graph = function (_PureComponent5) {
 					return;
 				}
 				var action = actions[actionIndex];
-				_this36.doActions([action]);
+				_this40.doActions([action]);
 				actionIndex++;
-				setTimeout(next.bind(_this36), action.nextInterval ? action.nextInterval : (0, _objectPath.get)(playingOps, "interval", 1000));
+				setTimeout(next.bind(_this40), action.nextInterval ? action.nextInterval : (0, _objectPath.get)(playingOps, "interval", 1000));
 			};
 			next();
 		}
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this37 = this;
+			var _this41 = this;
 
 			return _react2.default.createElement(
 				_WorkSpace2.default,
 				{ actions: this.props.renderToolbar(this) },
 				_react2.default.createElement('svg', _extends({ ref: function ref(_ref) {
-						return _this37.ele = _ref;
+						return _this41.ele = _ref;
 					} }, this.props.attrs))
 			);
 		}
