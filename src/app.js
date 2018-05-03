@@ -170,7 +170,6 @@ class Example extends Component {
 				<div>
 					<h6>运筹学图形Example</h6>
 					<div>
-						<button type="button" onClick={this.playActions.bind(this)}>play</button>
 						<button type="button" onClick={this.playDataActions.bind(this)}>play data</button>
 					</div>
 					<D3Graph

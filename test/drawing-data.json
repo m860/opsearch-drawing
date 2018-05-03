@@ -1,216 +1,383 @@
 {
-  "exam": [
+  "exam":[
     "min 2 1",
     "2 4 > 20",
     "3 > 15",
     "0 1 > 2"
   ],
-  "input": {
-    "x": 0,
-    "y": 0,
-    "z": 12.5
+  "input":{
+    "x":0,
+    "y":0,
+    "z":12.5
   },
-  "formula": {
-    "x": [
+  "formula":{
+    "x":[
       2,
       3,
       0,
       2
     ],
-    "y": [
+    "y":[
       4,
       0,
       1,
       1
     ],
-    "z": [
+    "z":[
       20,
       15,
       2,
       0
     ],
-    "symbol": "min",
-    "index": 3,
-    "areaX": [
-      0,
-      10,
-      0,
-      5,
-      5,
-      5,
-      0,
-      999,
-      6,
-      5
+    "symbol":"min",
+    "index":3,
+    "areaX":[
+      657.8512396694216,
+      96441.09691960934,
+      100,
+      122.72727272727273,
+      127.27272727272728,
+      4640.909090909091
     ],
-    "areaY": [
-      0,
-      0,
-      5,
-      0,
-      999,
-      2.5,
-      2,
-      2,
-      2,
-      2
+    "areaY":[
+      -3190.9090909090914,
+      15404.132231404963,
+      890.9090909090909,
+      890.9090909090909,
+      890.9090909090909,
+      890.9090909090909
     ]
   },
-  "step": {
-    "index": 8,
-    "data": [
+  "step":{
+    "index":8,
+    "data":[
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "DotDrawing",
-            "option": {
-              "attrs": {
-                "cx": 5,
-                "cy": 2.5
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
               },
-              "id": "dot1"
+              "id":"dot1"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "LineDrawing",
-            "option": {
-              "attrs": {
-                "x1": 10,
-                "y1": 0,
-                "x2": 0,
-                "y2": 5
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
               },
-              "id": "line2"
+              "id":"dot2"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "DotDrawing",
-            "option": {
-              "attrs": {
-                "cx": 5,
-                "cy": 2.5
+            "type":"LineDrawing",
+            "option":{
+              "attrs":{
+                "x1":10,
+                "y1":0,
+                "x2":0,
+                "y2":5
               },
-              "id": "dot11"
+              "id":"line2"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "LineDrawing",
-            "option": {
-              "attrs": {
-                "x1": 10,
-                "y1": 0,
-                "x2": 0,
-                "y2": 5
+            "type":"PathDrawing",
+            "option":{
+              "attrs":{
+                "fill":"blue"
               },
-              "id": "line12"
+              "id":"Path3",
+              "d":[
+                {
+                  "x":4640.909090909091,
+                  "y":900
+                },
+                {
+                  "x":100,
+                  "y":900
+                },
+                {
+                  "x":100,
+                  "y":-3640.909090909091
+                },
+                {
+                  "x":4640.909090909091,
+                  "y":-3640.909090909091
+                },
+                {
+                  "x":145.45454545454547,
+                  "y":900
+                },
+                {
+                  "x":100,
+                  "y":877.2727272727273
+                }
+              ]
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "DotDrawing",
-            "option": {
-              "attrs": {
-                "cx": 5,
-                "cy": 2
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
               },
-              "id": "dot21"
+              "id":"dot11"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "LineDrawing",
-            "option": {
-              "attrs": {
-                "x1": 10,
-                "y1": 0,
-                "x2": 0,
-                "y2": 5
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
               },
-              "id": "line22"
+              "id":"dot12"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "DotDrawing",
-            "option": {
-              "attrs": {
-                "cx": 5,
-                "cy": 2.5
+            "type":"LineDrawing",
+            "option":{
+              "attrs":{
+                "x1":5,
+                "y1":0,
+                "x2":5,
+                "y2":999
               },
-              "id": "dot35"
+              "id":"line12"
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "DotDrawing",
-            "option": {
-              "attrs": {
-                "cx": 5,
-                "cy": 2.5
+            "type":"PathDrawing",
+            "option":{
+              "attrs":{
+                "fill":"blue"
               },
-              "id": "dot36"
+              "id":"Path13",
+              "d":[
+                {
+                  "x":21195.041322314053,
+                  "y":-3190.9090909090914
+                },
+                {
+                  "x":122.72727272727273,
+                  "y":900
+                },
+                {
+                  "x":122.72727272727273,
+                  "y":888.6363636363636
+                },
+                {
+                  "x":122.72727272727273,
+                  "y":-3640.909090909091
+                }
+              ]
             }
           }
         ]
       },
       {
-        "type": "draw",
-        "params": [
+        "type":"draw",
+        "params":[
           {
-            "type": "LineDrawing",
-            "option": {
-              "attrs": {
-                "x1": 6.25,
-                "y1": 0,
-                "x2": 0,
-                "y2": 12.5,
-                "stroke": "red"
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2
               },
-              "id": "line36"
+              "id":"dot21"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2
+              },
+              "id":"dot22"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"LineDrawing",
+            "option":{
+              "attrs":{
+                "x1":0,
+                "y1":2,
+                "x2":999,
+                "y2":2
+              },
+              "id":"line22"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"PathDrawing",
+            "option":{
+              "attrs":{
+                "fill":"blue"
+              },
+              "id":"Path23",
+              "d":[
+                {
+                  "x":657.8512396694216,
+                  "y":-3190.9090909090914
+                },
+                {
+                  "x":96441.09691960934,
+                  "y":15404.132231404963
+                },
+                {
+                  "x":100,
+                  "y":890.9090909090909
+                },
+                {
+                  "x":122.72727272727273,
+                  "y":890.9090909090909
+                },
+                {
+                  "x":127.27272727272728,
+                  "y":890.9090909090909
+                },
+                {
+                  "x":4640.909090909091,
+                  "y":890.9090909090909
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
+              },
+              "id":"dot35"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"DotDrawing",
+            "option":{
+              "attrs":{
+                "cx":5,
+                "cy":2.5
+              },
+              "id":"dot36"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"LineDrawing",
+            "option":{
+              "attrs":{
+                "x1":6.25,
+                "y1":0,
+                "x2":0,
+                "y2":12.5,
+                "stroke":"red"
+              },
+              "id":"linelast36"
+            }
+          }
+        ]
+      },
+      {
+        "type":"draw",
+        "params":[
+          {
+            "type":"LineDrawing",
+            "option":{
+              "attrs":{
+                "x1":128.4090909090909,
+                "y1":900,
+                "x2":100,
+                "y2":843.1818181818181,
+                "stroke":"red"
+              },
+              "id":"line36"
             }
           }
         ]
       }
     ]
   },
-  "error": "",
-  "Anser": {
-    "x": 0,
-    "y": 0,
-    "z": 0
+  "error":"",
+  "Anser":{
+    "x":0,
+    "y":0,
+    "z":0
   },
-  "IsAuto": 1
+  "IsAuto":1
 }
 

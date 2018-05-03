@@ -1293,7 +1293,7 @@ export class ArrowLinkToolbar extends PureComponent {
 									const targetID = this.getShapeID(event.target);
 									if (this._sourceID && targetID) {
 										graph.doActions([
-											new DrawAction(new LinkDrawing({
+											new DrawAction(new ArrowLinkDrawing({
 												sourceId: this._sourceID,
 												targetId: targetID
 											}))
