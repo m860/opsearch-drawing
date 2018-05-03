@@ -50,9 +50,12 @@ test('fromActions', () => {
 		}]
 	}, {
 		type: "delete",//删除
-		params: ["line1", {
-			nextInterval: 1 //有时候需要快速执行下一个操作,可以设置nextInterval=1,保证操作的连续性
-		}] // 参数是对应图形的ID
+		params: [
+			"line1",// 参数是对应图形的ID
+			{
+				nextInterval: 1 //有时候需要快速执行下一个操作,可以设置nextInterval=1,保证操作的连续性
+			}
+		]
 	}];
 	const ins = fromActions(actions);
 	expect(ins.length).toBe(actions.length);
