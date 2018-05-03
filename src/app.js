@@ -23,7 +23,8 @@ import D3Graph, {
 	TextToolbar,
 	ClearAction,
 	NoneToolbar,
-	LinkToolbar
+	LinkToolbar,
+	ArrowLinkToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -180,6 +181,7 @@ class Example extends Component {
 									<LineToolbar graph={graph}/>
 									<CircleToolbar graph={graph}/>
 									<LinkToolbar graph={graph}/>
+									<ArrowLinkToolbar graph={graph}/>
 									<div style={{
 										display: "flex",
 										justifyContent: "center",

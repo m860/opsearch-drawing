@@ -104,6 +104,21 @@ function isNullOrUndefined(value) {
 	return false;
 }
 
+function getArrowPoints(startPoint, endPoint, distance = 5) {
+	const diffX = startPoint.x - endPoint.x;
+	const diffY = startPoint.y - endPoint.y;
+	const a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
+	const q1x = endPoint.x + (distance * (diffX + diffY)) / a
+	const q1y = endPoint.y + (distance * (diffY - diffX)) / a
+	const q3x = endPoint.x + (distance * (diffX - diffY)) / a;
+	const q3y = endPoint.y + (distance * (diffX + diffY)) / a;
+	return [
+		new Point(endPoint.x, endPoint.y),
+		new Point(q1x, q1y),
+		new Point(q3x, q3y)
+	];
+}
+
 /**
  * 反序列化drawing
  * */
@@ -1231,7 +1246,65 @@ export class LinkToolbar extends PureComponent {
 							type={this.type}>
 				<circle cx={10} cy={10} r={2} stroke={"#888888"} fill={"#888888"}></circle>
 				<circle cx={30} cy={30} r={2} stroke={"#888888"} fill={"#888888"}></circle>
-				<line x1={10} y1={10} x2={30} y2={30} stroke={"#888888"} fill={"#888888"}></line>
+				<path d="M 10 10 S 20 10, 20 20 S 20 30, 30 30" stroke={"#888888"} fill={"transparent"}></path>
+			</DrawingToolbar>
+		);
+	}
+}
+
+export class ArrowLinkToolbar extends PureComponent {
+	static propTypes = {
+		onClick: PropTypes.func,
+		style: PropTypes.object,
+		graph: PropTypes.object.isRequired
+	};
+
+	get type() {
+		return "ArrowLinkDrawing";
+	}
+
+	getShapeID(ele) {
+		try {
+			return ele.attributes['shape-id'].nodeValue;
+		}
+		catch (ex) {
+			return null;
+		}
+	}
+
+	render() {
+		const arrowPoint = getArrowPoints({x: 20, y: 25}, {x: 30, y: 30}, 5);
+		const arrowPath = arrowPoint.map((p, i) => {
+			if (i === 0) {
+				return `M ${p.x} ${p.y}`;
+			}
+			return `L ${p.x} ${p.y}`;
+		});
+		return (
+			<DrawingToolbar style={this.props.style}
+							onClick={() => {
+								const {graph} = this.props;
+								const svg = d3.select(graph.ele);
+								svg.on("mousedown", () => {
+									const event = d3.event;
+									this._sourceID = this.getShapeID(event.target);
+								}).on("mouseup", () => {
+									const event = d3.event;
+									const targetID = this.getShapeID(event.target);
+									if (this._sourceID && targetID) {
+										graph.doActions([
+											new DrawAction(new LinkDrawing({
+												sourceId: this._sourceID,
+												targetId: targetID
+											}))
+										])
+									}
+									delete this._sourceID;
+								})
+							}}
+							type={this.type}>
+				<path d="M 10 10 S 20 15, 20 20 S 20 25, 30 30" stroke={"#888888"} fill={"transparent"}></path>
+				<path d={[...arrowPath, "Z"].join(" ")} stroke={"#888888"} fill={"#888888"}></path>
 			</DrawingToolbar>
 		);
 	}
