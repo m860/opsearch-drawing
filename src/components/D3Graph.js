@@ -1404,6 +1404,10 @@ export default class D3Graph extends PureComponent {
 		return this.shapes[index];
 	}
 
+	getSelectedShapes(){
+		return this.selectedShapes
+	}
+
 	/**
 	 * 根据坐标系计算x值
 	 * */
