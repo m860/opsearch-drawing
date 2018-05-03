@@ -14,22 +14,46 @@
     "x": [
       2,
       3,
-      0
+      0,
+      2
     ],
     "y": [
       4,
       0,
+      1,
       1
     ],
     "z": [
       20,
       15,
-      2
+      2,
+      0
     ],
-    "symbol": [
-      ">",
-      ">",
-      ">"
+    "symbol": "min",
+    "index": 3,
+    "areaX": [
+      0,
+      10,
+      0,
+      5,
+      5,
+      5,
+      0,
+      999,
+      6,
+      5
+    ],
+    "areaY": [
+      0,
+      0,
+      5,
+      0,
+      999,
+      2.5,
+      2,
+      2,
+      2,
+      2
     ]
   },
   "step": {
@@ -77,7 +101,7 @@
                 "cx": 5,
                 "cy": 2.5
               },
-              "id": "dot5"
+              "id": "dot11"
             }
           }
         ]
@@ -89,12 +113,92 @@
             "type": "LineDrawing",
             "option": {
               "attrs": {
-                "x1": 5,
+                "x1": 10,
                 "y1": 0,
-                "x2": 5,
-                "y2": 999
+                "x2": 0,
+                "y2": 5
               },
-              "id": "line6"
+              "id": "line12"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "DotDrawing",
+            "option": {
+              "attrs": {
+                "cx": 5,
+                "cy": 2
+              },
+              "id": "dot21"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "LineDrawing",
+            "option": {
+              "attrs": {
+                "x1": 10,
+                "y1": 0,
+                "x2": 0,
+                "y2": 5
+              },
+              "id": "line22"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "DotDrawing",
+            "option": {
+              "attrs": {
+                "cx": 5,
+                "cy": 2.5
+              },
+              "id": "dot35"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "DotDrawing",
+            "option": {
+              "attrs": {
+                "cx": 5,
+                "cy": 2.5
+              },
+              "id": "dot36"
+            }
+          }
+        ]
+      },
+      {
+        "type": "draw",
+        "params": [
+          {
+            "type": "LineDrawing",
+            "option": {
+              "attrs": {
+                "x1": 6.25,
+                "y1": 0,
+                "x2": 0,
+                "y2": 12.5,
+                "stroke": "red"
+              },
+              "id": "line36"
             }
           }
         ]
