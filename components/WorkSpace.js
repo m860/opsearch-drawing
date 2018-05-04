@@ -41,7 +41,7 @@ var WorkSpace = function (_PureComponent) {
 			return _react2.default.createElement(
 				'div',
 				{ style: this.props.style, className: (0, _classnames2.default)("work-space", this.props.className) },
-				_react2.default.createElement(
+				this.hasActions && _react2.default.createElement(
 					'div',
 					{ className: 'work-space-actions' },
 					this.props.actions
@@ -52,6 +52,14 @@ var WorkSpace = function (_PureComponent) {
 					this.props.children
 				)
 			);
+		}
+	}, {
+		key: 'hasActions',
+		get: function get() {
+			if (this.props.actions) {
+				return true;
+			}
+			return false;
 		}
 	}]);
 
