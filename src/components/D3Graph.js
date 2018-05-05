@@ -958,14 +958,13 @@ export class PathDrawing extends Drawing {
 		if (!this.attrs.d) {
 			let d = this.d.map((point, index) => {
 				if (index === 0) {
-					return `M ${point.x} ${point.y}`
+					return `M ${this.graph.getX(point.x)} ${this.graph.getY(point.y)}`
 				}
-				return `L ${point.x} ${point.y}`;
+				return `L ${this.graph.getX(point.x)} ${this.graph.getY(point.y)}`;
 			});
 			d.push("Z");
 			this.attrs.d = d.join(" ");
 		}
-		console.log(this.attrs.d);
 		super.render();
 	}
 }
@@ -1404,7 +1403,7 @@ export default class D3Graph extends PureComponent {
 		return this.shapes[index];
 	}
 
-	getSelectedShapes(){
+	getSelectedShapes() {
 		return this.selectedShapes
 	}
 
