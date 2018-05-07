@@ -46,10 +46,9 @@ class Example extends Component {
 		};
 	}
 
-	playActions() {
+	draw() {
 		this.setState({
-			scale: 1,
-			mode: graphModeEnum.playing,
+			mode: graphModeEnum.draw,
 			actions: [
 				new DrawAction(new NumberScaleDrawing({
 					original: this.original,
@@ -58,39 +57,31 @@ class Example extends Component {
 				})),
 				new DrawAction(new DotDrawing({
 					attrs: {
-						cx: 20,
-						cy: 20
+						cx: 15,
+						cy: 10
 					}
 				})),
 				new DrawAction(new LineDrawing({
 					id: "line1",
 					attrs: {
-						x1: 50,
-						y1: 50,
-						x2: 100,
-						y2: 100
-					}
-				})),
-				new DrawAction(new LineDrawing({
-					attrs: {
-						x1: 50,
-						y1: 150,
-						x2: 100,
-						y2: 200
+						x1: 0,
+						y1: 1,
+						x2: 5,
+						y2: 5
 					}
 				})),
 				new DrawAction(new CircleDrawing({
 					id: "circle1",
 					attrs: {
-						cx: 100,
-						cy: 20
+						cx: 4,
+						cy: 1
 					}
 				})),
 				new DrawAction(new CircleDrawing({
 					id: "circle2",
 					attrs: {
-						cx: 100,
-						cy: 60
+						cx: 10,
+						cy: 1
 					}
 				}), {
 					nextInterval: 1
@@ -102,15 +93,15 @@ class Example extends Component {
 				new DrawAction(new CircleDrawing({
 					id: "c3",
 					attrs: {
-						cx: 150,
-						cy: 20
+						cx: 4,
+						cy: 7
 					}
 				})),
 				new DrawAction(new CircleDrawing({
 					id: "c4",
 					attrs: {
-						cx: 150,
-						cy: 60
+						cx: 10,
+						cy: 7
 					}
 				})),
 				new DrawAction(new ArrowLinkDrawing({
@@ -119,30 +110,24 @@ class Example extends Component {
 				}), {
 					nextInterval: 1
 				}),
-				new DrawAction(new DotDrawing({
-					attrs: {
-						cx: Math.random() * 100,
-						cy: Math.random() * 100
-					}
-				})),
-				new DrawAction(new PathDrawing({
-					attrs: {
-						d: "M 100 100 L 150 100 L 130 80 Z"
-					}
-				})),
+				// new DrawAction(new PathDrawing({
+				// 	attrs: {
+				// 		d: "M 100 100 L 150 100 L 130 80 Z"
+				// 	}
+				// })),
 				new DrawAction(new TextDrawing({
 					attrs: {
-						x: Math.random() * 100,
-						y: Math.random() * 100
+						x: 10,
+						y: 10
 					},
 					text: "hello text"
 				})),
-				new DrawAction(new RectDrawing({
-					attrs: {
-						d: "M 80 80 L 120 80 L 120 120 L 80 120 Z"
-					}
-				})),
-				new DeleteAction("line1")
+				// new DrawAction(new RectDrawing({
+				// 	attrs: {
+				// 		d: "M 80 80 L 120 80 L 120 120 L 80 120 Z"
+				// 	}
+				// })),
+				// new DeleteAction("line1")
 			]
 		})
 	}
@@ -150,7 +135,6 @@ class Example extends Component {
 	playDataActions() {
 		const actions = fromActions(data.step.data);
 		this.setState({
-			scale: 20,
 			mode: graphModeEnum.playing,
 			actions: [
 				new DrawAction(new NumberScaleDrawing({
@@ -164,29 +148,6 @@ class Example extends Component {
 		});
 	}
 
-	drawPath() {
-		this.setState({
-			mode: graphModeEnum.draw,
-			actions: [
-				new DrawAction(new NumberScaleDrawing({
-					original: this.original,
-					xAxisLength: 360,
-					yAxisLength: 260,
-					scale: this.state.scale
-				})),
-				new DrawAction(new PathDrawing({
-					// attrs: {
-					// 	d: "M 100 100 L 150 100 L 130 80 Z"
-					// },
-					d:[
-						{x:5,y:0},
-						{x:10,y:5},
-						{x:1,y:5},
-					]
-				})),
-			]
-		})
-	}
 
 	render() {
 		return (
@@ -194,8 +155,8 @@ class Example extends Component {
 				<div>
 					<h6>运筹学图形Example</h6>
 					<div>
-						<button type="button" onClick={this.playDataActions.bind(this)}>play data</button>
-						<button type="button" onClick={this.drawPath.bind(this)}>draw path</button>
+						<button type="button" onClick={this.playDataActions.bind(this)}>play</button>
+						<button type="button" onClick={this.draw.bind(this)}>draw</button>
 					</div>
 					<D3Graph
 						renderToolbar={(graph) => {
