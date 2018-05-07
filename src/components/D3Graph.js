@@ -305,6 +305,7 @@ actionIndex[actionTypeEnums.redraw] = ReDrawAction;
 //#region Drawing
 /**
  * 绘画接口,所有的绘画类都需要继承这个类并实现相关方法
+ * @todo 添加 TextCircleDrawing 实现图(有向图/无向图)节点的绘制
  * */
 export class Drawing {
 
@@ -785,6 +786,8 @@ registerDrawing("NumberScaleDrawing", NumberScaleDrawing);
 
 /**
  * 绘制带箭头的link
+ * @todo 添加label
+ * @todo 实现label的修改
  * */
 export class ArrowLinkDrawing extends Drawing {
     constructor(option) {
@@ -863,6 +866,8 @@ registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
 
 /**
  * 绘制link
+ * @todo 添加label
+ * @todo 实现label的修改
  * */
 export class LinkDrawing extends Drawing {
     /**
