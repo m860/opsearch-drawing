@@ -830,12 +830,13 @@ export class ArrowLinkDrawing extends Drawing {
         const p1 = this.source.getLinkPoint();
         const p2 = this.target.getLinkPoint();
         this.attrs = update(this.attrs, {
-            d: {$set: this.getArrowLinkPath(p1, p2).join(' ')}
+            d: {$set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ')}
         });
         super.render();
     }
 
     getArrowLinkPath(startPoint, endPoint, distance = 10) {
+
         const diffX = startPoint.x - endPoint.x;
         const diffY = startPoint.y - endPoint.y;
         const a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
@@ -1384,6 +1385,10 @@ export default class D3Graph extends PureComponent {
         scale: 1
     }
 
+    get scale() {
+        return this.props.scale;
+    }
+
     constructor(props) {
         super(props);
         this.ele = null;
@@ -1556,6 +1561,12 @@ export default class D3Graph extends PureComponent {
         next();
     }
 
+    stop() {
+        if (this.playingTimer) {
+            clearTimeout(this.playingTimer);
+        }
+    }
+
     render() {
         return (
             <WorkSpace actions={this.props.renderToolbar(this)}>
@@ -1566,9 +1577,7 @@ export default class D3Graph extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.playingTimer) {
-            clearTimeout(this.playingTimer);
-        }
+        this.stop();
         if (nextProps.mode === graphModeEnum.draw) {
             this.doActions(nextProps.actions);
         }
@@ -1587,9 +1596,7 @@ export default class D3Graph extends PureComponent {
     }
 
     componentWillUnmount() {
-        if (this.playingTimer) {
-            clearTimeout(this.playingTimer);
-        }
+        this.stop()
     }
 }
 //#endregion
