@@ -1,8 +1,9 @@
 /**
  * @todo 实现用户的输入action,输入action是一个中断操作
- * @todo 实现link,arrowLink的label
+ * 实现link,arrowLink的label
  * @todo 实现图的drawing
  * @todo 实现transition
+ * @todo 实现data action
  *
  * */
 
@@ -57,6 +58,7 @@ type ActionOptionType = {
  * @property {string} clear - 清除所有图形
  * @property {string} undo - 撤销
  * @property {string} data - 数据操作
+ * @property {string} input - 用户输入操作
  * */
 export const actionTypeEnums = {
     draw: "draw",
@@ -68,6 +70,7 @@ export const actionTypeEnums = {
     // move: "move",
     // undo: "undo",
     data: "data",
+    input: "input"
 };
 
 /**
@@ -422,7 +425,7 @@ export class Drawing {
         if (!isNullOrUndefined(attrs.cy)) {
             attrs.cy = this.graph.getY(attrs.cy);
         }
-        this.updateAttrs(attrs);
+        this.updateAttrs(this.selection, attrs);
         if (this.text) {
             this.selection.text(this.text);
         }
@@ -446,9 +449,9 @@ export class Drawing {
     /**
      * 批量更新attrs
      * */
-    updateAttrs(attrs) {
-        if (this.selection) {
-            this.selection.call(self => {
+    updateAttrs(selection, attrs) {
+        if (selection) {
+            selection.call(self => {
                 for (let key in attrs) {
                     self.attr(key, attrs[key]);
                 }
@@ -811,6 +814,9 @@ export class ArrowLinkDrawing extends Drawing {
         }
         this.source = null;
         this.target = null;
+        this.label = getPath(option, "label");
+        this.labelAttrs = getPath(option, "labelAttrs");
+        this.labelSelection = null;
     }
 
     get defaultAttrs() {
@@ -834,6 +840,20 @@ export class ArrowLinkDrawing extends Drawing {
         this.selection.on("click", () => {
             this.select();
         });
+        this.labelSelection = d3.select(graph.ele).append("text");
+    }
+
+    renderLabel(x, y) {
+        if (this.labelSelection) {
+            if (this.label) {
+                this.labelSelection.text(this.label);
+            }
+            const attrs = Object.assign({
+                x: this.graph.getX(x),
+                y: this.graph.getY(y)
+            }, this.labelAttrs);
+            this.updateAttrs(this.labelSelection, attrs);
+        }
     }
 
     render() {
@@ -844,6 +864,11 @@ export class ArrowLinkDrawing extends Drawing {
             d: {$set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ')}
         });
         super.render();
+        const hx = Math.abs(p1.x - p2.x) / 2;
+        const hy = Math.abs(p1.y - p2.y) / 2;
+        const labelX = Math.min(p1.x, p2.x) + hx;
+        const labelY = Math.min(p1.y, p2.y) + hy;
+        this.renderLabel(labelX, labelY);
     }
 
     getArrowLinkPath(startPoint, endPoint, distance = 10) {
@@ -899,6 +924,9 @@ export class LinkDrawing extends Drawing {
         }
         this.source = null;
         this.target = null;
+        this.label = getPath(option, "label");
+        this.labelAttrs = getPath(option, "labelAttrs");
+        this.labelSelection = null;
     }
 
     get defaultAttrs() {
@@ -923,6 +951,20 @@ export class LinkDrawing extends Drawing {
         this.selection.on("click", () => {
             this.select();
         });
+        this.labelSelection = d3.select(graph.ele).append("text");
+    }
+
+    renderLabel(x, y) {
+        if (this.labelSelection) {
+            if (this.label) {
+                this.labelSelection.text(this.label);
+            }
+            const attrs = Object.assign({
+                x: this.graph.getX(x),
+                y: this.graph.getY(y)
+            }, this.labelAttrs);
+            this.updateAttrs(this.labelSelection, attrs);
+        }
     }
 
     render() {
@@ -936,6 +978,11 @@ export class LinkDrawing extends Drawing {
             y2: {$set: p2.y}
         });
         super.render();
+        const hx = Math.abs(p1.x - p2.x) / 2;
+        const hy = Math.abs(p1.y - p2.y) / 2;
+        const labelX = Math.min(p1.x, p2.x) + hx;
+        const labelY = Math.min(p1.y, p2.y) + hy;
+        this.renderLabel(labelX, labelY);
     }
 
 }

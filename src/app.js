@@ -88,7 +88,8 @@ class Example extends Component {
                 }),
                 new DrawAction(new LinkDrawing({
                     sourceId: "circle1",
-                    targetId: "circle2"
+                    targetId: "circle2",
+                    label:"abc"
                 })),
                 new DrawAction(new CircleDrawing({
                     id: "c3",
@@ -106,7 +107,8 @@ class Example extends Component {
                 })),
                 new DrawAction(new ArrowLinkDrawing({
                     sourceId: "c3",
-                    targetId: "c4"
+                    targetId: "c4",
+                    label:"def"
                 }), {
                     nextInterval: 1
                 }),
