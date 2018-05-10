@@ -1,3 +1,11 @@
+/**
+ * @todo 实现用户的输入action,输入action是一个中断操作
+ * @todo 实现link,arrowLink的label
+ * @todo 实现图的drawing
+ * @todo 实现transition
+ *
+ * */
+
 import React, {Component, PureComponent} from "react";
 import PropTypes from 'prop-types'
 import * as d3 from 'd3'
