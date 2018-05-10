@@ -797,10 +797,18 @@ registerDrawing("NumberScaleDrawing", NumberScaleDrawing);
 
 /**
  * 绘制带箭头的link
- * @todo 添加label
  * @todo 实现label的修改
  * */
 export class ArrowLinkDrawing extends Drawing {
+    /**
+     * @constructor
+     *
+     * @param {object} option
+     * @param {string} option.sourceId - link的源id
+     * @param {string} option.targetId - link的目标id
+     * @param {string|function} option.label - link的label
+     * @param {object} option.labelAttrs - label的attributes
+     * */
     constructor(option) {
         super(option);
         this.type = "arrow-link";
@@ -906,10 +914,11 @@ export class LinkDrawing extends Drawing {
     /**
      * @constructor
      *
-     * @param {Object} option
-     * @param {String} option.sourceId
-     * @param {String} option.targetId
-     *
+     * @param {object} option
+     * @param {string} option.sourceId - link的源id
+     * @param {string} option.targetId - link的目标id
+     * @param {string|function} option.label - link的label
+     * @param {object} option.labelAttrs - label的attributes
      * */
     constructor(option) {
         super(option);
