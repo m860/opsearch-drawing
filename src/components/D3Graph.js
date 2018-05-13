@@ -469,6 +469,7 @@ export class Drawing {
         if (!isNullOrUndefined(result.cy)) {
             result.cy = this.graph.getY(result.cy);
         }
+        result["shape-id"] = this.id;
         return result;
     }
 
@@ -1105,6 +1106,7 @@ export class TextCircleDrawing extends Drawing {
             fill: "red"
         };
     }
+
     /**
      * @constructor
      *
@@ -1411,10 +1413,13 @@ export class LinkToolbar extends PureComponent {
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const event = d3.event;
+                                    console.log(event.target)
                                     this._sourceID = this.getShapeID(event.target);
+                                    console.log(`source id : ${this._sourceID}`)
                                 }).on("mouseup", () => {
                                     const event = d3.event;
                                     const targetID = this.getShapeID(event.target);
+                                    console.log(`target id : ${targetID}`)
                                     if (this._sourceID && targetID) {
                                         graph.doActions([
                                             new DrawAction(new LinkDrawing({
