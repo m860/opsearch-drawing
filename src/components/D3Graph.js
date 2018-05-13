@@ -382,7 +382,7 @@ export class Drawing {
      * @member {Object}
      * */
     get defaultAttrs() {
-        throw new Error('property `defaultAttrs` is not implementation');
+        return {};
     }
 
     /**
@@ -391,41 +391,14 @@ export class Drawing {
      * @member {Object}
      * */
     get selectedAttrs() {
-        throw new Error('property `selectedAttrs` is not implementation');
+        return {};
     }
 
     /**
      * 绘制,更新selection相关
      * */
     render() {
-        let attrs = Object.assign({
-            "shape-id": this.id
-        }, this.defaultAttrs, this.attrs, this.selected ? this.selectedAttrs : {});
-        if (!isNullOrUndefined(attrs.x)) {
-            attrs.x = this.graph.getX(attrs.x);
-        }
-        if (!isNullOrUndefined(attrs.y)) {
-            attrs.y = this.graph.getY(attrs.y);
-        }
-        if (!isNullOrUndefined(attrs.x1)) {
-            attrs.x1 = this.graph.getX(attrs.x1);
-        }
-        if (!isNullOrUndefined(attrs.x2)) {
-            attrs.x2 = this.graph.getX(attrs.x2);
-        }
-        if (!isNullOrUndefined(attrs.y1)) {
-            attrs.y1 = this.graph.getY(attrs.y1);
-        }
-        if (!isNullOrUndefined(attrs.y2)) {
-            attrs.y2 = this.graph.getY(attrs.y2);
-        }
-        if (!isNullOrUndefined(attrs.cx)) {
-            attrs.cx = this.graph.getX(attrs.cx);
-        }
-        if (!isNullOrUndefined(attrs.cy)) {
-            attrs.cy = this.graph.getY(attrs.cy);
-        }
-        this.updateAttrs(this.selection, attrs);
+        this.updateAttrs(this.selection, this.combineAttrs(this.defaultAttrs, this.attrs, this.selectedAttrs, null));
         if (this.text) {
             this.selection.text(this.text);
         }
@@ -469,6 +442,36 @@ export class Drawing {
             ])
         }
     }
+
+    combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
+        let result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
+        if (!isNullOrUndefined(result.x)) {
+            result.x = this.graph.getX(result.x);
+        }
+        if (!isNullOrUndefined(result.y)) {
+            result.y = this.graph.getY(result.y);
+        }
+        if (!isNullOrUndefined(result.x1)) {
+            result.x1 = this.graph.getX(result.x1);
+        }
+        if (!isNullOrUndefined(result.x2)) {
+            result.x2 = this.graph.getX(result.x2);
+        }
+        if (!isNullOrUndefined(result.y1)) {
+            result.y1 = this.graph.getY(result.y1);
+        }
+        if (!isNullOrUndefined(result.y2)) {
+            result.y2 = this.graph.getY(result.y2);
+        }
+        if (!isNullOrUndefined(result.cx)) {
+            result.cx = this.graph.getX(result.cx);
+        }
+        if (!isNullOrUndefined(result.cy)) {
+            result.cy = this.graph.getY(result.cy);
+        }
+        return result;
+    }
+
 }
 
 /**
@@ -1073,6 +1076,117 @@ export class TextDrawing extends Drawing {
 }
 
 registerDrawing("TextDrawing", TextDrawing)
+
+export class TextCircleDrawing extends Drawing {
+    get defaultCircleAttrs() {
+        return {
+            r: 20,
+            fill: "transparent",
+            stroke: "black"
+        };
+    }
+
+    get defaultCircleSelectedAttrs() {
+        return {
+            fill: "transparent",
+            stroke: "red"
+        };
+    }
+
+    get defaultTextAttrs() {
+        return {
+            "text-anchor": "middle",
+            "dominant-baseline": "middle"
+        };
+    }
+
+    get defaultTextSelectedAttrs() {
+        return {
+            fill: "red"
+        };
+    }
+    /**
+     * @constructor
+     *
+     * @param {Object} option - 绘制的选项
+     * @param {Object} option.circleAttrs - 圆圈的属性
+     * @param {Object} option.circleSelectedAttrs - 圆圈选中的属性
+     * @param {Object} option.textAttrs - 文本的属性
+     * @param {Object} option.textSelectedAttrs - 文本选中的属性
+     *
+     * */
+    constructor(option) {
+        super(option);
+        /**
+         * 绘制的类型
+         * @member {String}
+         * */
+        this.type = "text-circle";
+        /**
+         * 圆圈的属性
+         * @member {Object}
+         * @private
+         * */
+        this.circleAttrs = getPath(option, "circleAttrs", {});
+        /**
+         * 圆圈选中的属性
+         * @member {Object}
+         * @private
+         * */
+        this.circleSelectedAttrs = getPath(option, "circleSelectedAttrs", {});
+        /**
+         * 文本的属性
+         * @member {Object}
+         * @private
+         * */
+        this.textAttrs = getPath(option, "textAttrs", {});
+        /**
+         * 文本选中的属性
+         * @member {Object}
+         * @private
+         * */
+        this.textSelectedAttrs = getPath(option, "textSelectedAttrs", {});
+        /**
+         * 文本的selection
+         * @member {D3.Selection}
+         * @private
+         * */
+        this.textSelection = null;
+        /**
+         * 圆圈的selection
+         * @member {D3.Selection}
+         * @private
+         * */
+        this.circleSelection = null;
+    }
+
+    initialize(graph) {
+        super.initialize(graph);
+        this.selection = d3.select(graph.ele).append("g");
+        //add  circle
+        this.circleSelection = this.selection.append("circle");
+        //add text
+        this.textSelection = this.selection.append("text");
+        this.selection.on("click", this.select.bind(this));
+    }
+
+    render() {
+        this.textSelection.text(this.text);
+        let circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
+        let textAttrs = this.combineAttrs(this.defaultTextAttrs, this.textAttrs, this.defaultTextSelectedAttrs, this.textSelectedAttrs);
+        textAttrs.x = circleAttrs.cx;
+        textAttrs.y = circleAttrs.cy;
+        this.updateAttrs(this.textSelection, textAttrs);
+        this.updateAttrs(this.circleSelection, circleAttrs);
+    }
+
+    getLinkPoint() {
+        const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
+        return new Point(circleAttrs.cx, circleAttrs.cy);
+    }
+}
+
+registerDrawing("TextCircleDrawing", TextCircleDrawing);
 //#endregion
 
 //#region Toolbar

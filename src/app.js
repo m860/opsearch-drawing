@@ -24,7 +24,8 @@ import D3Graph, {
     ClearAction,
     NoneToolbar,
     LinkToolbar,
-    ArrowLinkToolbar
+    ArrowLinkToolbar,
+    TextCircleDrawing
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -89,7 +90,7 @@ class Example extends Component {
                 new DrawAction(new LinkDrawing({
                     sourceId: "circle1",
                     targetId: "circle2",
-                    label:"abc"
+                    label: "abc"
                 })),
                 new DrawAction(new CircleDrawing({
                     id: "c3",
@@ -108,7 +109,7 @@ class Example extends Component {
                 new DrawAction(new ArrowLinkDrawing({
                     sourceId: "c3",
                     targetId: "c4",
-                    label:"def"
+                    label: "def"
                 }), {
                     nextInterval: 1
                 }),
@@ -130,6 +131,13 @@ class Example extends Component {
                 // 	}
                 // })),
                 // new DeleteAction("line1")
+                new DrawAction(new TextCircleDrawing({
+                    text: "abc",
+                    circleAttrs: {
+                        cx: 12,
+                        cy: 3
+                    }
+                }))
             ]
         })
     }
