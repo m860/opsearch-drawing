@@ -1115,6 +1115,7 @@ export class TextCircleDrawing extends Drawing {
      * @param {Object} option.circleSelectedAttrs - 圆圈选中的属性
      * @param {Object} option.textAttrs - 文本的属性
      * @param {Object} option.textSelectedAttrs - 文本选中的属性
+     * @param {String} option.text
      *
      * */
     constructor(option) {

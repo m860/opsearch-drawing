@@ -65,7 +65,8 @@ test('fromActions', () => {
                 circleAttrs: {
                     cx: 13,
                     cy: 5
-                }
+                },
+                text:"abc"
             }
         }]
     }];
