@@ -69,6 +69,46 @@ test('fromActions', () => {
                 text:"abc"
             }
         }]
+    },{
+        type:"draw",
+        params:[{
+            type:"CircleDrawing",
+            option:{
+                id:"c1",
+                attrs:{
+                    cx:10,
+                    cy:10
+                }
+            }
+        }]
+    },{
+        type:"draw",
+        params:[{
+            type:"CircleDrawing",
+            option:{
+                id:"c2",
+                attrs:{
+                    cx:100,
+                    cy:100
+                }
+            }
+        }]
+    },{
+        type:"draw",
+        params:[{
+            //绘制link
+            type:"LinkDrawing",
+            option:{
+                //link的起点对应的图形id
+                sourceId:"c1",
+                //link的终点对应的图形id
+                targetId:"c2",
+                //label
+                label:"abc",
+                //label的属性
+                labelAttrs:{}
+            }
+        }]
     }];
     const ins = fromActions(actions);
     expect(ins.length).toBe(actions.length);
