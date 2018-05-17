@@ -1078,6 +1078,9 @@ export class TextDrawing extends Drawing {
 
 registerDrawing("TextDrawing", TextDrawing)
 
+/**
+ * 绘制带文本的圆圈
+ */
 export class TextCircleDrawing extends Drawing {
     get defaultCircleAttrs() {
         return {

@@ -550,6 +550,7 @@ var Drawing = exports.Drawing = function () {
             if (!isNullOrUndefined(result.cy)) {
                 result.cy = this.graph.getY(result.cy);
             }
+            result["shape-id"] = this.id;
             return result;
         }
     }, {
@@ -1287,6 +1288,10 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
 
 registerDrawing("TextDrawing", TextDrawing);
 
+/**
+ * 绘制带文本的圆圈
+ */
+
 var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
     _inherits(TextCircleDrawing, _Drawing10);
 
@@ -1322,6 +1327,7 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
                 fill: "red"
             };
         }
+
         /**
          * @constructor
          *
@@ -1330,6 +1336,7 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
          * @param {Object} option.circleSelectedAttrs - 圆圈选中的属性
          * @param {Object} option.textAttrs - 文本的属性
          * @param {Object} option.textSelectedAttrs - 文本选中的属性
+         * @param {String} option.text
          *
          * */
 
@@ -1724,10 +1731,13 @@ var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
                         var svg = d3.select(graph.ele);
                         svg.on("mousedown", function () {
                             var event = d3.event;
+                            console.log(event.target);
                             _this38._sourceID = _this38.getShapeID(event.target);
+                            console.log('source id : ' + _this38._sourceID);
                         }).on("mouseup", function () {
                             var event = d3.event;
                             var targetID = _this38.getShapeID(event.target);
+                            console.log('target id : ' + targetID);
                             if (_this38._sourceID && targetID) {
                                 graph.doActions([new DrawAction(new LinkDrawing({
                                     sourceId: _this38._sourceID,
