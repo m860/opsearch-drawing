@@ -1,7 +1,7 @@
 /**
  * Created by jean.h.ma on 26/04/2018.
  */
-import {fromDrawing, actionTypeEnums, fromActions, SelectAction} from '../src/components/D3Graph'
+import {fromDrawing, actionTypeEnums, fromActions, SelectAction, UnSelectAction} from '../src/components/D3Graph'
 import drawData from './drawing-data'
 
 test('fromDrawing', () => {
@@ -112,6 +112,9 @@ test('fromActions', () => {
     }, {
         type: "select",
         params: ["id"]
+    }, {
+        type: "unselect",
+        params: ["id"]
     }];
     const ins = fromActions(actions);
     expect(ins.length).toBe(actions.length);
@@ -120,6 +123,7 @@ test('fromActions', () => {
     expect(ins[3].params).toBe(actions[3].params[0]);
     expect(ins[3].nextInterval).toBe(1);
     expect(ins[8].constructor.name).toBe("SelectAction")
+    expect(ins[9].constructor.name).toBe("UnSelectAction")
     // console.log(ins);
 })
 
