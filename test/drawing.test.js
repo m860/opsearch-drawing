@@ -1,7 +1,7 @@
 /**
  * Created by jean.h.ma on 26/04/2018.
  */
-import {fromDrawing, actionTypeEnums, fromActions} from '../src/components/D3Graph'
+import {fromDrawing, actionTypeEnums, fromActions, SelectAction} from '../src/components/D3Graph'
 import drawData from './drawing-data'
 
 test('fromDrawing', () => {
@@ -66,49 +66,52 @@ test('fromActions', () => {
                     cx: 13,
                     cy: 5
                 },
-                text:"abc"
+                text: "abc"
             }
         }]
-    },{
-        type:"draw",
-        params:[{
-            type:"CircleDrawing",
-            option:{
-                id:"c1",
-                attrs:{
-                    cx:10,
-                    cy:10
+    }, {
+        type: "draw",
+        params: [{
+            type: "CircleDrawing",
+            option: {
+                id: "c1",
+                attrs: {
+                    cx: 10,
+                    cy: 10
                 }
             }
         }]
-    },{
-        type:"draw",
-        params:[{
-            type:"CircleDrawing",
-            option:{
-                id:"c2",
-                attrs:{
-                    cx:100,
-                    cy:100
+    }, {
+        type: "draw",
+        params: [{
+            type: "CircleDrawing",
+            option: {
+                id: "c2",
+                attrs: {
+                    cx: 100,
+                    cy: 100
                 }
             }
         }]
-    },{
-        type:"draw",
-        params:[{
+    }, {
+        type: "draw",
+        params: [{
             //绘制link
-            type:"LinkDrawing",
-            option:{
+            type: "LinkDrawing",
+            option: {
                 //link的起点对应的图形id
-                sourceId:"c1",
+                sourceId: "c1",
                 //link的终点对应的图形id
-                targetId:"c2",
+                targetId: "c2",
                 //label
-                label:"abc",
+                label: "abc",
                 //label的属性
-                labelAttrs:{}
+                labelAttrs: {}
             }
         }]
+    }, {
+        type: "select",
+        params: ["id"]
     }];
     const ins = fromActions(actions);
     expect(ins.length).toBe(actions.length);
@@ -116,7 +119,8 @@ test('fromActions', () => {
     expect(ins[3].constructor.name).toBe("DeleteAction");
     expect(ins[3].params).toBe(actions[3].params[0]);
     expect(ins[3].nextInterval).toBe(1);
-    console.log(ins);
+    expect(ins[8].constructor.name).toBe("SelectAction")
+    // console.log(ins);
 })
 
 test('fromActions from drawing-data.json', () => {
