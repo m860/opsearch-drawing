@@ -25,7 +25,8 @@ import D3Graph, {
     NoneToolbar,
     LinkToolbar,
     ArrowLinkToolbar,
-    TextCircleDrawing
+    TextCircleDrawing,
+    InputAction
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -158,6 +159,94 @@ class Example extends Component {
         });
     }
 
+    playCustomAction() {
+        this.setState({
+            mode: graphModeEnum.playing,
+            actions: [
+                new DrawAction(new NumberScaleDrawing({
+                    original: this.original,
+                    xAxisLength: 360,
+                    yAxisLength: 260
+                })),
+                new DrawAction(new DotDrawing({
+                    attrs: {
+                        cx: 15,
+                        cy: 10
+                    }
+                })),
+                new DrawAction(new LineDrawing({
+                    id: "line1",
+                    attrs: {
+                        x1: 0,
+                        y1: 1,
+                        x2: 5,
+                        y2: 5
+                    }
+                })),
+                new DrawAction(new CircleDrawing({
+                    id: "circle1",
+                    attrs: {
+                        cx: 4,
+                        cy: 1
+                    }
+                })),
+                new DrawAction(new CircleDrawing({
+                    id: "circle2",
+                    attrs: {
+                        cx: 10,
+                        cy: 1
+                    }
+                }), {
+                    nextInterval: 1
+                }),
+                new DrawAction(new LinkDrawing({
+                    sourceId: "circle1",
+                    targetId: "circle2",
+                    label: "abc"
+                })),
+                new DrawAction(new CircleDrawing({
+                    id: "c3",
+                    attrs: {
+                        cx: 4,
+                        cy: 7
+                    }
+                })),
+                new DrawAction(new CircleDrawing({
+                    id: "c4",
+                    attrs: {
+                        cx: 10,
+                        cy: 7
+                    }
+                })),
+                new DrawAction(new ArrowLinkDrawing({
+                    sourceId: "c3",
+                    targetId: "c4",
+                    label: "def"
+                }), {
+                    nextInterval: 1
+                }),
+                new InputAction([{
+                    label: "x",
+                    fieldName: "x"
+                }]),
+                new DrawAction(new TextDrawing({
+                    attrs: {
+                        x: 10,
+                        y: 10
+                    },
+                    text: "hello text"
+                })),
+                new DrawAction(new TextCircleDrawing({
+                    text: "abc",
+                    circleAttrs: {
+                        cx: 12,
+                        cy: 3
+                    }
+                }))
+            ]
+        })
+    }
+
 
     render() {
         return (
@@ -167,6 +256,7 @@ class Example extends Component {
                     <div>
                         <button type="button" onClick={this.playDataActions.bind(this)}>play</button>
                         <button type="button" onClick={this.draw.bind(this)}>draw</button>
+                        <button type="button" onClick={this.playCustomAction.bind(this)}>play custom action</button>
                     </div>
                     <D3Graph
                         renderToolbar={(graph) => {

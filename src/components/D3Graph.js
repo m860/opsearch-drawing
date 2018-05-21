@@ -1,7 +1,7 @@
 /**
  * @todo 实现用户的输入action,输入action是一个中断操作
  * 实现link,arrowLink的label
- * @todo 实现图的drawing
+ * 实现图的drawing
  * @todo 实现transition
  * @todo 实现data action
  *
@@ -15,6 +15,7 @@ import WorkSpace from './WorkSpace'
 import {get as getPath} from 'object-path'
 import update from 'immutability-helper'
 import {EventEmitter} from 'fbemitter'
+import UserInput from "./UserInput"
 
 //#region event
 const emitter = new EventEmitter();
@@ -24,21 +25,14 @@ const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 
 /**
  * @typedef
- * */
-type FromDrawingType = {
-    /**
-     * 对应到绘制的类的名字
-     * */
-    type: String,
-    /**
-     * 目前包含两个主要属性就是`attrs`和`text`,`text`是指svg中的嵌套内容,`attrs`是对应到svg元素的attributes,以后可能还会扩展其他属性(svg的标准)
-     * */
-    option: Object
-}
+ */
 type DrawingOptionType = {
-    type: String,
+    type: actionTypeEnums,
     option: Object
 };
+/**
+ * @typedef
+ */
 type ActionOptionType = {
     type: String,
     params: Array,
@@ -211,8 +205,33 @@ class Action {
          * @member {?Number}
          * */
         this.nextInterval = getPath(ops, "nextInterval", null);
+        /**
+         * 是否允许中断操作
+         * @type {boolean}
+         */
+        this.canBreak = false;
     }
 }
+
+/**
+ * 用户输入action,中断操作
+ */
+export class InputAction extends Action {
+    /**
+     *
+     * @param {Array} params
+     * @param {String} params[].label
+     * @param {String} params[].fieldName
+     * @param {any} params[].defaultValue
+     * @param {?Object} ops
+     */
+    constructor(params, ops) {
+        super(actionTypeEnums.input, params, ops);
+        this.canBreak = true;
+    }
+}
+
+actionIndex[actionTypeEnums.input] = InputAction;
 
 /**
  * 绘图action
@@ -1591,6 +1610,31 @@ export default class D3Graph extends PureComponent {
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
         this.playingTimer = null;
+        /**
+         * 播放的索引
+         * @type {number}
+         */
+        this.playingIndex = 0;
+        /**
+         * 正在播放的action
+         * @type {Array}
+         */
+        this.playingActions = [];
+        /**
+         * 播放选项
+         * @type {null}
+         */
+        this.playingOption = null;
+        this.state = {
+            /**
+             * inputAction的属性
+             */
+            inputProperties: [],
+            /**
+             * 是否显示用户输入
+             */
+            showUserInput: false
+        };
     }
 
     /**
@@ -1636,97 +1680,164 @@ export default class D3Graph extends PureComponent {
     }
 
     doActions(actions) {
+        actions.forEach(a => this.doAction(a));
+        // //#region draw
+        // const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
+        // if (drawActions.length > 0) {
+        //     console.log(`draw : ${drawActions.map(f => `${f.params.type}(id=${f.params.id})`).join(',')}`)
+        //     this.shapes = this.shapes.concat(drawActions.map(data => data.params));
+        //     this.drawShapes(this.shapes);
+        // }
+        // //#endregion
+        //
+        // //#region redraw
+        // const redrawActions = actions.filter(f => f.type === actionTypeEnums.redraw);
+        // if (redrawActions.length > 0) {
+        //     console.log(`redraw : ${redrawActions.map(f => f.params.id).join(',')}`);
+        //     let shapes = [];
+        //     redrawActions.forEach(action => {
+        //         const index = this.shapes.findIndex(f => f.id === action.params.id);
+        //         if (index >= 0) {
+        //             this.shapes[index] = update(this.shapes[index], action.params.state);
+        //             shapes.push(this.shapes[index]);
+        //         }
+        //     });
+        //     this.drawShapes(shapes);
+        // }
+        // //#endregion
+        //
+        // //#region select
+        // const selectActions = actions.filter(f => f.type === actionTypeEnums.select);
+        // if (selectActions.length > 0) {
+        //     console.log(`${this.props.selectMode} select : ${selectActions.map(f => f.params).join(',')}`)
+        //     if (this.props.selectMode === selectModeEnums.single) {
+        //         this.doActions(this.selectedShapes.map(shape => new UnSelectAction(shape.id)))
+        //         this.selectedShapes = selectActions.map(f => {
+        //             const id = f.params;
+        //             let shape = this.findShapeById(id);
+        //             shape.selected = true;
+        //             return shape;
+        //         });
+        //     }
+        //     else {
+        //         this.selectedShapes = this.selectedShapes.concat(selectActions.map(f => {
+        //             const id = f.params;
+        //             let shape = this.findShapeById(id);
+        //             shape.selected = true;
+        //             return shape;
+        //         }));
+        //     }
+        //     this.drawShapes(this.selectedShapes);
+        // }
+        // //#endregion
+        //
+        // //#region unselect
+        // const unSelectActions = actions.filter(f => f.type === actionTypeEnums.unselect);
+        // if (unSelectActions.length > 0) {
+        //     console.log(`unselect : ${unSelectActions.map(f => f.params).join(',')}`);
+        //     const unSelectShape = unSelectActions.map(f => {
+        //         const id = f.params;
+        //         let shape = this.findShapeById(id);
+        //         shape.selected = false;
+        //         return shape;
+        //     });
+        //     this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
+        //     this.drawShapes(unSelectShape);
+        // }
+        // //#endregion
+        //
+        // //#region delete
+        // const deleteActions = actions.filter(f => f.type === actionTypeEnums.delete);
+        // if (deleteActions.length > 0) {
+        //     const ids = deleteActions.map(f => f.params);
+        //     console.log(`delete : ${ids.join(",")}`);
+        //     //删除的图形
+        //     const deletedShapes = this.shapes.filter(s => ids.indexOf(s.id) >= 0);
+        //     //删除后的图形
+        //     this.shapes = this.shapes.filter(s => ids.indexOf(s.id) <= 0);
+        //     deletedShapes.forEach(s => {
+        //         if (s.selection) {
+        //             //删除图形
+        //             s.selection.remove();
+        //             delete s.selection;
+        //         }
+        //     })
+        // }
+        // //#endregion
+        //
+        // //#region clear
+        // const clearActions = actions.filter(f => f.type === actionTypeEnums.clear);
+        // if (clearActions.length > 0) {
+        //     this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
+        // }
+        // //#endregion
+        //
+        // //#region input
+        // const inputActions = actions.filter(f => f.type === actionTypeEnums.input);
+        // if (inputActions.length > 0) {
+        //     //TODO show input
+        // }
+        // //#endregion
+    }
 
-        //#region draw
-        const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
-        if (drawActions.length > 0) {
-            console.log(`draw : ${drawActions.map(f => `${f.params.type}(id=${f.params.id})`).join(',')}`)
-            this.shapes = this.shapes.concat(drawActions.map(data => data.params));
-            this.drawShapes(this.shapes);
-        }
-        //#endregion
-
-        //#region redraw
-        const redrawActions = actions.filter(f => f.type === actionTypeEnums.redraw);
-        if (redrawActions.length > 0) {
-            console.log(`redraw : ${redrawActions.map(f => f.params.id).join(',')}`);
-            let shapes = [];
-            redrawActions.forEach(action => {
+    doAction(action) {
+        switch (action.type) {
+            case actionTypeEnums.draw: {
+                this.shapes.push(action.params);
+                this.drawShapes([action.params]);
+                break;
+            }
+            case actionTypeEnums.redraw: {
                 const index = this.shapes.findIndex(f => f.id === action.params.id);
                 if (index >= 0) {
                     this.shapes[index] = update(this.shapes[index], action.params.state);
-                    shapes.push(this.shapes[index]);
+                    this.drawShapes([this.shapes[index]]);
                 }
-            });
-            this.drawShapes(shapes);
-        }
-        //#endregion
-
-        //#region select
-        const selectActions = actions.filter(f => f.type === actionTypeEnums.select);
-        if (selectActions.length > 0) {
-            console.log(`${this.props.selectMode} select : ${selectActions.map(f => f.params).join(',')}`)
-            if (this.props.selectMode === selectModeEnums.single) {
-                this.doActions(this.selectedShapes.map(shape => new UnSelectAction(shape.id)))
-                this.selectedShapes = selectActions.map(f => {
-                    const id = f.params;
-                    let shape = this.findShapeById(id);
-                    shape.selected = true;
-                    return shape;
-                });
+                break;
             }
-            else {
-                this.selectedShapes = this.selectedShapes.concat(selectActions.map(f => {
-                    const id = f.params;
-                    let shape = this.findShapeById(id);
-                    shape.selected = true;
-                    return shape;
-                }));
+            case actionTypeEnums.select: {
+                const id = action.params;
+                let shape = this.findShapeById(id);
+                shape.selected = true;
+                if (this.props.selectMode === selectModeEnums.single) {
+                    this.doAction(new UnSelectAction(shape.id));
+                    this.selectedShapes = [shape];
+                }
+                else {
+                    this.selectedShapes.push(shape);
+                }
+                this.drawShapes([shape]);
+                break;
             }
-            this.drawShapes(this.selectedShapes);
-        }
-        //#endregion
-
-        //#region unselect
-        const unSelectActions = actions.filter(f => f.type === actionTypeEnums.unselect);
-        if (unSelectActions.length > 0) {
-            console.log(`unselect : ${unSelectActions.map(f => f.params).join(',')}`);
-            const unSelectShape = unSelectActions.map(f => {
-                const id = f.params;
+            case actionTypeEnums.unselect: {
+                const id = action.params;
                 let shape = this.findShapeById(id);
                 shape.selected = false;
-                return shape;
-            });
-            this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
-            this.drawShapes(unSelectShape);
-        }
-        //#endregion
-
-        //#region delete
-        const deleteActions = actions.filter(f => f.type === actionTypeEnums.delete);
-        if (deleteActions.length > 0) {
-            const ids = deleteActions.map(f => f.params);
-            console.log(`delete : ${ids.join(",")}`);
-            //删除的图形
-            const deletedShapes = this.shapes.filter(s => ids.indexOf(s.id) >= 0);
-            //删除后的图形
-            this.shapes = this.shapes.filter(s => ids.indexOf(s.id) <= 0);
-            deletedShapes.forEach(s => {
-                if (s.selection) {
-                    //删除图形
-                    s.selection.remove();
-                    delete s.selection;
+                this.selectedShapes = this.selectedShapes.filter(f => f.id !== id);
+                this.drawShapes([shape]);
+                break;
+            }
+            case actionTypeEnums.delete: {
+                const id = action.params;
+                //删除的图形
+                const shape = this.shapes.find(s => s.id === id);
+                //删除后的图形
+                this.shapes = this.shapes.filter(s => s.id !== id);
+                if (shape.selection) {
+                    shape.selection.remove();
+                    delete shape.selection;
                 }
-            })
+                break;
+            }
+            case actionTypeEnums.clear: {
+                this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
+                break;
+            }
+            case actionTypeEnums.input: {
+                //TODO
+                break;
+            }
         }
-        //#endregion
-
-        //#region clear
-        const clearActions = actions.filter(f => f.type === actionTypeEnums.clear);
-        if (clearActions.length > 0) {
-            this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
-        }
-        //#endregion
     }
 
     drawShapes(shapes) {
@@ -1740,17 +1851,43 @@ export default class D3Graph extends PureComponent {
     }
 
     play(actions, playingOps) {
-        let actionIndex = 0;
-        const next = () => {
-            if (actionIndex >= actions.length) {
-                return;
-            }
-            const action = actions[actionIndex];
-            this.doActions([action]);
-            actionIndex++;
-            this.playingTimer = setTimeout(next.bind(this), action.nextInterval ? action.nextInterval : getPath(playingOps, "interval", 1000));
+        this.playingActions = actions;
+        this.playingIndex = 0;
+        this.playingOption = playingOps;
+        // let actionIndex = 0;
+        // const next = () => {
+        //     if (actionIndex >= actions.length) {
+        //         return;
+        //     }
+        //     const action = actions[actionIndex];
+        //     /**
+        //      * 如果action允许中断操作则停止play
+        //      */
+        //     if (action.canBreak) {
+        //         return;
+        //     }
+        //     this.doActions([action]);
+        //     actionIndex++;
+        //     this.playingTimer = setTimeout(next.bind(this), action.nextInterval ? action.nextInterval : getPath(playingOps, "interval", 1000));
+        // }
+        // next();
+        this.playNextAction();
+    }
+
+    /**
+     * 执行下一个下一个action
+     */
+    playNextAction() {
+        if (this.playingIndex >= this.playingActions.length) {
+            return;
         }
-        next();
+        const action = this.playingActions[this.playingIndex];
+        this.doActions([action]);
+        if (action.canBreak) {
+            return;
+        }
+        this.playingIndex++;
+        this.playingTimer = setTimeout(this.playNextAction.bind(this), action.nextInterval ? action.nextInterval : getPath(this.playingOption, "interval", 1000));
     }
 
     stop() {
@@ -1764,6 +1901,9 @@ export default class D3Graph extends PureComponent {
             <WorkSpace actions={this.props.renderToolbar(this)}>
                 <svg ref={ref => this.ele = ref} {...this.props.attrs}>
                 </svg>
+                {this.state.showUserInput && <UserInput properties={this.state.inputProperties} onOK={() => {
+                    //TODO
+                }}/>}
             </WorkSpace>
         );
     }

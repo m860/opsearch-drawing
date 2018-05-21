@@ -71,6 +71,14 @@ var EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
  * @typedef
  * */
 
+/**
+ * @typedef
+ */
+
+/**
+ * @typedef
+ */
+
 
 //#region enums
 /**
