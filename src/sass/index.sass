@@ -4,6 +4,7 @@
   border: solid 1px #cccccc
   padding: 0 0 10px 0
   border-radius: 10px
+  position: relative
   .work-space-actions
     height: 40px
     border-bottom: solid 1px #cccccc
@@ -13,3 +14,34 @@
   .work-space-content
     flex: 1 0 auto
     padding: 10px
+
+.user-input
+  display: flex
+  justify-content: center
+  align-items: center
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  background-color: rgba(0, 0, 0, 0.5)
+  > div
+    width: 80%
+    height: 80%
+    background-color: white
+    display: flex
+    flex-direction: column
+    .properties
+      flex: 1
+      ul
+        li
+          list-style: none
+          label
+            width: 40px
+            padding-right: 10px
+    .buttons
+      height: 60px
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center

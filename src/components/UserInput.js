@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react"
 import PropTypes from "prop-types"
-import {get as getPath} from "object-path"
+import {get as getPath, set as setPath} from "object-path"
 
 export default class UserInput extends PureComponent {
     static propTypes = {
@@ -17,38 +17,44 @@ export default class UserInput extends PureComponent {
 
     constructor(props) {
         super(props);
+        let data = {};
+        props.properties.forEach(property => {
+            setPath(data, property.fieldName, property.defaultValue || "");
+        });
+        console.log(data);
         this.state = {
-            data: {}
+            data: data
         };
     }
 
     render() {
         return (
-            <div>
+            <div className="user-input">
                 <div>
-                    <ul>
-                        {this.props.properties.map((property, index) => {
-                            return (
-                                <li key={index}>
-                                    <label>{property.label}</label>
-                                    <input type="text"
-                                           value={getPath(this.state.data, `${property.fieldName}`)}
-                                           onChange={({target: {value}}) => {
-                                               this.setState({
-                                                   [property.fieldName]: value
-                                               })
-                                           }}
-                                           defaultValue={property.defaultValue}/>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
-                <div>
-                    <button type="button" onClick={() => {
-                        this.props.onOK({...this.state.data})
-                    }}>确定
-                    </button>
+                    <div className="properties">
+                        <ul>
+                            {this.props.properties.map((property, index) => {
+                                return (
+                                    <li key={index}>
+                                        <label>{property.label}</label>
+                                        <input type="text"
+                                               value={this.state.data[property.fieldName]}
+                                               onChange={({target: {value}}) => {
+                                                   let newState =Object.assign({},this.state);
+                                                   setPath(newState.data, property.fieldName, value);
+                                                   this.setState(newState);
+                                               }}/>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                    <div className="buttons">
+                        <button type="button" onClick={() => {
+                            this.props.onOK({...this.state.data})
+                        }}>确定
+                        </button>
+                    </div>
                 </div>
             </div>
         );

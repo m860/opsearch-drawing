@@ -12,7 +12,7 @@ import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import guid from 'guid'
 import WorkSpace from './WorkSpace'
-import {get as getPath} from 'object-path'
+import {get as getPath, set as setPath} from 'object-path'
 import update from 'immutability-helper'
 import {EventEmitter} from 'fbemitter'
 import UserInput from "./UserInput"
@@ -1538,6 +1538,7 @@ export default class D3Graph extends PureComponent {
      * @property {object} playingOption - mode===playing时有效
      * @property {Function} renderToolbar - 绘图的工具栏
      * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
+     * @property {Number} interval - action的执行时间间隔
      * */
     static propTypes = {
         attrs: PropTypes.object,
@@ -1573,7 +1574,8 @@ export default class D3Graph extends PureComponent {
             interval: PropTypes.number
         }),
         renderToolbar: PropTypes.func,
-        scale: PropTypes.number
+        scale: PropTypes.number,
+        interval: PropTypes.number,
     };
     static defaultProps = {
         attrs: {
@@ -1593,7 +1595,8 @@ export default class D3Graph extends PureComponent {
         coordinateType: coordinateTypeEnum.screen,
         mode: graphModeEnum.none,
         renderToolbar: () => null,
-        scale: 1
+        scale: 1,
+        interval: 1,
     }
 
     get scale() {
@@ -1625,6 +1628,11 @@ export default class D3Graph extends PureComponent {
          * @type {null}
          */
         this.playingOption = null;
+        /**
+         * 执行action的timter
+         * @type {null}
+         */
+        this.timer = null;
         this.state = {
             /**
              * inputAction的属性
@@ -1633,7 +1641,15 @@ export default class D3Graph extends PureComponent {
             /**
              * 是否显示用户输入
              */
-            showUserInput: false
+            showUserInput: false,
+            /**
+             * 所有的action
+             */
+            actions: [],
+            /**
+             * action执行的时间间隔
+             */
+            interval: props.interval
         };
     }
 
@@ -1680,7 +1696,27 @@ export default class D3Graph extends PureComponent {
     }
 
     doActions(actions) {
-        actions.forEach(a => this.doAction(a));
+        const action = actions.shift();
+        if (action) {
+            this.doAction(action);
+            if (!action.canBreak) {
+                //next
+                this.timer = setTimeout(() => {
+                    this.doActions(actions);
+                }, this.state.interval);
+            }
+            else {
+                //保存后续的action,等待继续执行
+                this._leftActions = actions;
+            }
+        }
+        // let i=0,len=actions.length;
+        // for(;i<len;i++){
+        //     this.doAction(actions[i]);
+        // }
+        // actions.forEach(action => {
+        //     this.doAction(action)
+        // });
         // //#region draw
         // const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
         // if (drawActions.length > 0) {
@@ -1775,12 +1811,13 @@ export default class D3Graph extends PureComponent {
         // //#region input
         // const inputActions = actions.filter(f => f.type === actionTypeEnums.input);
         // if (inputActions.length > 0) {
-        //     //TODO show input
+        //     //show input
         // }
         // //#endregion
     }
 
     doAction(action) {
+        console.log(`action : ${action.type}`)
         switch (action.type) {
             case actionTypeEnums.draw: {
                 this.shapes.push(action.params);
@@ -1834,10 +1871,55 @@ export default class D3Graph extends PureComponent {
                 break;
             }
             case actionTypeEnums.input: {
-                //TODO
+                //显示用户输入
+                this.showUserInput(action);
                 break;
             }
         }
+        this.setState(
+            update(this.state, {
+                actions: {$push: [action]}
+            })
+        );
+    }
+
+    /**
+     * 显示用户输入
+     * @param action
+     */
+    showUserInput(action) {
+        this.setState({
+            showUserInput: true,
+            inputProperties: action.params
+        })
+    }
+
+    /**
+     * 隐藏用户输入并执行下一个action
+     */
+    hideUserInput(nextActionOption) {
+        const params = this.state.inputProperties.map(property => {
+            return {
+                path: property.fieldName,
+                value: getPath(nextActionOption, property.fieldName)
+            }
+        })
+        this.setState({
+            showUserInput: false,
+            inputProperties: []
+        }, () => {
+            //执行下一个action
+            console.log("next action option", JSON.stringify(nextActionOption));
+            console.log("first action", JSON.stringify(this._leftActions[0]));
+            console.log("params", JSON.stringify(params));
+            if (this._leftActions.length > 0) {
+                params.forEach(p => {
+                    setPath(this._leftActions[0].params, p.path, p.value)
+                });
+            }
+            console.log("target first action", JSON.stringify(this._leftActions[0]))
+            this.doActions(this._leftActions);
+        })
     }
 
     drawShapes(shapes) {
@@ -1901,34 +1983,35 @@ export default class D3Graph extends PureComponent {
             <WorkSpace actions={this.props.renderToolbar(this)}>
                 <svg ref={ref => this.ele = ref} {...this.props.attrs}>
                 </svg>
-                {this.state.showUserInput && <UserInput properties={this.state.inputProperties} onOK={() => {
-                    //TODO
-                }}/>}
+                {this.state.showUserInput && <UserInput properties={this.state.inputProperties}
+                                                        onOK={(value) => {
+                                                            //执行下一个action,并把用户的输入参数参入到下一个action
+                                                            this.hideUserInput(value);
+                                                        }}/>}
             </WorkSpace>
         );
     }
 
     componentWillReceiveProps(nextProps) {
-        this.stop();
-        if (nextProps.mode === graphModeEnum.draw) {
-            this.doActions(nextProps.actions);
+        let newState = {};
+        if (this.state.interval !== nextProps.interval) {
+            newState.interval = nextProps.interval;
         }
-        if (nextProps.mode === graphModeEnum.playing) {
-            this.play(nextProps.actions, nextProps.playingOption);
-        }
+        this.setState(newState, () => {
+            if (nextProps.actions.length > 0) {
+                this.doActions(nextProps.actions);
+            }
+        });
     }
 
     componentDidMount() {
-        if (this.props.mode === graphModeEnum.draw) {
-            this.doActions(this.props.actions);
-        }
-        if (this.props.mode === graphModeEnum.playing) {
-            this.play(this.props.actions);
-        }
+        this.doActions(this.props.actions);
     }
 
     componentWillUnmount() {
-        this.stop()
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
     }
 }
 //#endregion
