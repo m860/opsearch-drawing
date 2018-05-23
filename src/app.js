@@ -32,13 +32,23 @@ import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
 import * as d3 from 'd3'
 import data from '../test/drawing-data'
+import update from 'immutability-helper'
 
 class TestDrawing extends Component {
     constructor(props) {
         super(props);
         this.state = {
             interval: 1,
-            actions: []
+            actions: [],
+            scale: 1,
+            original: {
+                x: 0,
+                y: 0
+            },
+            coordinateType: "screen",
+            actionJson: "[\n" +
+            "  {\"type\":\"draw\",\"params\":[{\"type\":\"CircleDrawing\",\"option\":{\"attrs\":{\"cx\":50,\"cy\":50}}}]}\n" +
+            "]"
         };
     }
 
@@ -51,56 +61,20 @@ class TestDrawing extends Component {
     }
 
     drawing() {
-        this.setState({
-            actions: [
-                new ClearAction(),
-                new DrawAction(new DotDrawing({
-                    attrs: {
-                        cx: this.randomX(),
-                        cy: this.randomY()
-                    }
-                })),
-                new DrawAction(new LineDrawing({
-                    attrs: {
-                        x1: 20,
-                        y1: 10,
-                        x2: 100,
-                        y2: 200
-                    }
-                })),
-                new DrawAction(new CircleDrawing({
-                    attrs: {
-                        cx: this.randomX(),
-                        cy: this.randomY()
-                    }
-                })),
-                new DrawAction(new TextCircleDrawing({
-                    text: "A",
-                    circleAttrs: {
-                        cx: this.randomX(),
-                        cy: this.randomY()
-                    }
-                })),
-                new DrawAction(new PathDrawing({
-                    d: [{
-                        x: 150,
-                        y: 30
-                    }, {
-                        x: 180,
-                        y: 70
-                    }, {
-                        x: 120,
-                        y: 50
-                    }]
-                }))
-            ]
-        })
+        try {
+            const actions = fromActions(JSON.parse(this.state.actionJson));
+            this.setState({
+                actions: actions
+            })
+        }
+        catch (ex) {
+            throw ex;
+        }
     }
 
     render() {
         return (
             <div>
-                <h3>测试屏幕坐标系的绘制</h3>
                 <div>
                     <label>时间间隔</label>
                     <input type="text" value={this.state.interval} onChange={({target: {value}}) => {
@@ -109,6 +83,57 @@ class TestDrawing extends Component {
                             interval: isNaN(num) ? 0 : num
                         });
                     }}/>
+                </div>
+                <div>
+                    <label>刻度尺</label>
+                    <input type="text" value={this.state.scale} onChange={({target: {value}}) => {
+                        const num = parseFloat(value);
+                        this.setState({
+                            scale: isNaN(num) ? 0 : num
+                        });
+                    }}/>
+                </div>
+                <div>
+                    <label>坐标原点</label>
+                    x:<input type="text" value={this.state.original.x} onChange={({target: {value}}) => {
+                    const num = parseFloat(value);
+                    this.setState(
+                        update(this.state, {
+                            original: {
+                                x: {$set: isNaN(num) ? 0 : num}
+                            }
+                        })
+                    );
+                }}/>
+                    y:<input type="text" value={this.state.original.y} onChange={({target: {value}}) => {
+                    const num = parseFloat(value);
+                    this.setState(
+                        update(this.state, {
+                            original: {
+                                y: {$set: isNaN(num) ? 0 : num}
+                            }
+                        })
+                    );
+                }}/>
+                </div>
+                <div>
+                    <label>坐标系</label>
+                    <select value={this.state.coordinateType} onChange={({target: {value}}) => {
+                        this.setState({
+                            coordinateType: value
+                        })
+                    }}>
+                        <option value="screen">screen</option>
+                        <option value="math">math</option>
+                    </select>
+                </div>
+                <div>
+                    <label>图形JSON数据</label><br/>
+                    <textarea value={this.state.actionJson} onChange={({target: {value}}) => {
+                        this.setState({
+                            actionJson: value
+                        })
+                    }} style={{width: "100%", height: 100}}></textarea>
                 </div>
                 <div>
                     <button type="button"
@@ -379,10 +404,11 @@ class Example extends Component {
 
 
     render() {
+        return <TestDrawing/>;
+        /*
         return (
             <div>
                 <TestDrawing/>
-                <TestMathCoordinateDrawing/>
                 <div>
                     <h6>运筹学图形Example</h6>
                     <div>
@@ -465,6 +491,7 @@ class Example extends Component {
                 </div>
             </div>
         );
+        */
     }
 
     componentDidMount() {
