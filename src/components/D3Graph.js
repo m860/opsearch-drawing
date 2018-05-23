@@ -1599,10 +1599,6 @@ export default class D3Graph extends PureComponent {
         interval: 1,
     }
 
-    get scale() {
-        return this.props.scale;
-    }
-
     constructor(props) {
         super(props);
         this.ele = null;
@@ -1649,7 +1645,19 @@ export default class D3Graph extends PureComponent {
             /**
              * action执行的时间间隔
              */
-            interval: props.interval
+            interval: props.interval,
+            /**
+             * 比例尺
+             */
+            scale: props.scale,
+            /**
+             * 原点
+             */
+            original: props.original,
+            /**
+             * 坐标系类型
+             */
+            coordinateType: props.coordinateType
         };
     }
 
@@ -1669,30 +1677,30 @@ export default class D3Graph extends PureComponent {
      * 根据坐标系计算x值
      * */
     getX(value) {
-        return this.props.original.x + parseFloat(value) * this.props.scale;
+        return this.state.original.x + parseFloat(value) * this.state.scale;
     }
 
     /**
      * 根据坐标系计算y值
      * */
     getY(value) {
-        if (this.props.coordinateType === coordinateTypeEnum.screen) {
-            return this.props.original.y + parseFloat(value) * this.props.scale;
+        if (this.state.coordinateType === coordinateTypeEnum.screen) {
+            return this.state.original.y + parseFloat(value) * this.state.scale;
         }
-        return this.props.original.y - parseFloat(value) * this.props.scale;
+        return this.state.original.y - parseFloat(value) * this.state.scale;
     }
 
     /**
      * 将屏幕坐标转换成对应坐标系坐标
      * */
     getPointFromScreen(screenX, screenY) {
-        if (this.props.coordinateType === coordinateTypeEnum.math) {
+        if (this.state.coordinateType === coordinateTypeEnum.math) {
             return {
-                x: (screenX - this.props.original.x) / this.props.scale,
-                y: (this.props.original.y - screenY) / this.props.scale
+                x: (screenX - this.state.original.x) / this.state.scale,
+                y: (this.state.original.y - screenY) / this.state.scale
             }
         }
-        return {x: screenX / this.props.scale, y: screenY / this.props.scale};
+        return {x: screenX / this.state.scale, y: screenY / this.state.scale};
     }
 
     doActions(actions) {
@@ -1867,7 +1875,9 @@ export default class D3Graph extends PureComponent {
                 break;
             }
             case actionTypeEnums.clear: {
-                this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
+                this.shapes.forEach(shape => {
+                    this.doAction(new DeleteAction(shape.id))
+                });
                 break;
             }
             case actionTypeEnums.input: {
@@ -1996,6 +2006,12 @@ export default class D3Graph extends PureComponent {
         let newState = {};
         if (this.state.interval !== nextProps.interval) {
             newState.interval = nextProps.interval;
+        }
+        if (this.state.scale !== nextProps.scale) {
+            newState.scale = nextProps.scale;
+        }
+        if (this.state.original.x !== nextProps.original.x || this.state.original.y !== nextProps.original.y) {
+            newState.original = nextProps.original;
         }
         this.setState(newState, () => {
             if (nextProps.actions.length > 0) {

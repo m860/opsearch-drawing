@@ -34,53 +34,128 @@ import * as d3 from 'd3'
 import data from '../test/drawing-data'
 
 class TestDrawing extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            interval: 1,
+            actions: []
+        };
+    }
+
+    get randomX() {
+        return d3.randomUniform(20, 380);
+    }
+
+    get randomY() {
+        return d3.randomUniform(20, 280);
+    }
+
+    drawing() {
+        this.setState({
+            actions: [
+                new ClearAction(),
+                new DrawAction(new DotDrawing({
+                    attrs: {
+                        cx: this.randomX(),
+                        cy: this.randomY()
+                    }
+                })),
+                new DrawAction(new LineDrawing({
+                    attrs: {
+                        x1: 20,
+                        y1: 10,
+                        x2: 100,
+                        y2: 200
+                    }
+                })),
+                new DrawAction(new CircleDrawing({
+                    attrs: {
+                        cx: this.randomX(),
+                        cy: this.randomY()
+                    }
+                })),
+                new DrawAction(new TextCircleDrawing({
+                    text: "A",
+                    circleAttrs: {
+                        cx: this.randomX(),
+                        cy: this.randomY()
+                    }
+                })),
+                new DrawAction(new PathDrawing({
+                    d: [{
+                        x: 150,
+                        y: 30
+                    }, {
+                        x: 180,
+                        y: 70
+                    }, {
+                        x: 120,
+                        y: 50
+                    }]
+                }))
+            ]
+        })
+    }
+
     render() {
         return (
             <div>
-                <h3>测试绘制,坐标系基于屏幕坐标系</h3>
+                <h3>测试屏幕坐标系的绘制</h3>
+                <div>
+                    <label>时间间隔</label>
+                    <input type="text" value={this.state.interval} onChange={({target: {value}}) => {
+                        const num = parseFloat(value);
+                        this.setState({
+                            interval: isNaN(num) ? 0 : num
+                        });
+                    }}/>
+                </div>
+                <div>
+                    <button type="button"
+                            onClick={this.drawing.bind(this)}>Drawing
+                    </button>
+                </div>
+                <D3Graph actions={this.state.actions}
+                         interval={this.state.interval}/>
+            </div>
+        )
+    }
+}
+
+class TestMathCoordinateDrawing extends Component {
+    render() {
+        const original = {
+            x: 20,
+            y: 280
+        };
+        const scale = 20;
+        return (
+            <div>
+                <h3>测试数学坐标系的绘制</h3>
                 <D3Graph actions={[
-                    new DrawAction(new DotDrawing({
-                        attrs: {
-                            cx: 50,
-                            cy: 50
-                        }
-                    })),
-                    new DrawAction(new LineDrawing({
-                        attrs: {
-                            x1: 20,
-                            y1: 10,
-                            x2: 100,
-                            y2: 200
-                        }
+                    new DrawAction(new NumberScaleDrawing({
+                        original,
+                        scale
                     })),
                     new DrawAction(new CircleDrawing({
                         attrs: {
-                            cx: 100,
-                            cy: 100
+                            cx: 5,
+                            cy: 5
                         }
                     })),
                     new DrawAction(new TextCircleDrawing({
-                        text: "1",
+                        text: "A",
                         circleAttrs: {
-                            cx: 150,
-                            cy: 150
+                            cx: 9,
+                            cy: 5
                         }
-                    })),
-                    new DrawAction(new PathDrawing({
-                        d: [{
-                            x: 150,
-                            y: 30
-                        }, {
-                            x: 180,
-                            y: 70
-                        }, {
-                            x: 120,
-                            y: 50
-                        }]
                     }))
-                ]}/>
+                ]}
+                         original={original}
+                         coordinateType="math"
+                         scale={scale}/>
             </div>
-        )
+        );
     }
 }
 
@@ -307,6 +382,7 @@ class Example extends Component {
         return (
             <div>
                 <TestDrawing/>
+                <TestMathCoordinateDrawing/>
                 <div>
                     <h6>运筹学图形Example</h6>
                     <div>

@@ -1895,26 +1895,18 @@ ArrowLinkToolbar.propTypes = {
 var D3Graph = function (_PureComponent8) {
     _inherits(D3Graph, _PureComponent8);
 
-    _createClass(D3Graph, [{
-        key: 'scale',
-
-        /**
-         * @property {object} attrs - svg的属性
-         * @property {Array} actions - 所有的操作
-         * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
-         * @property {object} original - 坐标原点,默认值{x:0,y:0}
-         * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
-         * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
-         * @property {object} playingOption - mode===playing时有效
-         * @property {Function} renderToolbar - 绘图的工具栏
-         * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
-         * @property {Number} interval - action的执行时间间隔
-         * */
-        get: function get() {
-            return this.props.scale;
-        }
-    }]);
-
+    /**
+     * @property {object} attrs - svg的属性
+     * @property {Array} actions - 所有的操作
+     * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
+     * @property {object} original - 坐标原点,默认值{x:0,y:0}
+     * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
+     * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
+     * @property {object} playingOption - mode===playing时有效
+     * @property {Function} renderToolbar - 绘图的工具栏
+     * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
+     * @property {Number} interval - action的执行时间间隔
+     * */
     function D3Graph(props) {
         _classCallCheck(this, D3Graph);
 
@@ -1964,7 +1956,19 @@ var D3Graph = function (_PureComponent8) {
             /**
              * action执行的时间间隔
              */
-            interval: props.interval
+            interval: props.interval,
+            /**
+             * 比例尺
+             */
+            scale: props.scale,
+            /**
+             * 原点
+             */
+            original: props.original,
+            /**
+             * 坐标系类型
+             */
+            coordinateType: props.coordinateType
         };
         return _this42;
     }
@@ -1995,7 +1999,7 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'getX',
         value: function getX(value) {
-            return this.props.original.x + parseFloat(value) * this.props.scale;
+            return this.state.original.x + parseFloat(value) * this.state.scale;
         }
 
         /**
@@ -2005,10 +2009,10 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'getY',
         value: function getY(value) {
-            if (this.props.coordinateType === coordinateTypeEnum.screen) {
-                return this.props.original.y + parseFloat(value) * this.props.scale;
+            if (this.state.coordinateType === coordinateTypeEnum.screen) {
+                return this.state.original.y + parseFloat(value) * this.state.scale;
             }
-            return this.props.original.y - parseFloat(value) * this.props.scale;
+            return this.state.original.y - parseFloat(value) * this.state.scale;
         }
 
         /**
@@ -2018,13 +2022,13 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'getPointFromScreen',
         value: function getPointFromScreen(screenX, screenY) {
-            if (this.props.coordinateType === coordinateTypeEnum.math) {
+            if (this.state.coordinateType === coordinateTypeEnum.math) {
                 return {
-                    x: (screenX - this.props.original.x) / this.props.scale,
-                    y: (this.props.original.y - screenY) / this.props.scale
+                    x: (screenX - this.state.original.x) / this.state.scale,
+                    y: (this.state.original.y - screenY) / this.state.scale
                 };
             }
-            return { x: screenX / this.props.scale, y: screenY / this.props.scale };
+            return { x: screenX / this.state.scale, y: screenY / this.state.scale };
         }
     }, {
         key: 'doActions',
@@ -2152,6 +2156,8 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'doAction',
         value: function doAction(action) {
+            var _this44 = this;
+
             console.log('action : ' + action.type);
             switch (action.type) {
                 case actionTypeEnums.draw:
@@ -2215,9 +2221,9 @@ var D3Graph = function (_PureComponent8) {
                     }
                 case actionTypeEnums.clear:
                     {
-                        this.doActions(this.shapes.map(function (f) {
-                            return new DeleteAction(f.id);
-                        }));
+                        this.shapes.forEach(function (shape) {
+                            _this44.doAction(new DeleteAction(shape.id));
+                        });
                         break;
                     }
                 case actionTypeEnums.input:
@@ -2253,7 +2259,7 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'hideUserInput',
         value: function hideUserInput(nextActionOption) {
-            var _this44 = this;
+            var _this45 = this;
 
             var params = this.state.inputProperties.map(function (property) {
                 return {
@@ -2267,26 +2273,26 @@ var D3Graph = function (_PureComponent8) {
             }, function () {
                 //执行下一个action
                 console.log("next action option", JSON.stringify(nextActionOption));
-                console.log("first action", JSON.stringify(_this44._leftActions[0]));
+                console.log("first action", JSON.stringify(_this45._leftActions[0]));
                 console.log("params", JSON.stringify(params));
-                if (_this44._leftActions.length > 0) {
+                if (_this45._leftActions.length > 0) {
                     params.forEach(function (p) {
-                        (0, _objectPath.set)(_this44._leftActions[0].params, p.path, p.value);
+                        (0, _objectPath.set)(_this45._leftActions[0].params, p.path, p.value);
                     });
                 }
-                console.log("target first action", JSON.stringify(_this44._leftActions[0]));
-                _this44.doActions(_this44._leftActions);
+                console.log("target first action", JSON.stringify(_this45._leftActions[0]));
+                _this45.doActions(_this45._leftActions);
             });
         }
     }, {
         key: 'drawShapes',
         value: function drawShapes(shapes) {
-            var _this45 = this;
+            var _this46 = this;
 
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
-                    shape.initialize(_this45);
+                    shape.initialize(_this46);
                 }
                 shape.render();
             });
@@ -2345,33 +2351,39 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'render',
         value: function render() {
-            var _this46 = this;
+            var _this47 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
                 _react2.default.createElement('svg', _extends({ ref: function ref(_ref) {
-                        return _this46.ele = _ref;
+                        return _this47.ele = _ref;
                     } }, this.props.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this46.hideUserInput(value);
+                        _this47.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this47 = this;
+            var _this48 = this;
 
             var newState = {};
             if (this.state.interval !== nextProps.interval) {
                 newState.interval = nextProps.interval;
             }
+            if (this.state.scale !== nextProps.scale) {
+                newState.scale = nextProps.scale;
+            }
+            if (this.state.original.x !== nextProps.original.x || this.state.original.y !== nextProps.original.y) {
+                newState.original = nextProps.original;
+            }
             this.setState(newState, function () {
                 if (nextProps.actions.length > 0) {
-                    _this47.doActions(nextProps.actions);
+                    _this48.doActions(nextProps.actions);
                 }
             });
         }
