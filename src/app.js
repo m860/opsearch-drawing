@@ -46,9 +46,32 @@ class TestDrawing extends Component {
                 y: 0
             },
             coordinateType: "screen",
-            actionJson: "[\n" +
-            "  {\"type\":\"draw\",\"params\":[{\"type\":\"CircleDrawing\",\"option\":{\"attrs\":{\"cx\":50,\"cy\":50}}}]}\n" +
-            "]"
+            actionJson: JSON.stringify([{
+                type: "draw",
+                params: [{
+                    type: "CircleDrawing",
+                    option: {
+                        attrs: {
+                            cx: this.randomX(),
+                            cy: this.randomY()
+                        }
+                    }
+                }]
+            }, {
+                type: "input",
+                params: [[{
+                    label: "x",
+                    fieldName: "attrs.cx"
+                }, {
+                    label: "y",
+                    fieldName: "attrs.cy"
+                }]]
+            }, {
+                type: "draw",
+                params: [{
+                    type: "CircleDrawing"
+                }]
+            }])
         };
     }
 
