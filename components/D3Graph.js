@@ -3,13 +3,63 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
+exports.default = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _keys = require('babel-runtime/core-js/object/keys');
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _keys2 = _interopRequireDefault(_keys);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _get2 = require('babel-runtime/helpers/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _assign = require('babel-runtime/core-js/object/assign');
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 
 exports.fromDrawing = fromDrawing;
 exports.fromActions = fromActions;
@@ -50,24 +100,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /**
-                                                                                                                                                                                                     * @todo 实现用户的输入action,输入action是一个中断操作
-                                                                                                                                                                                                     * 实现link,arrowLink的label
-                                                                                                                                                                                                     * 实现图的drawing
-                                                                                                                                                                                                     * @todo 实现transition
-                                                                                                                                                                                                     * @todo 实现data action
-                                                                                                                                                                                                     *
-                                                                                                                                                                                                     * */
-
 //#region event
 var emitter = new _fbemitter.EventEmitter();
 //toolbar 按钮切换
+/**
+ * @todo 实现用户的输入action,输入action是一个中断操作
+ * 实现link,arrowLink的label
+ * 实现图的drawing
+ * @todo 实现transition
+ * @todo 实现data action
+ *
+ * */
+
 var EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 //#endregion
 
@@ -199,7 +243,7 @@ function fromDrawing(drawingOps) {
 function fromActions(actions) {
     return actions.map(function (action) {
         var type = action.type;
-        var args = action.params;
+        var args = action.params || [];
         var ops = action.ops;
         var func = actionIndex[type];
         if (!func) {
@@ -207,17 +251,17 @@ function fromActions(actions) {
         }
         switch (type) {
             case actionTypeEnums.draw:
-                return new (Function.prototype.bind.apply(actionIndex[type], [null].concat(_toConsumableArray(args.map(function (arg) {
+                return new (Function.prototype.bind.apply(actionIndex[type], [null].concat((0, _toConsumableArray3.default)(args.map(function (arg) {
                     return fromDrawing(arg);
                 }, ops)))))();
             default:
-                return new (Function.prototype.bind.apply(actionIndex[type], [null].concat(_toConsumableArray(args), [ops])))();
+                return new (Function.prototype.bind.apply(actionIndex[type], [null].concat((0, _toConsumableArray3.default)(args), [ops])))();
         }
     });
 }
 
 var Point = function Point(x, y) {
-    _classCallCheck(this, Point);
+    (0, _classCallCheck3.default)(this, Point);
 
     this.x = x;
     this.y = y;
@@ -230,7 +274,7 @@ var Point = function Point(x, y) {
 
 
 var Action = function Action(type, params, ops) {
-    _classCallCheck(this, Action);
+    (0, _classCallCheck3.default)(this, Action);
 
     /**
      * action的类型,是一个枚举值
@@ -260,7 +304,7 @@ var Action = function Action(type, params, ops) {
 
 
 var InputAction = exports.InputAction = function (_Action) {
-    _inherits(InputAction, _Action);
+    (0, _inherits3.default)(InputAction, _Action);
 
     /**
      *
@@ -271,9 +315,9 @@ var InputAction = exports.InputAction = function (_Action) {
      * @param {?Object} ops
      */
     function InputAction(params, ops) {
-        _classCallCheck(this, InputAction);
+        (0, _classCallCheck3.default)(this, InputAction);
 
-        var _this = _possibleConstructorReturn(this, (InputAction.__proto__ || Object.getPrototypeOf(InputAction)).call(this, actionTypeEnums.input, params, ops));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (InputAction.__proto__ || (0, _getPrototypeOf2.default)(InputAction)).call(this, actionTypeEnums.input, params, ops));
 
         _this.canBreak = true;
         return _this;
@@ -297,12 +341,11 @@ actionIndex[actionTypeEnums.input] = InputAction;
  * */
 
 var DrawAction = exports.DrawAction = function (_Action2) {
-    _inherits(DrawAction, _Action2);
+    (0, _inherits3.default)(DrawAction, _Action2);
 
     function DrawAction(drawingOps, ops) {
-        _classCallCheck(this, DrawAction);
-
-        return _possibleConstructorReturn(this, (DrawAction.__proto__ || Object.getPrototypeOf(DrawAction)).call(this, actionTypeEnums.draw, drawingOps, ops));
+        (0, _classCallCheck3.default)(this, DrawAction);
+        return (0, _possibleConstructorReturn3.default)(this, (DrawAction.__proto__ || (0, _getPrototypeOf2.default)(DrawAction)).call(this, actionTypeEnums.draw, drawingOps, ops));
     }
 
     return DrawAction;
@@ -320,12 +363,11 @@ actionIndex[actionTypeEnums.draw] = DrawAction;
  * */
 
 var SelectAction = exports.SelectAction = function (_Action3) {
-    _inherits(SelectAction, _Action3);
+    (0, _inherits3.default)(SelectAction, _Action3);
 
     function SelectAction(shapeId, ops) {
-        _classCallCheck(this, SelectAction);
-
-        return _possibleConstructorReturn(this, (SelectAction.__proto__ || Object.getPrototypeOf(SelectAction)).call(this, actionTypeEnums.select, shapeId, ops));
+        (0, _classCallCheck3.default)(this, SelectAction);
+        return (0, _possibleConstructorReturn3.default)(this, (SelectAction.__proto__ || (0, _getPrototypeOf2.default)(SelectAction)).call(this, actionTypeEnums.select, shapeId, ops));
     }
 
     return SelectAction;
@@ -343,12 +385,11 @@ actionIndex[actionTypeEnums.select] = SelectAction;
  * */
 
 var UnSelectAction = exports.UnSelectAction = function (_Action4) {
-    _inherits(UnSelectAction, _Action4);
+    (0, _inherits3.default)(UnSelectAction, _Action4);
 
     function UnSelectAction(shapeId, ops) {
-        _classCallCheck(this, UnSelectAction);
-
-        return _possibleConstructorReturn(this, (UnSelectAction.__proto__ || Object.getPrototypeOf(UnSelectAction)).call(this, actionTypeEnums.unselect, shapeId, ops));
+        (0, _classCallCheck3.default)(this, UnSelectAction);
+        return (0, _possibleConstructorReturn3.default)(this, (UnSelectAction.__proto__ || (0, _getPrototypeOf2.default)(UnSelectAction)).call(this, actionTypeEnums.unselect, shapeId, ops));
     }
 
     return UnSelectAction;
@@ -366,12 +407,11 @@ actionIndex[actionTypeEnums.unselect] = UnSelectAction;
  * */
 
 var DeleteAction = exports.DeleteAction = function (_Action5) {
-    _inherits(DeleteAction, _Action5);
+    (0, _inherits3.default)(DeleteAction, _Action5);
 
     function DeleteAction(shapeId, ops) {
-        _classCallCheck(this, DeleteAction);
-
-        return _possibleConstructorReturn(this, (DeleteAction.__proto__ || Object.getPrototypeOf(DeleteAction)).call(this, actionTypeEnums.delete, shapeId, ops));
+        (0, _classCallCheck3.default)(this, DeleteAction);
+        return (0, _possibleConstructorReturn3.default)(this, (DeleteAction.__proto__ || (0, _getPrototypeOf2.default)(DeleteAction)).call(this, actionTypeEnums.delete, shapeId, ops));
     }
 
     return DeleteAction;
@@ -389,12 +429,11 @@ actionIndex[actionTypeEnums.delete] = DeleteAction;
  * */
 
 var ClearAction = exports.ClearAction = function (_Action6) {
-    _inherits(ClearAction, _Action6);
+    (0, _inherits3.default)(ClearAction, _Action6);
 
     function ClearAction(ops) {
-        _classCallCheck(this, ClearAction);
-
-        return _possibleConstructorReturn(this, (ClearAction.__proto__ || Object.getPrototypeOf(ClearAction)).call(this, actionTypeEnums.clear, null, ops));
+        (0, _classCallCheck3.default)(this, ClearAction);
+        return (0, _possibleConstructorReturn3.default)(this, (ClearAction.__proto__ || (0, _getPrototypeOf2.default)(ClearAction)).call(this, actionTypeEnums.clear, null, ops));
     }
 
     return ClearAction;
@@ -407,12 +446,11 @@ actionIndex[actionTypeEnums.clear] = ClearAction;
  * */
 
 var ReDrawAction = exports.ReDrawAction = function (_Action7) {
-    _inherits(ReDrawAction, _Action7);
+    (0, _inherits3.default)(ReDrawAction, _Action7);
 
     function ReDrawAction(shapeId, state, ops) {
-        _classCallCheck(this, ReDrawAction);
-
-        return _possibleConstructorReturn(this, (ReDrawAction.__proto__ || Object.getPrototypeOf(ReDrawAction)).call(this, actionTypeEnums.redraw, {
+        (0, _classCallCheck3.default)(this, ReDrawAction);
+        return (0, _possibleConstructorReturn3.default)(this, (ReDrawAction.__proto__ || (0, _getPrototypeOf2.default)(ReDrawAction)).call(this, actionTypeEnums.redraw, {
             id: shapeId,
             state: state
         }, ops));
@@ -442,7 +480,7 @@ var Drawing = exports.Drawing = function () {
      *
      * */
     function Drawing(option) {
-        _classCallCheck(this, Drawing);
+        (0, _classCallCheck3.default)(this, Drawing);
 
         /**
          * 图形的id,如果没有提供会生成一个guid
@@ -497,7 +535,7 @@ var Drawing = exports.Drawing = function () {
      * */
 
 
-    _createClass(Drawing, [{
+    (0, _createClass3.default)(Drawing, [{
         key: 'render',
 
 
@@ -556,7 +594,7 @@ var Drawing = exports.Drawing = function () {
         key: 'select',
         value: function select() {
             if (this.graph) {
-                this.graph.doActions([new SelectAction(this.id)]);
+                this.graph.doActionsAsync([new SelectAction(this.id)]);
             }
         }
     }, {
@@ -567,7 +605,8 @@ var Drawing = exports.Drawing = function () {
             var defaultSelectedAttrs = arguments[2];
             var selectedAttrs = arguments[3];
 
-            var result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
+            console.log('selected', this.selected);
+            var result = (0, _assign2.default)({}, defaultAttrs, attrs, this.selected ? (0, _assign2.default)({}, defaultSelectedAttrs, selectedAttrs) : {});
             if (!isNullOrUndefined(result.x)) {
                 result.x = this.graph.getX(result.x);
             }
@@ -593,6 +632,7 @@ var Drawing = exports.Drawing = function () {
                 result.cy = this.graph.getY(result.cy);
             }
             result["shape-id"] = this.id;
+            console.log("combined attrs", result);
             return result;
         }
     }, {
@@ -613,7 +653,6 @@ var Drawing = exports.Drawing = function () {
             return {};
         }
     }]);
-
     return Drawing;
 }();
 
@@ -623,23 +662,23 @@ var Drawing = exports.Drawing = function () {
 
 
 var LineDrawing = exports.LineDrawing = function (_Drawing) {
-    _inherits(LineDrawing, _Drawing);
+    (0, _inherits3.default)(LineDrawing, _Drawing);
 
     function LineDrawing(option) {
-        _classCallCheck(this, LineDrawing);
+        (0, _classCallCheck3.default)(this, LineDrawing);
 
-        var _this8 = _possibleConstructorReturn(this, (LineDrawing.__proto__ || Object.getPrototypeOf(LineDrawing)).call(this, option));
+        var _this8 = (0, _possibleConstructorReturn3.default)(this, (LineDrawing.__proto__ || (0, _getPrototypeOf2.default)(LineDrawing)).call(this, option));
 
         _this8.type = "line";
         return _this8;
     }
 
-    _createClass(LineDrawing, [{
+    (0, _createClass3.default)(LineDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this9 = this;
 
-            _get(LineDrawing.prototype.__proto__ || Object.getPrototypeOf(LineDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(LineDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LineDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("line");
             this.selection.on("click", function () {
                 _this9.select();
@@ -703,7 +742,6 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
             };
         }
     }]);
-
     return LineDrawing;
 }(Drawing);
 
@@ -714,23 +752,23 @@ registerDrawing("LineDrawing", LineDrawing);
  * */
 
 var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
-    _inherits(CircleDrawing, _Drawing2);
+    (0, _inherits3.default)(CircleDrawing, _Drawing2);
 
     function CircleDrawing(option) {
-        _classCallCheck(this, CircleDrawing);
+        (0, _classCallCheck3.default)(this, CircleDrawing);
 
-        var _this10 = _possibleConstructorReturn(this, (CircleDrawing.__proto__ || Object.getPrototypeOf(CircleDrawing)).call(this, option));
+        var _this10 = (0, _possibleConstructorReturn3.default)(this, (CircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(CircleDrawing)).call(this, option));
 
         _this10.type = "circle";
         return _this10;
     }
 
-    _createClass(CircleDrawing, [{
+    (0, _createClass3.default)(CircleDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this11 = this;
 
-            _get(CircleDrawing.prototype.__proto__ || Object.getPrototypeOf(CircleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(CircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(CircleDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("circle");
             this.selection.on("click", function () {
                 _this11.select();
@@ -759,7 +797,6 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
             };
         }
     }]);
-
     return CircleDrawing;
 }(Drawing);
 
@@ -770,23 +807,23 @@ registerDrawing("CircleDrawing", CircleDrawing);
  * */
 
 var DotDrawing = exports.DotDrawing = function (_Drawing3) {
-    _inherits(DotDrawing, _Drawing3);
+    (0, _inherits3.default)(DotDrawing, _Drawing3);
 
     function DotDrawing(option) {
-        _classCallCheck(this, DotDrawing);
+        (0, _classCallCheck3.default)(this, DotDrawing);
 
-        var _this12 = _possibleConstructorReturn(this, (DotDrawing.__proto__ || Object.getPrototypeOf(DotDrawing)).call(this, option));
+        var _this12 = (0, _possibleConstructorReturn3.default)(this, (DotDrawing.__proto__ || (0, _getPrototypeOf2.default)(DotDrawing)).call(this, option));
 
         _this12.type = "dot";
         return _this12;
     }
 
-    _createClass(DotDrawing, [{
+    (0, _createClass3.default)(DotDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this13 = this;
 
-            _get(DotDrawing.prototype.__proto__ || Object.getPrototypeOf(DotDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(DotDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(DotDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("circle");
             this.selection.on("click", function () {
                 _this13.select();
@@ -809,7 +846,6 @@ var DotDrawing = exports.DotDrawing = function (_Drawing3) {
             };
         }
     }]);
-
     return DotDrawing;
 }(Drawing);
 
@@ -820,23 +856,23 @@ registerDrawing("DotDrawing", DotDrawing);
  * */
 
 var RectDrawing = exports.RectDrawing = function (_Drawing4) {
-    _inherits(RectDrawing, _Drawing4);
+    (0, _inherits3.default)(RectDrawing, _Drawing4);
 
     function RectDrawing(option) {
-        _classCallCheck(this, RectDrawing);
+        (0, _classCallCheck3.default)(this, RectDrawing);
 
-        var _this14 = _possibleConstructorReturn(this, (RectDrawing.__proto__ || Object.getPrototypeOf(RectDrawing)).call(this, option));
+        var _this14 = (0, _possibleConstructorReturn3.default)(this, (RectDrawing.__proto__ || (0, _getPrototypeOf2.default)(RectDrawing)).call(this, option));
 
         _this14.type = "rect";
         return _this14;
     }
 
-    _createClass(RectDrawing, [{
+    (0, _createClass3.default)(RectDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this15 = this;
 
-            _get(RectDrawing.prototype.__proto__ || Object.getPrototypeOf(RectDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(RectDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(RectDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("path");
             this.selection.on("click", function () {
                 _this15.select();
@@ -903,7 +939,6 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
             return {};
         }
     }]);
-
     return RectDrawing;
 }(Drawing);
 
@@ -914,12 +949,12 @@ registerDrawing("RectDrawing", RectDrawing);
  * */
 
 var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
-    _inherits(NumberScaleDrawing, _Drawing5);
+    (0, _inherits3.default)(NumberScaleDrawing, _Drawing5);
 
     function NumberScaleDrawing(option) {
-        _classCallCheck(this, NumberScaleDrawing);
+        (0, _classCallCheck3.default)(this, NumberScaleDrawing);
 
-        var _this16 = _possibleConstructorReturn(this, (NumberScaleDrawing.__proto__ || Object.getPrototypeOf(NumberScaleDrawing)).call(this, option));
+        var _this16 = (0, _possibleConstructorReturn3.default)(this, (NumberScaleDrawing.__proto__ || (0, _getPrototypeOf2.default)(NumberScaleDrawing)).call(this, option));
 
         _this16.type = "number-scale";
         _this16.original = (0, _objectPath.get)(option, "original", {
@@ -933,16 +968,16 @@ var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
         return _this16;
     }
 
-    _createClass(NumberScaleDrawing, [{
+    (0, _createClass3.default)(NumberScaleDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this17 = this;
 
-            _get(NumberScaleDrawing.prototype.__proto__ || Object.getPrototypeOf(NumberScaleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(NumberScaleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(NumberScaleDrawing.prototype), 'initialize', this).call(this, graph);
             // const width = graph.ele.clientWidth;
             // const height = graph.ele.clientHeight;
             this.selection = d3.select(graph.ele).append("g");
-            var originalPoint = Object.assign({}, this.original);
+            var originalPoint = (0, _assign2.default)({}, this.original);
             var xEndPoint = new Point(this.original.x + this.xAxisLength, this.original.y);
             var yEndPoint = new Point(this.original.x, this.original.y - this.yAxisLength);
             //xAxis
@@ -981,7 +1016,6 @@ var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
             return {};
         }
     }]);
-
     return NumberScaleDrawing;
 }(Drawing);
 
@@ -993,7 +1027,7 @@ registerDrawing("NumberScaleDrawing", NumberScaleDrawing);
  * */
 
 var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
-    _inherits(ArrowLinkDrawing, _Drawing6);
+    (0, _inherits3.default)(ArrowLinkDrawing, _Drawing6);
 
     /**
      * @constructor
@@ -1005,9 +1039,9 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
      * @param {object} option.labelAttrs - label的attributes
      * */
     function ArrowLinkDrawing(option) {
-        _classCallCheck(this, ArrowLinkDrawing);
+        (0, _classCallCheck3.default)(this, ArrowLinkDrawing);
 
-        var _this18 = _possibleConstructorReturn(this, (ArrowLinkDrawing.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing)).call(this, option));
+        var _this18 = (0, _possibleConstructorReturn3.default)(this, (ArrowLinkDrawing.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing)).call(this, option));
 
         _this18.type = "arrow-link";
         _this18.sourceId = (0, _objectPath.get)(option, "sourceId");
@@ -1026,12 +1060,12 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         return _this18;
     }
 
-    _createClass(ArrowLinkDrawing, [{
+    (0, _createClass3.default)(ArrowLinkDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this19 = this;
 
-            _get(ArrowLinkDrawing.prototype.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'initialize', this).call(this, graph);
             this.source = this.graph.findShapeById(this.sourceId);
             this.target = this.graph.findShapeById(this.targetId);
             this.selection = d3.select(graph.ele).append("path");
@@ -1047,7 +1081,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
                 if (this.label) {
                     this.labelSelection.text(this.label);
                 }
-                var attrs = Object.assign({
+                var attrs = (0, _assign2.default)({
                     x: this.graph.getX(x),
                     y: this.graph.getY(y)
                 }, this.labelAttrs);
@@ -1063,7 +1097,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
                 d: { $set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ') }
             });
-            _get(ArrowLinkDrawing.prototype.__proto__ || Object.getPrototypeOf(ArrowLinkDrawing.prototype), 'render', this).call(this);
+            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
@@ -1103,7 +1137,6 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             };
         }
     }]);
-
     return ArrowLinkDrawing;
 }(Drawing);
 
@@ -1116,7 +1149,7 @@ registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
  * */
 
 var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
-    _inherits(LinkDrawing, _Drawing7);
+    (0, _inherits3.default)(LinkDrawing, _Drawing7);
 
     /**
      * @constructor
@@ -1128,9 +1161,9 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
      * @param {object} option.labelAttrs - label的attributes
      * */
     function LinkDrawing(option) {
-        _classCallCheck(this, LinkDrawing);
+        (0, _classCallCheck3.default)(this, LinkDrawing);
 
-        var _this20 = _possibleConstructorReturn(this, (LinkDrawing.__proto__ || Object.getPrototypeOf(LinkDrawing)).call(this, option));
+        var _this20 = (0, _possibleConstructorReturn3.default)(this, (LinkDrawing.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing)).call(this, option));
 
         _this20.type = "link";
         _this20.sourceId = (0, _objectPath.get)(option, "sourceId");
@@ -1149,12 +1182,12 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
         return _this20;
     }
 
-    _createClass(LinkDrawing, [{
+    (0, _createClass3.default)(LinkDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this21 = this;
 
-            _get(LinkDrawing.prototype.__proto__ || Object.getPrototypeOf(LinkDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'initialize', this).call(this, graph);
             this.source = this.graph.findShapeById(this.sourceId);
             this.target = this.graph.findShapeById(this.targetId);
             this.selection = d3.select(graph.ele).append("line");
@@ -1170,7 +1203,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
                 if (this.label) {
                     this.labelSelection.text(this.label);
                 }
-                var attrs = Object.assign({
+                var attrs = (0, _assign2.default)({
                     x: this.graph.getX(x),
                     y: this.graph.getY(y)
                 }, this.labelAttrs);
@@ -1189,7 +1222,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
                 x2: { $set: p2.x },
                 y2: { $set: p2.y }
             });
-            _get(LinkDrawing.prototype.__proto__ || Object.getPrototypeOf(LinkDrawing.prototype), 'render', this).call(this);
+            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
@@ -1213,7 +1246,6 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             };
         }
     }]);
-
     return LinkDrawing;
 }(Drawing);
 
@@ -1224,24 +1256,24 @@ registerDrawing("LinkDrawing", LinkDrawing);
  * */
 
 var PathDrawing = exports.PathDrawing = function (_Drawing8) {
-    _inherits(PathDrawing, _Drawing8);
+    (0, _inherits3.default)(PathDrawing, _Drawing8);
 
     function PathDrawing(option) {
-        _classCallCheck(this, PathDrawing);
+        (0, _classCallCheck3.default)(this, PathDrawing);
 
-        var _this22 = _possibleConstructorReturn(this, (PathDrawing.__proto__ || Object.getPrototypeOf(PathDrawing)).call(this, option));
+        var _this22 = (0, _possibleConstructorReturn3.default)(this, (PathDrawing.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing)).call(this, option));
 
         _this22.type = "path";
         _this22.d = (0, _objectPath.get)(option, "d", []);
         return _this22;
     }
 
-    _createClass(PathDrawing, [{
+    (0, _createClass3.default)(PathDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this23 = this;
 
-            _get(PathDrawing.prototype.__proto__ || Object.getPrototypeOf(PathDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("path");
             this.selection.on("click", function () {
                 _this23.select();
@@ -1262,7 +1294,7 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
                 d.push("Z");
                 this.attrs.d = d.join(" ");
             }
-            _get(PathDrawing.prototype.__proto__ || Object.getPrototypeOf(PathDrawing.prototype), 'render', this).call(this);
+            (0, _get3.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'render', this).call(this);
         }
     }, {
         key: 'defaultAttrs',
@@ -1275,7 +1307,6 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
             return {};
         }
     }]);
-
     return PathDrawing;
 }(Drawing);
 
@@ -1286,23 +1317,23 @@ registerDrawing("PathDrawing", PathDrawing);
  * */
 
 var TextDrawing = exports.TextDrawing = function (_Drawing9) {
-    _inherits(TextDrawing, _Drawing9);
+    (0, _inherits3.default)(TextDrawing, _Drawing9);
 
     function TextDrawing(option) {
-        _classCallCheck(this, TextDrawing);
+        (0, _classCallCheck3.default)(this, TextDrawing);
 
-        var _this25 = _possibleConstructorReturn(this, (TextDrawing.__proto__ || Object.getPrototypeOf(TextDrawing)).call(this, option));
+        var _this25 = (0, _possibleConstructorReturn3.default)(this, (TextDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing)).call(this, option));
 
         _this25.type = "text";
         return _this25;
     }
 
-    _createClass(TextDrawing, [{
+    (0, _createClass3.default)(TextDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
             var _this26 = this;
 
-            _get(TextDrawing.prototype.__proto__ || Object.getPrototypeOf(TextDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(TextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("text");
             this.selection.on("click", function () {
                 _this26.select();
@@ -1324,7 +1355,6 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
             };
         }
     }]);
-
     return TextDrawing;
 }(Drawing);
 
@@ -1335,9 +1365,8 @@ registerDrawing("TextDrawing", TextDrawing);
  */
 
 var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
-    _inherits(TextCircleDrawing, _Drawing10);
-
-    _createClass(TextCircleDrawing, [{
+    (0, _inherits3.default)(TextCircleDrawing, _Drawing10);
+    (0, _createClass3.default)(TextCircleDrawing, [{
         key: 'defaultCircleAttrs',
         get: function get() {
             return {
@@ -1359,7 +1388,8 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
         get: function get() {
             return {
                 "text-anchor": "middle",
-                "dominant-baseline": "middle"
+                "dominant-baseline": "middle",
+                fill: "black"
             };
         }
     }, {
@@ -1385,13 +1415,13 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
     }]);
 
     function TextCircleDrawing(option) {
-        _classCallCheck(this, TextCircleDrawing);
+        (0, _classCallCheck3.default)(this, TextCircleDrawing);
 
         /**
          * 绘制的类型
          * @member {String}
          * */
-        var _this27 = _possibleConstructorReturn(this, (TextCircleDrawing.__proto__ || Object.getPrototypeOf(TextCircleDrawing)).call(this, option));
+        var _this27 = (0, _possibleConstructorReturn3.default)(this, (TextCircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing)).call(this, option));
 
         _this27.type = "text-circle";
         /**
@@ -1433,10 +1463,10 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
         return _this27;
     }
 
-    _createClass(TextCircleDrawing, [{
+    (0, _createClass3.default)(TextCircleDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            _get(TextCircleDrawing.prototype.__proto__ || Object.getPrototypeOf(TextCircleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get3.default)(TextCircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("g");
             //add  circle
             this.circleSelection = this.selection.append("circle");
@@ -1462,7 +1492,6 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
             return new Point(circleAttrs.cx, circleAttrs.cy);
         }
     }]);
-
     return TextCircleDrawing;
 }(Drawing);
 
@@ -1472,20 +1501,19 @@ registerDrawing("TextCircleDrawing", TextCircleDrawing);
 //#region Toolbar
 
 var Toolbar = exports.Toolbar = function (_PureComponent) {
-    _inherits(Toolbar, _PureComponent);
+    (0, _inherits3.default)(Toolbar, _PureComponent);
 
     function Toolbar() {
-        _classCallCheck(this, Toolbar);
-
-        return _possibleConstructorReturn(this, (Toolbar.__proto__ || Object.getPrototypeOf(Toolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, Toolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (Toolbar.__proto__ || (0, _getPrototypeOf2.default)(Toolbar)).apply(this, arguments));
     }
 
-    _createClass(Toolbar, [{
+    (0, _createClass3.default)(Toolbar, [{
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
                 'svg',
-                _extends({}, this.attrs, {
+                (0, _extends3.default)({}, this.attrs, {
                     onClick: this.props.onClick,
                     style: this.props.style }),
                 this.props.children
@@ -1500,7 +1528,6 @@ var Toolbar = exports.Toolbar = function (_PureComponent) {
             };
         }
     }]);
-
     return Toolbar;
 }(_react.PureComponent);
 
@@ -1511,12 +1538,12 @@ Toolbar.propTypes = {
 };
 
 var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
-    _inherits(DrawingToolbar, _PureComponent2);
+    (0, _inherits3.default)(DrawingToolbar, _PureComponent2);
 
     function DrawingToolbar(props) {
-        _classCallCheck(this, DrawingToolbar);
+        (0, _classCallCheck3.default)(this, DrawingToolbar);
 
-        var _this29 = _possibleConstructorReturn(this, (DrawingToolbar.__proto__ || Object.getPrototypeOf(DrawingToolbar)).call(this, props));
+        var _this29 = (0, _possibleConstructorReturn3.default)(this, (DrawingToolbar.__proto__ || (0, _getPrototypeOf2.default)(DrawingToolbar)).call(this, props));
 
         _this29.listener = null;
         _this29.state = {
@@ -1525,7 +1552,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
         return _this29;
     }
 
-    _createClass(DrawingToolbar, [{
+    (0, _createClass3.default)(DrawingToolbar, [{
         key: 'render',
         value: function render() {
             var _this30 = this;
@@ -1533,7 +1560,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
             return _react2.default.createElement(
                 Toolbar,
                 {
-                    style: Object.assign({}, this.props.style, this.state.selected ? { backgroundColor: "#D6D6D6" } : {}),
+                    style: (0, _assign2.default)({}, this.props.style, this.state.selected ? { backgroundColor: "#D6D6D6" } : {}),
                     type: this.props.type,
                     onClick: function onClick() {
                         var _props;
@@ -1563,7 +1590,6 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
             }
         }
     }]);
-
     return DrawingToolbar;
 }(_react.PureComponent);
 
@@ -1576,15 +1602,14 @@ DrawingToolbar.propTypes = {
 };
 
 var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
-    _inherits(NoneToolbar, _PureComponent3);
+    (0, _inherits3.default)(NoneToolbar, _PureComponent3);
 
     function NoneToolbar() {
-        _classCallCheck(this, NoneToolbar);
-
-        return _possibleConstructorReturn(this, (NoneToolbar.__proto__ || Object.getPrototypeOf(NoneToolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, NoneToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (NoneToolbar.__proto__ || (0, _getPrototypeOf2.default)(NoneToolbar)).apply(this, arguments));
     }
 
-    _createClass(NoneToolbar, [{
+    (0, _createClass3.default)(NoneToolbar, [{
         key: 'render',
         value: function render() {
             var _this33 = this;
@@ -1612,7 +1637,6 @@ var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
             return "";
         }
     }]);
-
     return NoneToolbar;
 }(_react.PureComponent);
 
@@ -1623,15 +1647,14 @@ NoneToolbar.propTypes = {
 };
 
 var LineToolbar = exports.LineToolbar = function (_PureComponent4) {
-    _inherits(LineToolbar, _PureComponent4);
+    (0, _inherits3.default)(LineToolbar, _PureComponent4);
 
     function LineToolbar() {
-        _classCallCheck(this, LineToolbar);
-
-        return _possibleConstructorReturn(this, (LineToolbar.__proto__ || Object.getPrototypeOf(LineToolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, LineToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (LineToolbar.__proto__ || (0, _getPrototypeOf2.default)(LineToolbar)).apply(this, arguments));
     }
 
-    _createClass(LineToolbar, [{
+    (0, _createClass3.default)(LineToolbar, [{
         key: 'render',
         value: function render() {
             var _this35 = this;
@@ -1654,11 +1677,11 @@ var LineToolbar = exports.LineToolbar = function (_PureComponent4) {
                                 }
                             });
                             _this35._id = drawing.id;
-                            graph.doActions([new DrawAction(drawing)]);
+                            graph.doActionsAsync([new DrawAction(drawing)]);
                         }).on("mousemove", function () {
                             if (_this35._id) {
                                 var point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-                                graph.doActions([new ReDrawAction(_this35._id, {
+                                graph.doActionsAsync([new ReDrawAction(_this35._id, {
                                     attrs: {
                                         x2: { $set: point.x },
                                         y2: { $set: point.y }
@@ -1679,7 +1702,6 @@ var LineToolbar = exports.LineToolbar = function (_PureComponent4) {
             return "LineDrawing";
         }
     }]);
-
     return LineToolbar;
 }(_react.PureComponent);
 
@@ -1690,15 +1712,14 @@ LineToolbar.propTypes = {
 };
 
 var CircleToolbar = exports.CircleToolbar = function (_PureComponent5) {
-    _inherits(CircleToolbar, _PureComponent5);
+    (0, _inherits3.default)(CircleToolbar, _PureComponent5);
 
     function CircleToolbar() {
-        _classCallCheck(this, CircleToolbar);
-
-        return _possibleConstructorReturn(this, (CircleToolbar.__proto__ || Object.getPrototypeOf(CircleToolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, CircleToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (CircleToolbar.__proto__ || (0, _getPrototypeOf2.default)(CircleToolbar)).apply(this, arguments));
     }
 
-    _createClass(CircleToolbar, [{
+    (0, _createClass3.default)(CircleToolbar, [{
         key: 'render',
         value: function render() {
             var _this37 = this;
@@ -1718,7 +1739,7 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent5) {
                                     cy: point.y
                                 }
                             });
-                            graph.doActions([new DrawAction(drawing)]);
+                            graph.doActionsAsync([new DrawAction(drawing)]);
                         });
                     },
                     type: this.type },
@@ -1731,7 +1752,6 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent5) {
             return "CircleDrawing";
         }
     }]);
-
     return CircleToolbar;
 }(_react.PureComponent);
 
@@ -1742,15 +1762,14 @@ CircleToolbar.propTypes = {
 };
 
 var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
-    _inherits(LinkToolbar, _PureComponent6);
+    (0, _inherits3.default)(LinkToolbar, _PureComponent6);
 
     function LinkToolbar() {
-        _classCallCheck(this, LinkToolbar);
-
-        return _possibleConstructorReturn(this, (LinkToolbar.__proto__ || Object.getPrototypeOf(LinkToolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, LinkToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (LinkToolbar.__proto__ || (0, _getPrototypeOf2.default)(LinkToolbar)).apply(this, arguments));
     }
 
-    _createClass(LinkToolbar, [{
+    (0, _createClass3.default)(LinkToolbar, [{
         key: 'getShapeID',
         value: function getShapeID(ele) {
             try {
@@ -1781,7 +1800,7 @@ var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
                             var targetID = _this39.getShapeID(event.target);
                             console.log('target id : ' + targetID);
                             if (_this39._sourceID && targetID) {
-                                graph.doActions([new DrawAction(new LinkDrawing({
+                                graph.doActionsAsync([new DrawAction(new LinkDrawing({
                                     sourceId: _this39._sourceID,
                                     targetId: targetID
                                 }))]);
@@ -1801,7 +1820,6 @@ var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
             return "LinkDrawing";
         }
     }]);
-
     return LinkToolbar;
 }(_react.PureComponent);
 
@@ -1812,15 +1830,14 @@ LinkToolbar.propTypes = {
 };
 
 var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
-    _inherits(ArrowLinkToolbar, _PureComponent7);
+    (0, _inherits3.default)(ArrowLinkToolbar, _PureComponent7);
 
     function ArrowLinkToolbar() {
-        _classCallCheck(this, ArrowLinkToolbar);
-
-        return _possibleConstructorReturn(this, (ArrowLinkToolbar.__proto__ || Object.getPrototypeOf(ArrowLinkToolbar)).apply(this, arguments));
+        (0, _classCallCheck3.default)(this, ArrowLinkToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (ArrowLinkToolbar.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkToolbar)).apply(this, arguments));
     }
 
-    _createClass(ArrowLinkToolbar, [{
+    (0, _createClass3.default)(ArrowLinkToolbar, [{
         key: 'getShapeID',
         value: function getShapeID(ele) {
             try {
@@ -1855,7 +1872,7 @@ var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
                             var event = d3.event;
                             var targetID = _this41.getShapeID(event.target);
                             if (_this41._sourceID && targetID) {
-                                graph.doActions([new DrawAction(new ArrowLinkDrawing({
+                                graph.doActionsAsync([new DrawAction(new ArrowLinkDrawing({
                                     sourceId: _this41._sourceID,
                                     targetId: targetID
                                 }))]);
@@ -1865,7 +1882,7 @@ var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
                     },
                     type: this.type },
                 _react2.default.createElement('path', { d: 'M 10 10 S 20 15, 20 20 S 20 25, 30 30', stroke: "#888888", fill: "transparent" }),
-                _react2.default.createElement('path', { d: [].concat(_toConsumableArray(arrowPath), ["Z"]).join(" "), stroke: "#888888", fill: "#888888" })
+                _react2.default.createElement('path', { d: [].concat((0, _toConsumableArray3.default)(arrowPath), ["Z"]).join(" "), stroke: "#888888", fill: "#888888" })
             );
         }
     }, {
@@ -1874,7 +1891,6 @@ var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
             return "ArrowLinkDrawing";
         }
     }]);
-
     return ArrowLinkToolbar;
 }(_react.PureComponent);
 
@@ -1892,8 +1908,8 @@ ArrowLinkToolbar.propTypes = {
     graph: _propTypes2.default.object.isRequired
 };
 
-var D3Graph = function (_PureComponent8) {
-    _inherits(D3Graph, _PureComponent8);
+var D3Graph = function (_Component) {
+    (0, _inherits3.default)(D3Graph, _Component);
 
     /**
      * @property {object} attrs - svg的属性
@@ -1908,9 +1924,9 @@ var D3Graph = function (_PureComponent8) {
      * @property {Number} interval - action的执行时间间隔
      * */
     function D3Graph(props) {
-        _classCallCheck(this, D3Graph);
+        (0, _classCallCheck3.default)(this, D3Graph);
 
-        var _this42 = _possibleConstructorReturn(this, (D3Graph.__proto__ || Object.getPrototypeOf(D3Graph)).call(this, props));
+        var _this42 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
 
         _this42.ele = null;
         //画布中已有的图形
@@ -1978,7 +1994,7 @@ var D3Graph = function (_PureComponent8) {
      * */
 
 
-    _createClass(D3Graph, [{
+    (0, _createClass3.default)(D3Graph, [{
         key: 'findShapeById',
         value: function findShapeById(id) {
             var index = this.shapes.findIndex(function (f) {
@@ -2031,212 +2047,228 @@ var D3Graph = function (_PureComponent8) {
             return { x: screenX / this.state.scale, y: screenY / this.state.scale };
         }
     }, {
-        key: 'doActions',
-        value: function doActions(actions) {
-            var _this43 = this;
+        key: 'doActionsAsync',
+        value: function () {
+            var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(actions) {
+                var _this43 = this;
 
-            var action = actions.shift();
-            if (action) {
-                this.doAction(action);
-                if (!action.canBreak) {
-                    //next
-                    this.timer = setTimeout(function () {
-                        _this43.doActions(actions);
-                    }, this.state.interval);
-                } else {
-                    //保存后续的action,等待继续执行
-                    this._leftActions = actions;
-                }
-            }
-            // let i=0,len=actions.length;
-            // for(;i<len;i++){
-            //     this.doAction(actions[i]);
-            // }
-            // actions.forEach(action => {
-            //     this.doAction(action)
-            // });
-            // //#region draw
-            // const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
-            // if (drawActions.length > 0) {
-            //     console.log(`draw : ${drawActions.map(f => `${f.params.type}(id=${f.params.id})`).join(',')}`)
-            //     this.shapes = this.shapes.concat(drawActions.map(data => data.params));
-            //     this.drawShapes(this.shapes);
-            // }
-            // //#endregion
-            //
-            // //#region redraw
-            // const redrawActions = actions.filter(f => f.type === actionTypeEnums.redraw);
-            // if (redrawActions.length > 0) {
-            //     console.log(`redraw : ${redrawActions.map(f => f.params.id).join(',')}`);
-            //     let shapes = [];
-            //     redrawActions.forEach(action => {
-            //         const index = this.shapes.findIndex(f => f.id === action.params.id);
-            //         if (index >= 0) {
-            //             this.shapes[index] = update(this.shapes[index], action.params.state);
-            //             shapes.push(this.shapes[index]);
-            //         }
-            //     });
-            //     this.drawShapes(shapes);
-            // }
-            // //#endregion
-            //
-            // //#region select
-            // const selectActions = actions.filter(f => f.type === actionTypeEnums.select);
-            // if (selectActions.length > 0) {
-            //     console.log(`${this.props.selectMode} select : ${selectActions.map(f => f.params).join(',')}`)
-            //     if (this.props.selectMode === selectModeEnums.single) {
-            //         this.doActions(this.selectedShapes.map(shape => new UnSelectAction(shape.id)))
-            //         this.selectedShapes = selectActions.map(f => {
-            //             const id = f.params;
-            //             let shape = this.findShapeById(id);
-            //             shape.selected = true;
-            //             return shape;
-            //         });
-            //     }
-            //     else {
-            //         this.selectedShapes = this.selectedShapes.concat(selectActions.map(f => {
-            //             const id = f.params;
-            //             let shape = this.findShapeById(id);
-            //             shape.selected = true;
-            //             return shape;
-            //         }));
-            //     }
-            //     this.drawShapes(this.selectedShapes);
-            // }
-            // //#endregion
-            //
-            // //#region unselect
-            // const unSelectActions = actions.filter(f => f.type === actionTypeEnums.unselect);
-            // if (unSelectActions.length > 0) {
-            //     console.log(`unselect : ${unSelectActions.map(f => f.params).join(',')}`);
-            //     const unSelectShape = unSelectActions.map(f => {
-            //         const id = f.params;
-            //         let shape = this.findShapeById(id);
-            //         shape.selected = false;
-            //         return shape;
-            //     });
-            //     this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
-            //     this.drawShapes(unSelectShape);
-            // }
-            // //#endregion
-            //
-            // //#region delete
-            // const deleteActions = actions.filter(f => f.type === actionTypeEnums.delete);
-            // if (deleteActions.length > 0) {
-            //     const ids = deleteActions.map(f => f.params);
-            //     console.log(`delete : ${ids.join(",")}`);
-            //     //删除的图形
-            //     const deletedShapes = this.shapes.filter(s => ids.indexOf(s.id) >= 0);
-            //     //删除后的图形
-            //     this.shapes = this.shapes.filter(s => ids.indexOf(s.id) <= 0);
-            //     deletedShapes.forEach(s => {
-            //         if (s.selection) {
-            //             //删除图形
-            //             s.selection.remove();
-            //             delete s.selection;
-            //         }
-            //     })
-            // }
-            // //#endregion
-            //
-            // //#region clear
-            // const clearActions = actions.filter(f => f.type === actionTypeEnums.clear);
-            // if (clearActions.length > 0) {
-            //     this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
-            // }
-            // //#endregion
-            //
-            // //#region input
-            // const inputActions = actions.filter(f => f.type === actionTypeEnums.input);
-            // if (inputActions.length > 0) {
-            //     //show input
-            // }
-            // //#endregion
-        }
-    }, {
-        key: 'doAction',
-        value: function doAction(action) {
-            var _this44 = this;
+                var action;
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                action = actions.shift();
 
-            console.log('action : ' + action.type);
-            switch (action.type) {
-                case actionTypeEnums.draw:
-                    {
-                        this.shapes.push(action.params);
-                        this.drawShapes([action.params]);
-                        break;
-                    }
-                case actionTypeEnums.redraw:
-                    {
-                        var index = this.shapes.findIndex(function (f) {
-                            return f.id === action.params.id;
-                        });
-                        if (index >= 0) {
-                            this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], action.params.state);
-                            this.drawShapes([this.shapes[index]]);
+                                if (!action) {
+                                    _context2.next = 5;
+                                    break;
+                                }
+
+                                _context2.next = 4;
+                                return this.doActionAsync(action);
+
+                            case 4:
+                                if (!action.canBreak) {
+                                    //next
+                                    this.timer = setTimeout((0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                                        return _regenerator2.default.wrap(function _callee$(_context) {
+                                            while (1) {
+                                                switch (_context.prev = _context.next) {
+                                                    case 0:
+                                                        _context.next = 2;
+                                                        return _this43.doActionsAsync(actions);
+
+                                                    case 2:
+                                                    case 'end':
+                                                        return _context.stop();
+                                                }
+                                            }
+                                        }, _callee, _this43);
+                                    })), this.state.interval);
+                                } else {
+                                    //保存后续的action,等待继续执行
+                                    this._leftActions = actions;
+                                }
+
+                            case 5:
+                            case 'end':
+                                return _context2.stop();
                         }
-                        break;
                     }
-                case actionTypeEnums.select:
-                    {
-                        var id = action.params;
-                        var shape = this.findShapeById(id);
-                        shape.selected = true;
-                        if (this.props.selectMode === selectModeEnums.single) {
-                            this.doAction(new UnSelectAction(shape.id));
-                            this.selectedShapes = [shape];
-                        } else {
-                            this.selectedShapes.push(shape);
-                        }
-                        this.drawShapes([shape]);
-                        break;
-                    }
-                case actionTypeEnums.unselect:
-                    {
-                        var _id = action.params;
-                        var _shape = this.findShapeById(_id);
-                        _shape.selected = false;
-                        this.selectedShapes = this.selectedShapes.filter(function (f) {
-                            return f.id !== _id;
-                        });
-                        this.drawShapes([_shape]);
-                        break;
-                    }
-                case actionTypeEnums.delete:
-                    {
-                        var _id2 = action.params;
-                        //删除的图形
-                        var _shape2 = this.shapes.find(function (s) {
-                            return s.id === _id2;
-                        });
-                        //删除后的图形
-                        this.shapes = this.shapes.filter(function (s) {
-                            return s.id !== _id2;
-                        });
-                        if (_shape2.selection) {
-                            _shape2.selection.remove();
-                            delete _shape2.selection;
-                        }
-                        break;
-                    }
-                case actionTypeEnums.clear:
-                    {
-                        this.shapes.forEach(function (shape) {
-                            _this44.doAction(new DeleteAction(shape.id));
-                        });
-                        break;
-                    }
-                case actionTypeEnums.input:
-                    {
-                        //显示用户输入
-                        this.showUserInput(action);
-                        break;
-                    }
-            }
-            this.setState((0, _immutabilityHelper2.default)(this.state, {
-                actions: { $push: [action] }
+                }, _callee2, this);
             }));
-        }
+
+            function doActionsAsync(_x5) {
+                return _ref.apply(this, arguments);
+            }
+
+            return doActionsAsync;
+        }()
+    }, {
+        key: 'doActionAsync',
+        value: function () {
+            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(action) {
+                var _this44 = this;
+
+                var index, id, shape, _id, _shape, _id2, _shape2;
+
+                return _regenerator2.default.wrap(function _callee5$(_context5) {
+                    while (1) {
+                        switch (_context5.prev = _context5.next) {
+                            case 0:
+                                console.log('action : ' + action.type);
+                                _context5.t0 = action.type;
+                                _context5.next = _context5.t0 === actionTypeEnums.draw ? 4 : _context5.t0 === actionTypeEnums.redraw ? 7 : _context5.t0 === actionTypeEnums.select ? 10 : _context5.t0 === actionTypeEnums.unselect ? 21 : _context5.t0 === actionTypeEnums.delete ? 27 : _context5.t0 === actionTypeEnums.clear ? 32 : _context5.t0 === actionTypeEnums.input ? 35 : 38;
+                                break;
+
+                            case 4:
+                                this.shapes.push(action.params);
+                                this.drawShapes([action.params]);
+                                return _context5.abrupt('break', 38);
+
+                            case 7:
+                                index = this.shapes.findIndex(function (f) {
+                                    return f.id === action.params.id;
+                                });
+
+                                if (index >= 0) {
+                                    this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], action.params.state);
+                                    this.drawShapes([this.shapes[index]]);
+                                }
+                                return _context5.abrupt('break', 38);
+
+                            case 10:
+                                id = action.params;
+                                shape = this.findShapeById(id);
+
+                                if (!shape.selected) {
+                                    _context5.next = 17;
+                                    break;
+                                }
+
+                                _context5.next = 15;
+                                return this.doActionAsync(new UnSelectAction(id));
+
+                            case 15:
+                                _context5.next = 19;
+                                break;
+
+                            case 17:
+                                shape.selected = true;
+                                if (this.props.selectMode === selectModeEnums.single) {
+                                    //将已选中的shape取消选中
+                                    this.selectedShapes.map(function (f) {
+                                        return f.id;
+                                    }).forEach(function () {
+                                        var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(i) {
+                                            return _regenerator2.default.wrap(function _callee3$(_context3) {
+                                                while (1) {
+                                                    switch (_context3.prev = _context3.next) {
+                                                        case 0:
+                                                            _context3.next = 2;
+                                                            return _this44.doActionAsync(new UnSelectAction(i));
+
+                                                        case 2:
+                                                        case 'end':
+                                                            return _context3.stop();
+                                                    }
+                                                }
+                                            }, _callee3, _this44);
+                                        }));
+
+                                        return function (_x7) {
+                                            return _ref4.apply(this, arguments);
+                                        };
+                                    }());
+                                    this.selectedShapes = [shape];
+                                } else {
+                                    this.selectedShapes.push(shape);
+                                }
+
+                            case 19:
+                                this.drawShapes([shape]);
+                                return _context5.abrupt('break', 38);
+
+                            case 21:
+                                _id = action.params;
+                                _shape = this.findShapeById(_id);
+
+                                _shape.selected = false;
+                                this.selectedShapes = this.selectedShapes.filter(function (f) {
+                                    return f.id !== _id;
+                                });
+                                this.drawShapes([_shape]);
+                                return _context5.abrupt('break', 38);
+
+                            case 27:
+                                _id2 = action.params;
+                                //删除的图形
+
+                                _shape2 = this.shapes.find(function (s) {
+                                    return s.id === _id2;
+                                });
+                                //删除后的图形
+
+                                this.shapes = this.shapes.filter(function (s) {
+                                    return s.id !== _id2;
+                                });
+                                if (_shape2.selection) {
+                                    _shape2.selection.remove();
+                                    delete _shape2.selection;
+                                }
+                                return _context5.abrupt('break', 38);
+
+                            case 32:
+                                this.shapes.forEach(function () {
+                                    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(shape) {
+                                        return _regenerator2.default.wrap(function _callee4$(_context4) {
+                                            while (1) {
+                                                switch (_context4.prev = _context4.next) {
+                                                    case 0:
+                                                        _context4.next = 2;
+                                                        return _this44.doActionAsync(new DeleteAction(shape.id));
+
+                                                    case 2:
+                                                    case 'end':
+                                                        return _context4.stop();
+                                                }
+                                            }
+                                        }, _callee4, _this44);
+                                    }));
+
+                                    return function (_x8) {
+                                        return _ref5.apply(this, arguments);
+                                    };
+                                }());
+                                this.selectedShapes = [];
+                                return _context5.abrupt('break', 38);
+
+                            case 35:
+                                _context5.next = 37;
+                                return this.showUserInputPromise(action);
+
+                            case 37:
+                                return _context5.abrupt('break', 38);
+
+                            case 38:
+                                this.setState((0, _immutabilityHelper2.default)(this.state, {
+                                    actions: { $push: [action] }
+                                }));
+
+                            case 39:
+                            case 'end':
+                                return _context5.stop();
+                        }
+                    }
+                }, _callee5, this);
+            }));
+
+            function doActionAsync(_x6) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return doActionAsync;
+        }()
 
         /**
          * 显示用户输入
@@ -2244,11 +2276,17 @@ var D3Graph = function (_PureComponent8) {
          */
 
     }, {
-        key: 'showUserInput',
-        value: function showUserInput(action) {
-            this.setState({
-                showUserInput: true,
-                inputProperties: action.params
+        key: 'showUserInputPromise',
+        value: function showUserInputPromise(action) {
+            var _this45 = this;
+
+            return new _promise2.default(function (resolve) {
+                _this45.setState({
+                    showUserInput: true,
+                    inputProperties: action.params
+                }, function () {
+                    resolve();
+                });
             });
         }
 
@@ -2259,7 +2297,7 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'hideUserInput',
         value: function hideUserInput(nextActionOption) {
-            var _this45 = this;
+            var _this46 = this;
 
             var params = this.state.inputProperties.map(function (property) {
                 return {
@@ -2272,27 +2310,28 @@ var D3Graph = function (_PureComponent8) {
                 inputProperties: []
             }, function () {
                 //执行下一个action
-                console.log("next action option", JSON.stringify(nextActionOption));
-                console.log("first action", JSON.stringify(_this45._leftActions[0]));
-                console.log("params", JSON.stringify(params));
-                if (_this45._leftActions.length > 0) {
+                console.log("next action option", (0, _stringify2.default)(nextActionOption));
+                console.log("first action", (0, _stringify2.default)(_this46._leftActions[0]));
+                console.log("params", (0, _stringify2.default)(params));
+                if (_this46._leftActions.length > 0) {
                     params.forEach(function (p) {
-                        (0, _objectPath.set)(_this45._leftActions[0].params, p.path, p.value);
+                        (0, _objectPath.set)(_this46._leftActions[0].params, p.path, p.value);
                     });
                 }
-                console.log("target first action", JSON.stringify(_this45._leftActions[0]));
-                _this45.doActions(_this45._leftActions);
+                console.log("target first action", (0, _stringify2.default)(_this46._leftActions[0]));
+                _this46.doActionsAsync(_this46._leftActions);
             });
         }
     }, {
         key: 'drawShapes',
         value: function drawShapes(shapes) {
-            var _this46 = this;
+            var _this47 = this;
 
+            console.log('draw shaped', shapes);
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
-                    shape.initialize(_this46);
+                    shape.initialize(_this47);
                 }
                 shape.render();
             });
@@ -2334,7 +2373,7 @@ var D3Graph = function (_PureComponent8) {
                 return;
             }
             var action = this.playingActions[this.playingIndex];
-            this.doActions([action]);
+            this.doActionsAsync([action]);
             if (action.canBreak) {
                 return;
             }
@@ -2351,25 +2390,25 @@ var D3Graph = function (_PureComponent8) {
     }, {
         key: 'render',
         value: function render() {
-            var _this47 = this;
+            var _this48 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
-                _react2.default.createElement('svg', _extends({ ref: function ref(_ref) {
-                        return _this47.ele = _ref;
+                _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref6) {
+                        return _this48.ele = _ref6;
                     } }, this.props.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this47.hideUserInput(value);
+                        _this48.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this48 = this;
+            var _this49 = this;
 
             var newState = {};
             if (this.state.interval !== nextProps.interval) {
@@ -2381,16 +2420,21 @@ var D3Graph = function (_PureComponent8) {
             if (this.state.original.x !== nextProps.original.x || this.state.original.y !== nextProps.original.y) {
                 newState.original = nextProps.original;
             }
-            this.setState(newState, function () {
+            var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this48.doActions(nextProps.actions);
+                    _this49.doActionsAsync(nextProps.actions);
                 }
-            });
+            };
+            if (newState.hasOwnProperty()) {
+                this.setState(newState, doActions);
+            } else {
+                doActions();
+            }
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            this.doActions(this.props.actions);
+            this.doActionsAsync(this.props.actions);
         }
     }, {
         key: 'componentWillUnmount',
@@ -2399,10 +2443,17 @@ var D3Graph = function (_PureComponent8) {
                 clearTimeout(this.timer);
             }
         }
+    }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            if (this.state.showUserInput !== nextState.showUserInput) {
+                return true;
+            }
+            return false;
+        }
     }]);
-
     return D3Graph;
-}(_react.PureComponent);
+}(_react.Component);
 //#endregion
 
 
@@ -2410,7 +2461,7 @@ D3Graph.propTypes = {
     attrs: _propTypes2.default.object,
     //action
     actions: _propTypes2.default.arrayOf(_propTypes2.default.shape({
-        type: _propTypes2.default.oneOf(Object.keys(actionTypeEnums)).isRequired,
+        type: _propTypes2.default.oneOf((0, _keys2.default)(actionTypeEnums)).isRequired,
         params: _propTypes2.default.any
     })),
     // //默认的图形的样式
@@ -2426,7 +2477,7 @@ D3Graph.propTypes = {
     // 	dot: PropTypes.object,
     // }),
     //选择模式,是多选还是单选
-    selectMode: _propTypes2.default.oneOf(Object.keys(selectModeEnums)),
+    selectMode: _propTypes2.default.oneOf((0, _keys2.default)(selectModeEnums)),
     //自定义绘制类型
     // customDefinedDrawing: PropTypes.object,
     // onDrawTypeChange: PropTypes.func,
@@ -2434,8 +2485,8 @@ D3Graph.propTypes = {
         x: _propTypes2.default.number,
         y: _propTypes2.default.number
     }),
-    coordinateType: _propTypes2.default.oneOf(Object.keys(coordinateTypeEnum)),
-    mode: _propTypes2.default.oneOf(Object.keys(graphModeEnum)),
+    coordinateType: _propTypes2.default.oneOf((0, _keys2.default)(coordinateTypeEnum)),
+    mode: _propTypes2.default.oneOf((0, _keys2.default)(graphModeEnum)),
     playingOption: _propTypes2.default.shape({
         interval: _propTypes2.default.number
     }),

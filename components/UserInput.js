@@ -3,10 +3,35 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends2 = require("babel-runtime/helpers/extends");
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _assign = require("babel-runtime/core-js/object/assign");
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require("babel-runtime/helpers/possibleConstructorReturn");
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require("babel-runtime/helpers/inherits");
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 var _react = require("react");
 
@@ -20,19 +45,13 @@ var _objectPath = require("object-path");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var UserInput = function (_PureComponent) {
-    _inherits(UserInput, _PureComponent);
+    (0, _inherits3.default)(UserInput, _PureComponent);
 
     function UserInput(props) {
-        _classCallCheck(this, UserInput);
+        (0, _classCallCheck3.default)(this, UserInput);
 
-        var _this = _possibleConstructorReturn(this, (UserInput.__proto__ || Object.getPrototypeOf(UserInput)).call(this, props));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (UserInput.__proto__ || (0, _getPrototypeOf2.default)(UserInput)).call(this, props));
 
         var data = {};
         props.properties.forEach(function (property) {
@@ -45,7 +64,7 @@ var UserInput = function (_PureComponent) {
         return _this;
     }
 
-    _createClass(UserInput, [{
+    (0, _createClass3.default)(UserInput, [{
         key: "render",
         value: function render() {
             var _this2 = this;
@@ -76,7 +95,7 @@ var UserInput = function (_PureComponent) {
                                         onChange: function onChange(_ref) {
                                             var value = _ref.target.value;
 
-                                            var newState = Object.assign({}, _this2.state);
+                                            var newState = (0, _assign2.default)({}, _this2.state);
                                             (0, _objectPath.set)(newState.data, property.fieldName, value);
                                             _this2.setState(newState);
                                         } })
@@ -90,7 +109,7 @@ var UserInput = function (_PureComponent) {
                         _react2.default.createElement(
                             "button",
                             { type: "button", onClick: function onClick() {
-                                    _this2.props.onOK(_extends({}, _this2.state.data));
+                                    _this2.props.onOK((0, _extends3.default)({}, _this2.state.data));
                                 } },
                             "\u786E\u5B9A"
                         )
@@ -99,7 +118,6 @@ var UserInput = function (_PureComponent) {
             );
         }
     }]);
-
     return UserInput;
 }(_react.PureComponent);
 

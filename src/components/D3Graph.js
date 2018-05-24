@@ -1121,7 +1121,8 @@ export class TextCircleDrawing extends Drawing {
     get defaultTextAttrs() {
         return {
             "text-anchor": "middle",
-            "dominant-baseline": "middle"
+            "dominant-baseline": "middle",
+            fill: "black"
         };
     }
 
