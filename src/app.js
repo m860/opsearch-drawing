@@ -46,32 +46,7 @@ class TestDrawing extends Component {
                 y: 0
             },
             coordinateType: "screen",
-            actionJson: JSON.stringify([{
-                type: "draw",
-                params: [{
-                    type: "CircleDrawing",
-                    option: {
-                        attrs: {
-                            cx: this.randomX(),
-                            cy: this.randomY()
-                        }
-                    }
-                }]
-            }, {
-                type: "input",
-                params: [[{
-                    label: "x",
-                    fieldName: "attrs.cx"
-                }, {
-                    label: "y",
-                    fieldName: "attrs.cy"
-                }]]
-            }, {
-                type: "draw",
-                params: [{
-                    type: "CircleDrawing"
-                }]
-            }])
+            actionJson: ""
         };
     }
 
@@ -267,13 +242,180 @@ class TestDrawing extends Component {
                     }}>画指定点
                     </button>
                     <button type="button" onClick={() => {
+                        const sourceId = guid.raw();
+                        const targetId = guid.raw();
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: sourceId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: targetId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "LinkDrawing",
+                                    option: {
+                                        sourceId: sourceId,
+                                        targetId: targetId
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>链接图形(link)
+                    </button>
+                    <button type="button" onClick={() => {
+                        const sourceId = guid.raw();
+                        const targetId = guid.raw();
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: sourceId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: targetId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "LinkDrawing",
+                                    option: {
+                                        sourceId: sourceId,
+                                        targetId: targetId,
+                                        label: "hello"
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>链接图形(link),label=hello
+                    </button>
+                    <button type="button" onClick={() => {
+                        const sourceId = guid.raw();
+                        const targetId = guid.raw();
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: sourceId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: targetId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "ArrowLinkDrawing",
+                                    option: {
+                                        sourceId: sourceId,
+                                        targetId: targetId
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>链接图形(arrow-link)
+                    </button>
+                    <button type="button" onClick={() => {
+                        const sourceId = guid.raw();
+                        const targetId = guid.raw();
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: sourceId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        id: targetId,
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "ArrowLinkDrawing",
+                                    option: {
+                                        sourceId: sourceId,
+                                        targetId: targetId,
+                                        label: "abc"
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>链接图形(arrow-link),label=abc
+                    </button>
+                    <button type="button" onClick={() => {
+                        const id = guid.raw();
                         this.setState({
                             actionJson: JSON.stringify([{
                                 type: "draw",
                                 params: [{
                                     type: "DotDrawing",
                                     option: {
-                                        id: "dot-1",
+                                        id: id,
                                         attrs: {
                                             cx: this.randomX(),
                                             cy: this.randomY()
@@ -282,7 +424,7 @@ class TestDrawing extends Component {
                                 }]
                             }, {
                                 type: "select",
-                                params: ["dot-1"]
+                                params: [id]
                             }])
                         }, this.exec.bind(this))
                     }}>随机画一个点,并选中它

@@ -462,6 +462,16 @@ export class Drawing {
         }
     }
 
+    /**
+     * 删除图形
+     */
+    remove() {
+        if (this.selection) {
+            this.selection.remove();
+        }
+        this.selection = null;
+    }
+
     combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
         console.log('selected', this.selected);
         let result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
@@ -876,6 +886,14 @@ export class ArrowLinkDrawing extends Drawing {
         this.labelSelection = d3.select(graph.ele).append("text");
     }
 
+    remove() {
+        super.remove();
+        if (this.labelSelection) {
+            this.labelSelection.remove();
+        }
+        this.labelSelection = null;
+    }
+
     renderLabel(x, y) {
         if (this.labelSelection) {
             if (this.label) {
@@ -905,7 +923,6 @@ export class ArrowLinkDrawing extends Drawing {
     }
 
     getArrowLinkPath(startPoint, endPoint, distance = 10) {
-
         const diffX = startPoint.x - endPoint.x;
         const diffY = startPoint.y - endPoint.y;
         const a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
@@ -986,6 +1003,14 @@ export class LinkDrawing extends Drawing {
             this.select();
         });
         this.labelSelection = d3.select(graph.ele).append("text");
+    }
+
+    remove() {
+        super.remove();
+        if (this.labelSelection) {
+            this.labelSelection.remove();
+        }
+        this.labelSelection = null;
     }
 
     renderLabel(x, y) {
@@ -1602,6 +1627,10 @@ export default class D3Graph extends Component {
         interval: 1,
     }
 
+    get scale() {
+        return this.state.scale;
+    }
+
     constructor(props) {
         super(props);
         this.ele = null;
@@ -1879,10 +1908,11 @@ export default class D3Graph extends Component {
                 const shape = this.shapes.find(s => s.id === id);
                 //删除后的图形
                 this.shapes = this.shapes.filter(s => s.id !== id);
-                if (shape.selection) {
-                    shape.selection.remove();
-                    delete shape.selection;
-                }
+                // if (shape.selection) {
+                //     shape.selection.remove();
+                //     delete shape.selection;
+                // }
+                shape.remove();
                 break;
             }
             case actionTypeEnums.clear: {

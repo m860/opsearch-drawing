@@ -597,6 +597,19 @@ var Drawing = exports.Drawing = function () {
                 this.graph.doActionsAsync([new SelectAction(this.id)]);
             }
         }
+
+        /**
+         * 删除图形
+         */
+
+    }, {
+        key: 'remove',
+        value: function remove() {
+            if (this.selection) {
+                this.selection.remove();
+            }
+            this.selection = null;
+        }
     }, {
         key: 'combineAttrs',
         value: function combineAttrs() {
@@ -1075,6 +1088,15 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             this.labelSelection = d3.select(graph.ele).append("text");
         }
     }, {
+        key: 'remove',
+        value: function remove() {
+            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'remove', this).call(this);
+            if (this.labelSelection) {
+                this.labelSelection.remove();
+            }
+            this.labelSelection = null;
+        }
+    }, {
         key: 'renderLabel',
         value: function renderLabel(x, y) {
             if (this.labelSelection) {
@@ -1108,7 +1130,6 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         key: 'getArrowLinkPath',
         value: function getArrowLinkPath(startPoint, endPoint) {
             var distance = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 10;
-
 
             var diffX = startPoint.x - endPoint.x;
             var diffY = startPoint.y - endPoint.y;
@@ -1195,6 +1216,15 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
                 _this21.select();
             });
             this.labelSelection = d3.select(graph.ele).append("text");
+        }
+    }, {
+        key: 'remove',
+        value: function remove() {
+            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'remove', this).call(this);
+            if (this.labelSelection) {
+                this.labelSelection.remove();
+            }
+            this.labelSelection = null;
         }
     }, {
         key: 'renderLabel',
@@ -1910,19 +1940,26 @@ ArrowLinkToolbar.propTypes = {
 
 var D3Graph = function (_Component) {
     (0, _inherits3.default)(D3Graph, _Component);
+    (0, _createClass3.default)(D3Graph, [{
+        key: 'scale',
 
-    /**
-     * @property {object} attrs - svg的属性
-     * @property {Array} actions - 所有的操作
-     * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
-     * @property {object} original - 坐标原点,默认值{x:0,y:0}
-     * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
-     * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
-     * @property {object} playingOption - mode===playing时有效
-     * @property {Function} renderToolbar - 绘图的工具栏
-     * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
-     * @property {Number} interval - action的执行时间间隔
-     * */
+        /**
+         * @property {object} attrs - svg的属性
+         * @property {Array} actions - 所有的操作
+         * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
+         * @property {object} original - 坐标原点,默认值{x:0,y:0}
+         * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
+         * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
+         * @property {object} playingOption - mode===playing时有效
+         * @property {Function} renderToolbar - 绘图的工具栏
+         * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
+         * @property {Number} interval - action的执行时间间隔
+         * */
+        get: function get() {
+            return this.state.scale;
+        }
+    }]);
+
     function D3Graph(props) {
         (0, _classCallCheck3.default)(this, D3Graph);
 
@@ -2212,10 +2249,11 @@ var D3Graph = function (_Component) {
                                 this.shapes = this.shapes.filter(function (s) {
                                     return s.id !== _id2;
                                 });
-                                if (_shape2.selection) {
-                                    _shape2.selection.remove();
-                                    delete _shape2.selection;
-                                }
+                                // if (shape.selection) {
+                                //     shape.selection.remove();
+                                //     delete shape.selection;
+                                // }
+                                _shape2.remove();
                                 return _context5.abrupt('break', 38);
 
                             case 32:
