@@ -161,7 +161,7 @@ export function fromDrawing(drawingOps: DrawingOptionType) {
 export function fromActions(actions: Array<ActionOptionType>) {
     return actions.map(action => {
         const type = action.type;
-        const args = action.params;
+        const args = action.params || [];
         const ops = action.ops;
         const func = actionIndex[type];
         if (!func) {
@@ -456,13 +456,14 @@ export class Drawing {
      * */
     select() {
         if (this.graph) {
-            this.graph.doActions([
+            this.graph.doActionsAsync([
                 new SelectAction(this.id)
             ])
         }
     }
 
     combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
+        console.log('selected', this.selected);
         let result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
         if (!isNullOrUndefined(result.x)) {
             result.x = this.graph.getX(result.x);
@@ -489,6 +490,7 @@ export class Drawing {
             result.cy = this.graph.getY(result.cy);
         }
         result["shape-id"] = this.id;
+        console.log("combined attrs", result);
         return result;
     }
 
@@ -1343,14 +1345,14 @@ export class LineToolbar extends PureComponent {
                                         }
                                     });
                                     this._id = drawing.id;
-                                    graph.doActions([
+                                    graph.doActionsAsync([
                                         new DrawAction(drawing)
                                     ])
                                 })
                                     .on("mousemove", () => {
                                         if (this._id) {
                                             const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-                                            graph.doActions([
+                                            graph.doActionsAsync([
                                                 new ReDrawAction(this._id, {
                                                     attrs: {
                                                         x2: {$set: point.x},
@@ -1396,7 +1398,7 @@ export class CircleToolbar extends PureComponent {
                                             cy: point.y
                                         }
                                     })
-                                    graph.doActions([
+                                    graph.doActionsAsync([
                                         new DrawAction(drawing)
                                     ])
                                 })
@@ -1444,7 +1446,7 @@ export class LinkToolbar extends PureComponent {
                                     const targetID = this.getShapeID(event.target);
                                     console.log(`target id : ${targetID}`)
                                     if (this._sourceID && targetID) {
-                                        graph.doActions([
+                                        graph.doActionsAsync([
                                             new DrawAction(new LinkDrawing({
                                                 sourceId: this._sourceID,
                                                 targetId: targetID
@@ -1503,7 +1505,7 @@ export class ArrowLinkToolbar extends PureComponent {
                                     const event = d3.event;
                                     const targetID = this.getShapeID(event.target);
                                     if (this._sourceID && targetID) {
-                                        graph.doActions([
+                                        graph.doActionsAsync([
                                             new DrawAction(new ArrowLinkDrawing({
                                                 sourceId: this._sourceID,
                                                 targetId: targetID
@@ -1527,7 +1529,7 @@ export class ArrowLinkToolbar extends PureComponent {
 /**
  * 运筹学图形D3
  * */
-export default class D3Graph extends PureComponent {
+export default class D3Graph extends Component {
     /**
      * @property {object} attrs - svg的属性
      * @property {Array} actions - 所有的操作
@@ -1703,14 +1705,14 @@ export default class D3Graph extends PureComponent {
         return {x: screenX / this.state.scale, y: screenY / this.state.scale};
     }
 
-    doActions(actions) {
+    async doActionsAsync(actions) {
         const action = actions.shift();
         if (action) {
-            this.doAction(action);
+            await this.doActionAsync(action);
             if (!action.canBreak) {
                 //next
-                this.timer = setTimeout(() => {
-                    this.doActions(actions);
+                this.timer = setTimeout(async () => {
+                    await this.doActionsAsync(actions);
                 }, this.state.interval);
             }
             else {
@@ -1824,7 +1826,7 @@ export default class D3Graph extends PureComponent {
         // //#endregion
     }
 
-    doAction(action) {
+    async doActionAsync(action) {
         console.log(`action : ${action.type}`)
         switch (action.type) {
             case actionTypeEnums.draw: {
@@ -1843,13 +1845,21 @@ export default class D3Graph extends PureComponent {
             case actionTypeEnums.select: {
                 const id = action.params;
                 let shape = this.findShapeById(id);
-                shape.selected = true;
-                if (this.props.selectMode === selectModeEnums.single) {
-                    this.doAction(new UnSelectAction(shape.id));
-                    this.selectedShapes = [shape];
+                if (shape.selected) {
+                    await this.doActionAsync(new UnSelectAction(id));
                 }
                 else {
-                    this.selectedShapes.push(shape);
+                    shape.selected = true;
+                    if (this.props.selectMode === selectModeEnums.single) {
+                        //将已选中的shape取消选中
+                        this.selectedShapes.map(f => f.id).forEach(async i => {
+                            await this.doActionAsync(new UnSelectAction(i));
+                        });
+                        this.selectedShapes = [shape];
+                    }
+                    else {
+                        this.selectedShapes.push(shape);
+                    }
                 }
                 this.drawShapes([shape]);
                 break;
@@ -1875,14 +1885,15 @@ export default class D3Graph extends PureComponent {
                 break;
             }
             case actionTypeEnums.clear: {
-                this.shapes.forEach(shape => {
-                    this.doAction(new DeleteAction(shape.id))
+                this.shapes.forEach(async shape => {
+                    await this.doActionAsync(new DeleteAction(shape.id))
                 });
+                this.selectedShapes = [];
                 break;
             }
             case actionTypeEnums.input: {
                 //显示用户输入
-                this.showUserInput(action);
+                await this.showUserInputPromise(action);
                 break;
             }
         }
@@ -1897,11 +1908,15 @@ export default class D3Graph extends PureComponent {
      * 显示用户输入
      * @param action
      */
-    showUserInput(action) {
-        this.setState({
-            showUserInput: true,
-            inputProperties: action.params
-        })
+    showUserInputPromise(action) {
+        return new Promise((resolve) => {
+            this.setState({
+                showUserInput: true,
+                inputProperties: action.params
+            }, () => {
+                resolve();
+            })
+        });
     }
 
     /**
@@ -1928,11 +1943,12 @@ export default class D3Graph extends PureComponent {
                 });
             }
             console.log("target first action", JSON.stringify(this._leftActions[0]))
-            this.doActions(this._leftActions);
+            this.doActionsAsync(this._leftActions);
         })
     }
 
     drawShapes(shapes) {
+        console.log('draw shaped', shapes);
         shapes.forEach(shape => {
             //初始化
             if (!shape.ready) {
@@ -1974,7 +1990,7 @@ export default class D3Graph extends PureComponent {
             return;
         }
         const action = this.playingActions[this.playingIndex];
-        this.doActions([action]);
+        this.doActionsAsync([action]);
         if (action.canBreak) {
             return;
         }
@@ -2013,21 +2029,34 @@ export default class D3Graph extends PureComponent {
         if (this.state.original.x !== nextProps.original.x || this.state.original.y !== nextProps.original.y) {
             newState.original = nextProps.original;
         }
-        this.setState(newState, () => {
+        const doActions = () => {
             if (nextProps.actions.length > 0) {
-                this.doActions(nextProps.actions);
+                this.doActionsAsync(nextProps.actions);
             }
-        });
+        }
+        if (newState.hasOwnProperty()) {
+            this.setState(newState, doActions);
+        }
+        else {
+            doActions();
+        }
     }
 
     componentDidMount() {
-        this.doActions(this.props.actions);
+        this.doActionsAsync(this.props.actions);
     }
 
     componentWillUnmount() {
         if (this.timer) {
             clearTimeout(this.timer);
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.showUserInput !== nextState.showUserInput) {
+            return true;
+        }
+        return false;
     }
 }
 //#endregion

@@ -83,9 +83,10 @@ class TestDrawing extends Component {
         return d3.randomUniform(20, 280);
     }
 
-    drawing() {
+    exec() {
         try {
             const actions = fromActions(JSON.parse(this.state.actionJson));
+            console.log("actions", JSON.stringify(actions))
             this.setState({
                 actions: actions
             })
@@ -158,9 +159,142 @@ class TestDrawing extends Component {
                         })
                     }} style={{width: "100%", height: 100}}></textarea>
                 </div>
-                <div>
+                <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", flex: "1 0 auto"}}>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "DotDrawing",
+                                    option: {
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画点
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "CircleDrawing",
+                                    option: {
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画圈
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "LineDrawing",
+                                    option: {
+                                        attrs: {
+                                            x1: this.randomX(),
+                                            y1: this.randomY(),
+                                            x2: this.randomX(),
+                                            y2: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画线
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "TextCircleDrawing",
+                                    option: {
+                                        text: "A",
+                                        circleAttrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画带圈的文本
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "PathDrawing",
+                                    option: {
+                                        d: [
+                                            {x: this.randomX(), y: this.randomY()},
+                                            {x: this.randomX(), y: this.randomY()},
+                                            {x: this.randomX(), y: this.randomY()},
+                                        ]
+                                    }
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画多边形(三角形)
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "input",
+                                params: [[
+                                    {label: "x", fieldName: "attrs.cx"},
+                                    {label: "y", fieldName: "attrs.cy"},
+                                ]]
+                            }, {
+                                type: "draw",
+                                params: [{
+                                    type: "DotDrawing"
+                                }]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>画指定点
+                    </button>
+                    <button type="button" onClick={() => {
+                        this.setState({
+                            actionJson: JSON.stringify([{
+                                type: "draw",
+                                params: [{
+                                    type: "DotDrawing",
+                                    option: {
+                                        id: "dot-1",
+                                        attrs: {
+                                            cx: this.randomX(),
+                                            cy: this.randomY()
+                                        }
+                                    }
+                                }]
+                            }, {
+                                type: "select",
+                                params: ["dot-1"]
+                            }])
+                        }, this.exec.bind(this))
+                    }}>随机画一个点,并选中它
+                    </button>
                     <button type="button"
-                            onClick={this.drawing.bind(this)}>Drawing
+                            onClick={() => {
+                                this.setState({
+                                    actionJson: JSON.stringify([{
+                                        type: "clear"
+                                    }])
+                                }, this.exec.bind(this))
+                            }}>clear
                     </button>
                 </div>
                 <D3Graph actions={this.state.actions}
