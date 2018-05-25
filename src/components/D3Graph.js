@@ -2065,7 +2065,8 @@ export default class D3Graph extends Component {
                 this.doActionsAsync(nextProps.actions);
             }
         }
-        if (newState.hasOwnProperty()) {
+        const keys = Object.keys(newState);
+        if (keys.length > 0) {
             this.setState(newState, doActions);
         }
         else {

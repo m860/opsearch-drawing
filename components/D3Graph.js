@@ -2463,7 +2463,8 @@ var D3Graph = function (_Component) {
                     _this49.doActionsAsync(nextProps.actions);
                 }
             };
-            if (newState.hasOwnProperty()) {
+            var keys = (0, _keys2.default)(newState);
+            if (keys.length > 0) {
                 this.setState(newState, doActions);
             } else {
                 doActions();
