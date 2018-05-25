@@ -38,9 +38,9 @@ export default class UserInput extends PureComponent {
                                     <li key={index}>
                                         <label>{property.label}</label>
                                         <input type="text"
-                                               value={this.state.data[property.fieldName]}
+                                               defaultValue={getPath(this.state.data, property.fieldName)}
                                                onChange={({target: {value}}) => {
-                                                   let newState =Object.assign({},this.state);
+                                                   let newState = Object.assign({}, this.state);
                                                    setPath(newState.data, property.fieldName, value);
                                                    this.setState(newState);
                                                }}/>

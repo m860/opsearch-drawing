@@ -91,7 +91,7 @@ var UserInput = function (_PureComponent) {
                                         property.label
                                     ),
                                     _react2.default.createElement("input", { type: "text",
-                                        value: _this2.state.data[property.fieldName],
+                                        defaultValue: (0, _objectPath.get)(_this2.state.data, property.fieldName),
                                         onChange: function onChange(_ref) {
                                             var value = _ref.target.value;
 

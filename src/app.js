@@ -33,6 +33,7 @@ import guid from 'guid'
 import * as d3 from 'd3'
 import data from '../test/drawing-data'
 import update from 'immutability-helper'
+import UserInput from "./components/UserInput";
 
 class TestDrawing extends Component {
     constructor(props) {
@@ -478,6 +479,7 @@ class TestMathCoordinateDrawing extends Component {
                          original={original}
                          coordinateType="math"
                          scale={scale}/>
+
             </div>
         );
     }
