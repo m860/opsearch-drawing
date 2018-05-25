@@ -1743,7 +1743,7 @@ export default class D3Graph extends Component {
                 //next
                 this.timer = setTimeout(async () => {
                     await this.doActionsAsync(actions);
-                }, this.state.interval);
+                }, action.nextInterval ? action.nextInterval : this.state.interval);
             }
             else {
                 //保存后续的action,等待继续执行

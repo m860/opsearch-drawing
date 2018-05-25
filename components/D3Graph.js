@@ -2121,7 +2121,7 @@ var D3Graph = function (_Component) {
                                                 }
                                             }
                                         }, _callee, _this43);
-                                    })), this.state.interval);
+                                    })), action.nextInterval ? action.nextInterval : this.state.interval);
                                 } else {
                                     //保存后续的action,等待继续执行
                                     this._leftActions = actions;
