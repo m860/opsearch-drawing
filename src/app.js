@@ -47,7 +47,8 @@ class TestDrawing extends Component {
                 y: 0
             },
             coordinateType: "screen",
-            actionJson: ""
+            actionJson: "",
+            selectMode: "single"
         };
     }
 
@@ -83,6 +84,17 @@ class TestDrawing extends Component {
                             interval: isNaN(num) ? 0 : num
                         });
                     }}/>
+                </div>
+                <div>
+                    <label>选择模式</label>
+                    <select value={this.state.selectMode} onChange={({target: {value}}) => {
+                        this.setState({
+                            selectMode: value
+                        })
+                    }}>
+                        <option value="single">single</option>
+                        <option value="multiple">multiple</option>
+                    </select>
                 </div>
                 <div>
                     <label>刻度尺</label>
@@ -441,6 +453,7 @@ class TestDrawing extends Component {
                     </button>
                 </div>
                 <D3Graph actions={this.state.actions}
+                         selectMode={this.state.selectMode}
                          interval={this.state.interval}/>
             </div>
         )

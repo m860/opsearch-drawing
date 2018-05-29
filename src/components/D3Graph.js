@@ -473,7 +473,6 @@ export class Drawing {
     }
 
     combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
-        console.log('selected', this.selected);
         let result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
         if (!isNullOrUndefined(result.x)) {
             result.x = this.graph.getX(result.x);
@@ -500,7 +499,6 @@ export class Drawing {
             result.cy = this.graph.getY(result.cy);
         }
         result["shape-id"] = this.id;
-        console.log("combined attrs", result);
         return result;
     }
 
@@ -537,45 +535,6 @@ export class LineDrawing extends Drawing {
         })
     }
 
-    // renderToolbar(graph, drawType, index) {
-    // 	return (
-    // 		<a key={index}
-    // 		   onClick={() => {
-    // 			   console.log('click');
-    // 			   d3.select(graph.ele)
-    // 				   .on("mousedown", function () {
-    // 					   this._id = guid.raw();
-    // 					   graph.doActions([
-    // 						   new DrawAction({
-    // 							   id: this._id,
-    // 							   type: this.type,
-    // 							   attrs: Object.assign({
-    // 								   x1: d3.event.offsetX,
-    // 								   y1: d3.event.offsetY,
-    // 								   x2: d3.event.offsetX,
-    // 								   y2: d3.event.offsetY
-    // 							   }, this.defaultAttrs)
-    // 						   })])
-    // 				   })
-    // 				   .on("mousemove", function () {
-    // 					   if (drawType.type === "line" && this._id) {
-    // 						   graph.doActions([
-    // 							   new ReDrawAction(this._id, {
-    // 								   attrs: {
-    // 									   x2: {$set: d3.event.offsetX},
-    // 									   y2: {$set: d3.event.offsetY}
-    // 								   }
-    // 							   })
-    // 						   ]);
-    // 					   }
-    // 				   })
-    // 				   .on("mouseup", function () {
-    // 					   delete this._id;
-    // 				   })
-    // 		   }}
-    // 		   href="javascript:void(0)">Line</a>
-    // 	);
-    // }
 }
 
 registerDrawing("LineDrawing", LineDrawing);
@@ -679,55 +638,6 @@ export class RectDrawing extends Drawing {
             this.select();
         });
     }
-
-    // renderToolbar(context, drawType, index) {
-    // 	return (
-    // 		<a key={index} href="javascript:void(0)" onClick={() => {
-    // 			d3.select(context.ele)
-    // 				.on('mousedown', function () {
-    // 					this._id = guid.raw();
-    // 					this._mouseDownEvent = d3.event;
-    // 					context.doActions([
-    // 						new DrawAction({
-    // 							id: this._id,
-    // 							type: drawType.type,
-    // 							attrs: Object.assign({
-    // 								d: `M ${d3.event.offsetX} ${d3.event.offsetY} l 0 0 z`
-    // 							}, drawType.defaultAttrs)
-    // 						})
-    // 					])
-    // 				})
-    // 				.on('mousemove', function () {
-    // 					if (this._id
-    // 						&& this._mouseDownEvent
-    // 						&& drawType.type === "rect") {
-    // 						const width = d3.event.offsetX - this._mouseDownEvent.offsetX;
-    // 						const height = d3.event.offsetY - this._mouseDownEvent.offsetY;
-    // 						console.log(`width:${width},height:${height}`)
-    // 						const d = [
-    // 							`M ${this._mouseDownEvent.offsetX} ${this._mouseDownEvent.offsetY}`,
-    // 							`L ${d3.event.offsetX} ${this._mouseDownEvent.offsetY}`,
-    // 							`L ${d3.event.offsetX} ${d3.event.offsetY}`,
-    // 							`L ${this._mouseDownEvent.offsetX} ${d3.event.offsetY}`,
-    // 							'z'
-    // 						]
-    // 						//update
-    // 						context.doActions([
-    // 							new ReDrawAction(this._id, {
-    // 								attrs: {
-    // 									d: {$set: d.join(' ')}
-    // 								}
-    // 							})
-    // 						])
-    // 					}
-    // 				})
-    // 				.on("mouseup", function () {
-    // 					delete this._id;
-    // 					delete this._mouseDownEvent
-    // 				})
-    // 		}}>Rect</a>
-    // 	);
-    // }
 }
 
 registerDrawing("RectDrawing", RectDrawing);
@@ -1464,13 +1374,10 @@ export class LinkToolbar extends PureComponent {
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const event = d3.event;
-                                    console.log(event.target)
                                     this._sourceID = this.getShapeID(event.target);
-                                    console.log(`source id : ${this._sourceID}`)
                                 }).on("mouseup", () => {
                                     const event = d3.event;
                                     const targetID = this.getShapeID(event.target);
-                                    console.log(`target id : ${targetID}`)
                                     if (this._sourceID && targetID) {
                                         graph.doActionsAsync([
                                             new DrawAction(new LinkDrawing({
@@ -1641,54 +1548,28 @@ export default class D3Graph extends Component {
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
         this.playingTimer = null;
-        /**
-         * 播放的索引
-         * @type {number}
-         */
+        //播放的索引
         this.playingIndex = 0;
-        /**
-         * 正在播放的action
-         * @type {Array}
-         */
+        //正在播放的action
         this.playingActions = [];
-        /**
-         * 播放选项
-         * @type {null}
-         */
+        //播放选项
         this.playingOption = null;
-        /**
-         * 执行action的timter
-         * @type {null}
-         */
+        //执行action的timter
         this.timer = null;
         this.state = {
-            /**
-             * inputAction的属性
-             */
+            //inputAction的属性
             inputProperties: [],
-            /**
-             * 是否显示用户输入
-             */
+            //是否显示用户输入
             showUserInput: false,
-            /**
-             * 所有的action
-             */
+            //所有的action
             actions: [],
-            /**
-             * action执行的时间间隔
-             */
+            //action执行的时间间隔
             interval: props.interval,
-            /**
-             * 比例尺
-             */
+            //比例尺
             scale: props.scale,
-            /**
-             * 原点
-             */
+            //原点
             original: props.original,
-            /**
-             * 坐标系类型
-             */
+            //坐标系类型
             coordinateType: props.coordinateType
         };
     }
@@ -1750,114 +1631,9 @@ export default class D3Graph extends Component {
                 this._leftActions = actions;
             }
         }
-        // let i=0,len=actions.length;
-        // for(;i<len;i++){
-        //     this.doAction(actions[i]);
-        // }
-        // actions.forEach(action => {
-        //     this.doAction(action)
-        // });
-        // //#region draw
-        // const drawActions = actions.filter(f => f.type === actionTypeEnums.draw);
-        // if (drawActions.length > 0) {
-        //     console.log(`draw : ${drawActions.map(f => `${f.params.type}(id=${f.params.id})`).join(',')}`)
-        //     this.shapes = this.shapes.concat(drawActions.map(data => data.params));
-        //     this.drawShapes(this.shapes);
-        // }
-        // //#endregion
-        //
-        // //#region redraw
-        // const redrawActions = actions.filter(f => f.type === actionTypeEnums.redraw);
-        // if (redrawActions.length > 0) {
-        //     console.log(`redraw : ${redrawActions.map(f => f.params.id).join(',')}`);
-        //     let shapes = [];
-        //     redrawActions.forEach(action => {
-        //         const index = this.shapes.findIndex(f => f.id === action.params.id);
-        //         if (index >= 0) {
-        //             this.shapes[index] = update(this.shapes[index], action.params.state);
-        //             shapes.push(this.shapes[index]);
-        //         }
-        //     });
-        //     this.drawShapes(shapes);
-        // }
-        // //#endregion
-        //
-        // //#region select
-        // const selectActions = actions.filter(f => f.type === actionTypeEnums.select);
-        // if (selectActions.length > 0) {
-        //     console.log(`${this.props.selectMode} select : ${selectActions.map(f => f.params).join(',')}`)
-        //     if (this.props.selectMode === selectModeEnums.single) {
-        //         this.doActions(this.selectedShapes.map(shape => new UnSelectAction(shape.id)))
-        //         this.selectedShapes = selectActions.map(f => {
-        //             const id = f.params;
-        //             let shape = this.findShapeById(id);
-        //             shape.selected = true;
-        //             return shape;
-        //         });
-        //     }
-        //     else {
-        //         this.selectedShapes = this.selectedShapes.concat(selectActions.map(f => {
-        //             const id = f.params;
-        //             let shape = this.findShapeById(id);
-        //             shape.selected = true;
-        //             return shape;
-        //         }));
-        //     }
-        //     this.drawShapes(this.selectedShapes);
-        // }
-        // //#endregion
-        //
-        // //#region unselect
-        // const unSelectActions = actions.filter(f => f.type === actionTypeEnums.unselect);
-        // if (unSelectActions.length > 0) {
-        //     console.log(`unselect : ${unSelectActions.map(f => f.params).join(',')}`);
-        //     const unSelectShape = unSelectActions.map(f => {
-        //         const id = f.params;
-        //         let shape = this.findShapeById(id);
-        //         shape.selected = false;
-        //         return shape;
-        //     });
-        //     this.selectedShapes = this.selectedShapes.filter(f => unSelectActions.findIndex(ff => ff.id !== f.id) >= 0);
-        //     this.drawShapes(unSelectShape);
-        // }
-        // //#endregion
-        //
-        // //#region delete
-        // const deleteActions = actions.filter(f => f.type === actionTypeEnums.delete);
-        // if (deleteActions.length > 0) {
-        //     const ids = deleteActions.map(f => f.params);
-        //     console.log(`delete : ${ids.join(",")}`);
-        //     //删除的图形
-        //     const deletedShapes = this.shapes.filter(s => ids.indexOf(s.id) >= 0);
-        //     //删除后的图形
-        //     this.shapes = this.shapes.filter(s => ids.indexOf(s.id) <= 0);
-        //     deletedShapes.forEach(s => {
-        //         if (s.selection) {
-        //             //删除图形
-        //             s.selection.remove();
-        //             delete s.selection;
-        //         }
-        //     })
-        // }
-        // //#endregion
-        //
-        // //#region clear
-        // const clearActions = actions.filter(f => f.type === actionTypeEnums.clear);
-        // if (clearActions.length > 0) {
-        //     this.doActions(this.shapes.map(f => new DeleteAction(f.id)));
-        // }
-        // //#endregion
-        //
-        // //#region input
-        // const inputActions = actions.filter(f => f.type === actionTypeEnums.input);
-        // if (inputActions.length > 0) {
-        //     //show input
-        // }
-        // //#endregion
     }
 
     async doActionAsync(action) {
-        console.log(`action : ${action.type}`)
         switch (action.type) {
             case actionTypeEnums.draw: {
                 this.shapes.push(action.params);
@@ -1965,21 +1741,16 @@ export default class D3Graph extends Component {
             inputProperties: []
         }, () => {
             //执行下一个action
-            console.log("next action option", JSON.stringify(nextActionOption));
-            console.log("first action", JSON.stringify(this._leftActions[0]));
-            console.log("params", JSON.stringify(params));
             if (this._leftActions.length > 0) {
                 params.forEach(p => {
                     setPath(this._leftActions[0].params, p.path, p.value)
                 });
             }
-            console.log("target first action", JSON.stringify(this._leftActions[0]))
             this.doActionsAsync(this._leftActions);
         })
     }
 
     drawShapes(shapes) {
-        console.log('draw shaped', shapes);
         shapes.forEach(shape => {
             //初始化
             if (!shape.ready) {

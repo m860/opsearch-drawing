@@ -9,10 +9,6 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
@@ -618,7 +614,6 @@ var Drawing = exports.Drawing = function () {
             var defaultSelectedAttrs = arguments[2];
             var selectedAttrs = arguments[3];
 
-            console.log('selected', this.selected);
             var result = (0, _assign2.default)({}, defaultAttrs, attrs, this.selected ? (0, _assign2.default)({}, defaultSelectedAttrs, selectedAttrs) : {});
             if (!isNullOrUndefined(result.x)) {
                 result.x = this.graph.getX(result.x);
@@ -645,7 +640,6 @@ var Drawing = exports.Drawing = function () {
                 result.cy = this.graph.getY(result.cy);
             }
             result["shape-id"] = this.id;
-            console.log("combined attrs", result);
             return result;
         }
     }, {
@@ -697,47 +691,6 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
                 _this9.select();
             });
         }
-
-        // renderToolbar(graph, drawType, index) {
-        // 	return (
-        // 		<a key={index}
-        // 		   onClick={() => {
-        // 			   console.log('click');
-        // 			   d3.select(graph.ele)
-        // 				   .on("mousedown", function () {
-        // 					   this._id = guid.raw();
-        // 					   graph.doActions([
-        // 						   new DrawAction({
-        // 							   id: this._id,
-        // 							   type: this.type,
-        // 							   attrs: Object.assign({
-        // 								   x1: d3.event.offsetX,
-        // 								   y1: d3.event.offsetY,
-        // 								   x2: d3.event.offsetX,
-        // 								   y2: d3.event.offsetY
-        // 							   }, this.defaultAttrs)
-        // 						   })])
-        // 				   })
-        // 				   .on("mousemove", function () {
-        // 					   if (drawType.type === "line" && this._id) {
-        // 						   graph.doActions([
-        // 							   new ReDrawAction(this._id, {
-        // 								   attrs: {
-        // 									   x2: {$set: d3.event.offsetX},
-        // 									   y2: {$set: d3.event.offsetY}
-        // 								   }
-        // 							   })
-        // 						   ]);
-        // 					   }
-        // 				   })
-        // 				   .on("mouseup", function () {
-        // 					   delete this._id;
-        // 				   })
-        // 		   }}
-        // 		   href="javascript:void(0)">Line</a>
-        // 	);
-        // }
-
     }, {
         key: 'defaultAttrs',
         get: function get() {
@@ -891,56 +844,6 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
                 _this15.select();
             });
         }
-
-        // renderToolbar(context, drawType, index) {
-        // 	return (
-        // 		<a key={index} href="javascript:void(0)" onClick={() => {
-        // 			d3.select(context.ele)
-        // 				.on('mousedown', function () {
-        // 					this._id = guid.raw();
-        // 					this._mouseDownEvent = d3.event;
-        // 					context.doActions([
-        // 						new DrawAction({
-        // 							id: this._id,
-        // 							type: drawType.type,
-        // 							attrs: Object.assign({
-        // 								d: `M ${d3.event.offsetX} ${d3.event.offsetY} l 0 0 z`
-        // 							}, drawType.defaultAttrs)
-        // 						})
-        // 					])
-        // 				})
-        // 				.on('mousemove', function () {
-        // 					if (this._id
-        // 						&& this._mouseDownEvent
-        // 						&& drawType.type === "rect") {
-        // 						const width = d3.event.offsetX - this._mouseDownEvent.offsetX;
-        // 						const height = d3.event.offsetY - this._mouseDownEvent.offsetY;
-        // 						console.log(`width:${width},height:${height}`)
-        // 						const d = [
-        // 							`M ${this._mouseDownEvent.offsetX} ${this._mouseDownEvent.offsetY}`,
-        // 							`L ${d3.event.offsetX} ${this._mouseDownEvent.offsetY}`,
-        // 							`L ${d3.event.offsetX} ${d3.event.offsetY}`,
-        // 							`L ${this._mouseDownEvent.offsetX} ${d3.event.offsetY}`,
-        // 							'z'
-        // 						]
-        // 						//update
-        // 						context.doActions([
-        // 							new ReDrawAction(this._id, {
-        // 								attrs: {
-        // 									d: {$set: d.join(' ')}
-        // 								}
-        // 							})
-        // 						])
-        // 					}
-        // 				})
-        // 				.on("mouseup", function () {
-        // 					delete this._id;
-        // 					delete this._mouseDownEvent
-        // 				})
-        // 		}}>Rect</a>
-        // 	);
-        // }
-
     }, {
         key: 'defaultAttrs',
         get: function get() {
@@ -1822,13 +1725,10 @@ var LinkToolbar = exports.LinkToolbar = function (_PureComponent6) {
                         var svg = d3.select(graph.ele);
                         svg.on("mousedown", function () {
                             var event = d3.event;
-                            console.log(event.target);
                             _this39._sourceID = _this39.getShapeID(event.target);
-                            console.log('source id : ' + _this39._sourceID);
                         }).on("mouseup", function () {
                             var event = d3.event;
                             var targetID = _this39.getShapeID(event.target);
-                            console.log('target id : ' + targetID);
                             if (_this39._sourceID && targetID) {
                                 graph.doActionsAsync([new DrawAction(new LinkDrawing({
                                     sourceId: _this39._sourceID,
@@ -1973,54 +1873,28 @@ var D3Graph = function (_Component) {
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
         _this42.playingTimer = null;
-        /**
-         * 播放的索引
-         * @type {number}
-         */
+        //播放的索引
         _this42.playingIndex = 0;
-        /**
-         * 正在播放的action
-         * @type {Array}
-         */
+        //正在播放的action
         _this42.playingActions = [];
-        /**
-         * 播放选项
-         * @type {null}
-         */
+        //播放选项
         _this42.playingOption = null;
-        /**
-         * 执行action的timter
-         * @type {null}
-         */
+        //执行action的timter
         _this42.timer = null;
         _this42.state = {
-            /**
-             * inputAction的属性
-             */
+            //inputAction的属性
             inputProperties: [],
-            /**
-             * 是否显示用户输入
-             */
+            //是否显示用户输入
             showUserInput: false,
-            /**
-             * 所有的action
-             */
+            //所有的action
             actions: [],
-            /**
-             * action执行的时间间隔
-             */
+            //action执行的时间间隔
             interval: props.interval,
-            /**
-             * 比例尺
-             */
+            //比例尺
             scale: props.scale,
-            /**
-             * 原点
-             */
+            //原点
             original: props.original,
-            /**
-             * 坐标系类型
-             */
+            //坐标系类型
             coordinateType: props.coordinateType
         };
         return _this42;
@@ -2153,17 +2027,16 @@ var D3Graph = function (_Component) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                console.log('action : ' + action.type);
                                 _context5.t0 = action.type;
-                                _context5.next = _context5.t0 === actionTypeEnums.draw ? 4 : _context5.t0 === actionTypeEnums.redraw ? 7 : _context5.t0 === actionTypeEnums.select ? 10 : _context5.t0 === actionTypeEnums.unselect ? 21 : _context5.t0 === actionTypeEnums.delete ? 27 : _context5.t0 === actionTypeEnums.clear ? 32 : _context5.t0 === actionTypeEnums.input ? 35 : 38;
+                                _context5.next = _context5.t0 === actionTypeEnums.draw ? 3 : _context5.t0 === actionTypeEnums.redraw ? 6 : _context5.t0 === actionTypeEnums.select ? 9 : _context5.t0 === actionTypeEnums.unselect ? 20 : _context5.t0 === actionTypeEnums.delete ? 26 : _context5.t0 === actionTypeEnums.clear ? 31 : _context5.t0 === actionTypeEnums.input ? 34 : 37;
                                 break;
 
-                            case 4:
+                            case 3:
                                 this.shapes.push(action.params);
                                 this.drawShapes([action.params]);
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 7:
+                            case 6:
                                 index = this.shapes.findIndex(function (f) {
                                     return f.id === action.params.id;
                                 });
@@ -2172,25 +2045,25 @@ var D3Graph = function (_Component) {
                                     this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], action.params.state);
                                     this.drawShapes([this.shapes[index]]);
                                 }
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 10:
+                            case 9:
                                 id = action.params;
                                 shape = this.findShapeById(id);
 
                                 if (!shape.selected) {
-                                    _context5.next = 17;
+                                    _context5.next = 16;
                                     break;
                                 }
 
-                                _context5.next = 15;
+                                _context5.next = 14;
                                 return this.doActionAsync(new UnSelectAction(id));
 
-                            case 15:
-                                _context5.next = 19;
+                            case 14:
+                                _context5.next = 18;
                                 break;
 
-                            case 17:
+                            case 16:
                                 shape.selected = true;
                                 if (this.props.selectMode === selectModeEnums.single) {
                                     //将已选中的shape取消选中
@@ -2222,11 +2095,11 @@ var D3Graph = function (_Component) {
                                     this.selectedShapes.push(shape);
                                 }
 
-                            case 19:
+                            case 18:
                                 this.drawShapes([shape]);
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 21:
+                            case 20:
                                 _id = action.params;
                                 _shape = this.findShapeById(_id);
 
@@ -2235,9 +2108,9 @@ var D3Graph = function (_Component) {
                                     return f.id !== _id;
                                 });
                                 this.drawShapes([_shape]);
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 27:
+                            case 26:
                                 _id2 = action.params;
                                 //删除的图形
 
@@ -2254,9 +2127,9 @@ var D3Graph = function (_Component) {
                                 //     delete shape.selection;
                                 // }
                                 _shape2.remove();
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 32:
+                            case 31:
                                 this.shapes.forEach(function () {
                                     var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(shape) {
                                         return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -2279,21 +2152,21 @@ var D3Graph = function (_Component) {
                                     };
                                 }());
                                 this.selectedShapes = [];
-                                return _context5.abrupt('break', 38);
+                                return _context5.abrupt('break', 37);
 
-                            case 35:
-                                _context5.next = 37;
+                            case 34:
+                                _context5.next = 36;
                                 return this.showUserInputPromise(action);
 
-                            case 37:
-                                return _context5.abrupt('break', 38);
+                            case 36:
+                                return _context5.abrupt('break', 37);
 
-                            case 38:
+                            case 37:
                                 this.setState((0, _immutabilityHelper2.default)(this.state, {
                                     actions: { $push: [action] }
                                 }));
 
-                            case 39:
+                            case 38:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -2348,15 +2221,11 @@ var D3Graph = function (_Component) {
                 inputProperties: []
             }, function () {
                 //执行下一个action
-                console.log("next action option", (0, _stringify2.default)(nextActionOption));
-                console.log("first action", (0, _stringify2.default)(_this46._leftActions[0]));
-                console.log("params", (0, _stringify2.default)(params));
                 if (_this46._leftActions.length > 0) {
                     params.forEach(function (p) {
                         (0, _objectPath.set)(_this46._leftActions[0].params, p.path, p.value);
                     });
                 }
-                console.log("target first action", (0, _stringify2.default)(_this46._leftActions[0]));
                 _this46.doActionsAsync(_this46._leftActions);
             });
         }
@@ -2365,7 +2234,6 @@ var D3Graph = function (_Component) {
         value: function drawShapes(shapes) {
             var _this47 = this;
 
-            console.log('draw shaped', shapes);
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
