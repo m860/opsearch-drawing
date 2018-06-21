@@ -48,16 +48,26 @@ class TestDrawing extends Component {
             },
             coordinateType: "screen",
             actionJson: "",
-            selectMode: "single"
+            selectMode: "single",
+            attrs: {
+                width: 400,
+                height: 300,
+                viewBox: "0 0 400 300",
+                style: {
+                    backgroundColor: "#cccccc"
+                }
+            }
         };
     }
 
-    get randomX() {
-        return d3.randomUniform(20, 380);
+    randomX() {
+        const fn = d3.randomUniform(20, 380);
+        return Math.floor(fn())
     }
 
-    get randomY() {
-        return d3.randomUniform(20, 280);
+    randomY() {
+        const fn = d3.randomUniform(20, 280);
+        return Math.floor(fn());
     }
 
     exec() {
@@ -76,6 +86,21 @@ class TestDrawing extends Component {
     render() {
         return (
             <div>
+                <div>
+                    <label>画布设置</label><br/>
+                    <textarea defaultValue={JSON.stringify(this.state.attrs)} onChange={({target: {value}}) => {
+                        try {
+                            const attrs = JSON.parse(value);
+                            this.setState({
+                                attrs: attrs
+                            })
+                        }
+                        catch (ex) {
+                            console.error(ex);
+                        }
+                    }} style={{width: "100%", height: 100}}>
+                    </textarea>
+                </div>
                 <div>
                     <label>时间间隔</label>
                     <input type="text" value={this.state.interval} onChange={({target: {value}}) => {
@@ -141,11 +166,16 @@ class TestDrawing extends Component {
                 </div>
                 <div>
                     <label>图形JSON数据</label><br/>
-                    <textarea value={this.state.actionJson} onChange={({target: {value}}) => {
-                        this.setState({
-                            actionJson: value
-                        })
-                    }} style={{width: "100%", height: 100}}></textarea>
+                    <textarea value={this.state.actionJson}
+                              onBlur={() => {
+                                  this.exec();
+                              }}
+                              onChange={({target: {value}}) => {
+                                  this.setState({
+                                      actionJson: value
+                                  })
+                              }}
+                              style={{width: "100%", height: 100}}></textarea>
                 </div>
                 <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", flex: "1 0 auto"}}>
                     <button type="button" onClick={() => {
@@ -453,48 +483,11 @@ class TestDrawing extends Component {
                     </button>
                 </div>
                 <D3Graph actions={this.state.actions}
+                         attrs={this.state.attrs}
                          selectMode={this.state.selectMode}
                          interval={this.state.interval}/>
             </div>
         )
-    }
-}
-
-class TestMathCoordinateDrawing extends Component {
-    render() {
-        const original = {
-            x: 20,
-            y: 280
-        };
-        const scale = 20;
-        return (
-            <div>
-                <h3>测试数学坐标系的绘制</h3>
-                <D3Graph actions={[
-                    new DrawAction(new NumberScaleDrawing({
-                        original,
-                        scale
-                    })),
-                    new DrawAction(new CircleDrawing({
-                        attrs: {
-                            cx: 5,
-                            cy: 5
-                        }
-                    })),
-                    new DrawAction(new TextCircleDrawing({
-                        text: "A",
-                        circleAttrs: {
-                            cx: 9,
-                            cy: 5
-                        }
-                    }))
-                ]}
-                         original={original}
-                         coordinateType="math"
-                         scale={scale}/>
-
-            </div>
-        );
     }
 }
 

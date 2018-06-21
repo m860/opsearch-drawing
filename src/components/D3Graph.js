@@ -1570,7 +1570,8 @@ export default class D3Graph extends Component {
             //原点
             original: props.original,
             //坐标系类型
-            coordinateType: props.coordinateType
+            coordinateType: props.coordinateType,
+            attrs: props.attrs
         };
     }
 
@@ -1809,7 +1810,7 @@ export default class D3Graph extends Component {
     render() {
         return (
             <WorkSpace actions={this.props.renderToolbar(this)}>
-                <svg ref={ref => this.ele = ref} {...this.props.attrs}>
+                <svg ref={ref => this.ele = ref} {...this.state.attrs}>
                 </svg>
                 {this.state.showUserInput && <UserInput properties={this.state.inputProperties}
                                                         onOK={(value) => {
@@ -1822,6 +1823,9 @@ export default class D3Graph extends Component {
 
     componentWillReceiveProps(nextProps) {
         let newState = {};
+        if (nextProps.attrs) {
+            newState.attrs = nextProps.attrs;
+        }
         if (this.state.interval !== nextProps.interval) {
             newState.interval = nextProps.interval;
         }
@@ -1855,11 +1859,11 @@ export default class D3Graph extends Component {
         }
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (this.state.showUserInput !== nextState.showUserInput) {
-            return true;
-        }
-        return false;
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (this.state.showUserInput !== nextState.showUserInput) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }
 //#endregion
