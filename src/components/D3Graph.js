@@ -508,23 +508,36 @@ export class Drawing {
  * 绘画线
  * */
 export class LineDrawing extends Drawing {
+    /**
+     * 线的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "transparent",
+        stroke: "black",
+        "stroke-width": "3px"
+    };
+    /**
+     * 线选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
     constructor(option) {
         super(option);
         this.type = "line";
     }
 
     get defaultAttrs() {
-        return {
-            fill: "transparent",
-            stroke: "black",
-            "stroke-width": "3px"
-        };
+        return LineDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            stroke: "red"
-        };
+        return LineDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -543,24 +556,37 @@ registerDrawing("LineDrawing", LineDrawing);
  * 绘画圈
  * */
 export class CircleDrawing extends Drawing {
+    /**
+     * 圈的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "transparent",
+        stroke: "black",
+        r: "10px",
+        "stroke-width": "1px"
+    };
+    /**
+     * 圈选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
     constructor(option) {
         super(option);
         this.type = "circle";
     }
 
     get defaultAttrs() {
-        return {
-            fill: "transparent",
-            stroke: "black",
-            r: "10px",
-            "stroke-width": "1px"
-        };
+        return CircleDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            stroke: "red"
-        };
+        return CircleDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -583,23 +609,36 @@ registerDrawing("CircleDrawing", CircleDrawing);
  * 绘制点
  * */
 export class DotDrawing extends Drawing {
+    /**
+     * 点默认的attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "black",
+        stroke: "black",
+        r: "5px"
+    };
+    /**
+     * 点选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
     constructor(option) {
         super(option);
         this.type = "dot";
     }
 
     get defaultAttrs() {
-        return {
-            fill: "black",
-            stroke: "black",
-            r: "5px"
-        };
+        return DotDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            stroke: "red"
-        };
+        return DotDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -618,17 +657,30 @@ registerDrawing("DotDrawing", DotDrawing);
  * 绘画矩形
  * */
 export class RectDrawing extends Drawing {
+    /**
+     * 矩形默认的attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {};
+    /**
+     * 矩形选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {};
+
     constructor(option) {
         super(option);
         this.type = "rect"
     }
 
     get defaultAttrs() {
-        return {};
+        return RectDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {};
+        return RectDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -746,6 +798,24 @@ registerDrawing("NumberScaleDrawing", NumberScaleDrawing);
  * */
 export class ArrowLinkDrawing extends Drawing {
     /**
+     * 带箭头link的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "black",
+        stroke: "black"
+    };
+    /**
+     * 带箭头link的选中attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
+    /**
      * @constructor
      *
      * @param {object} option
@@ -773,16 +843,11 @@ export class ArrowLinkDrawing extends Drawing {
     }
 
     get defaultAttrs() {
-        return {
-            fill: "black",
-            stroke: "black"
-        };
+        return ArrowLinkDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            stroke: "red"
-        };
+        return ArrowLinkDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -864,6 +929,25 @@ registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
  * */
 export class LinkDrawing extends Drawing {
     /**
+     * link的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "none",
+        "stroke-width": "2px",
+        stroke: "black"
+    };
+    /**
+     * link的选中attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
+    /**
      * @constructor
      *
      * @param {object} option
@@ -891,17 +975,11 @@ export class LinkDrawing extends Drawing {
     }
 
     get defaultAttrs() {
-        return {
-            fill: "none",
-            "stroke-width": "2px",
-            stroke: "black"
-        }
+        return LinkDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            stroke: "red"
-        }
+        return LinkDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -962,6 +1040,19 @@ registerDrawing("LinkDrawing", LinkDrawing);
  * 绘画Path
  * */
 export class PathDrawing extends Drawing {
+    /**
+     * path默认的attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {};
+    /**
+     * path选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {};
+
     constructor(option) {
         super(option);
         this.type = "path";
@@ -969,11 +1060,11 @@ export class PathDrawing extends Drawing {
     }
 
     get defaultAttrs() {
-        return {};
+        return PathDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {};
+        return PathDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -1005,22 +1096,35 @@ registerDrawing("PathDrawing", PathDrawing)
  * 绘制text
  * */
 export class TextDrawing extends Drawing {
+    /**
+     * 文本默认的attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultAttrs = {
+        fill: "black",
+        "font-size": "20px"
+    };
+    /**
+     * 文本选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static selectedAttrs = {
+        fill: "red"
+    };
+
     constructor(option) {
         super(option);
         this.type = "text";
     }
 
     get defaultAttrs() {
-        return {
-            fill: "black",
-            "font-size": "20px"
-        }
+        return TextDrawing.defaultAttrs;
     }
 
     get selectedAttrs() {
-        return {
-            fill: "red"
-        }
+        return TextDrawing.selectedAttrs;
     }
 
     initialize(graph) {
@@ -1038,33 +1142,58 @@ registerDrawing("TextDrawing", TextDrawing)
  * 绘制带文本的圆圈
  */
 export class TextCircleDrawing extends Drawing {
+    /**
+     * 圈的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultCircleAttrs = {
+        r: 20,
+        fill: "transparent",
+        stroke: "black"
+    };
+    /**
+     * 圈的选中attribute
+     * @static
+     * @type {Object}
+     */
+    static circleSelectedAttrs = {
+        fill: "transparent",
+        stroke: "red"
+    };
+    /**
+     * 文本的默认attribute
+     * @static
+     * @type {Object}
+     */
+    static defaultTextAttrs = {
+        "text-anchor": "middle",
+        "dominant-baseline": "middle",
+        fill: "black"
+    };
+    /**
+     * 文本选中的attribute
+     * @static
+     * @type {Object}
+     */
+    static textSelectedAttrs = {
+        fill: "red"
+    };
+
     get defaultCircleAttrs() {
-        return {
-            r: 20,
-            fill: "transparent",
-            stroke: "black"
-        };
+        return TextCircleDrawing.defaultCircleAttrs;
     }
 
     get defaultCircleSelectedAttrs() {
-        return {
-            fill: "transparent",
-            stroke: "red"
-        };
+        return TextCircleDrawing.circleSelectedAttrs;
     }
 
     get defaultTextAttrs() {
-        return {
-            "text-anchor": "middle",
-            "dominant-baseline": "middle",
-            fill: "black"
-        };
+        return TextCircleDrawing.defaultTextAttrs;
     }
 
     get defaultTextSelectedAttrs() {
-        return {
-            fill: "red"
-        };
+        return TextCircleDrawing.textSelectedAttrs;
     }
 
     /**
@@ -1199,7 +1328,7 @@ export class DrawingToolbar extends PureComponent {
     render() {
         return (
             <Toolbar
-                style={Object.assign({}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}
+                style={Object.assign({cursor: "pointer"}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}
                 type={this.props.type}
                 onClick={(...args) => {
                     emitter.emit(EVENT_TOOLBAR_CHANGE, this.props.type);
@@ -1326,7 +1455,7 @@ export class CircleToolbar extends PureComponent {
                             onClick={() => {
                                 const {graph} = this.props;
                                 const svg = d3.select(this.props.graph.ele);
-                                svg.on("mousedown", () => {
+                                svg.on("mousedown", async () => {
                                     const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
                                     const drawing = new CircleDrawing({
                                         attrs: {
@@ -1334,7 +1463,7 @@ export class CircleToolbar extends PureComponent {
                                             cy: point.y
                                         }
                                     })
-                                    graph.doActionsAsync([
+                                    await graph.doActionsAsync([
                                         new DrawAction(drawing)
                                     ])
                                 })
@@ -1456,6 +1585,47 @@ export class ArrowLinkToolbar extends PureComponent {
     }
 }
 
+export class TextCircleToolbar extends PureComponent {
+    static propTypes = {
+        onClick: PropTypes.func,
+        style: PropTypes.object,
+        graph: PropTypes.object.isRequired
+    };
+
+    get type() {
+        return "TextCircleDrawing";
+    }
+
+    render() {
+        return (
+            <DrawingToolbar style={this.props.style}
+                            onClick={() => {
+                                const {graph} = this.props;
+                                const svg = d3.select(graph.ele);
+                                svg.on("mousedown", async () => {
+                                    const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                    const drawing = new TextCircleDrawing({
+                                        circleAttrs: {
+                                            cx: point.x,
+                                            cy: point.y
+                                        },
+                                        text: "A"
+                                    })
+                                    await graph.doActionsAsync([
+                                        new DrawAction(drawing)
+                                    ])
+                                })
+                            }}
+                            type={this.type}>
+                <circle cx={20} cy={20} r={14} stroke={"black"} fill={"transparent"}></circle>
+                <text x={20} y={20} fill={"black"} style={{fontSize: 12}} textAnchor={"middle"}
+                      dominantBaseline={"middle"}>A
+                </text>
+            </DrawingToolbar>
+        );
+    }
+}
+
 //#endregion
 
 //#region D3Graph
@@ -1472,8 +1642,9 @@ export default class D3Graph extends Component {
      * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
      * @property {object} playingOption - mode===playing时有效
      * @property {Function} renderToolbar - 绘图的工具栏
-     * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
-     * @property {Number} interval - action的执行时间间隔
+     * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
+     * @property {?Number} interval [1] - action的执行时间间隔
+     * @property {?Function} onAction [null] - action的回调函数,函数包含一个参数 action
      * */
     static propTypes = {
         attrs: PropTypes.object,
@@ -1511,6 +1682,7 @@ export default class D3Graph extends Component {
         renderToolbar: PropTypes.func,
         scale: PropTypes.number,
         interval: PropTypes.number,
+        onAction: PropTypes.func
     };
     static defaultProps = {
         attrs: {
@@ -1532,6 +1704,7 @@ export default class D3Graph extends Component {
         renderToolbar: () => null,
         scale: 1,
         interval: 1,
+        onAction: null
     }
 
     get scale() {
@@ -1708,7 +1881,12 @@ export default class D3Graph extends Component {
         this.setState(
             update(this.state, {
                 actions: {$push: [action]}
-            })
+            }),
+            () => {
+                if (this.props.onAction) {
+                    this.props.onAction(action);
+                }
+            }
         );
     }
 

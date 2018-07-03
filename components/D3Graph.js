@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
+exports.default = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -671,6 +671,11 @@ var Drawing = exports.Drawing = function () {
 var LineDrawing = exports.LineDrawing = function (_Drawing) {
     (0, _inherits3.default)(LineDrawing, _Drawing);
 
+    /**
+     * 线的默认attribute
+     * @static
+     * @type {Object}
+     */
     function LineDrawing(option) {
         (0, _classCallCheck3.default)(this, LineDrawing);
 
@@ -679,6 +684,12 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
         _this8.type = "line";
         return _this8;
     }
+    /**
+     * 线选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(LineDrawing, [{
         key: 'initialize',
@@ -694,22 +705,26 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "transparent",
-                stroke: "black",
-                "stroke-width": "3px"
-            };
+            return LineDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                stroke: "red"
-            };
+            return LineDrawing.selectedAttrs;
         }
     }]);
     return LineDrawing;
 }(Drawing);
+
+LineDrawing.defaultAttrs = {
+    fill: "transparent",
+    stroke: "black",
+    "stroke-width": "3px"
+};
+LineDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("LineDrawing", LineDrawing);
 
@@ -720,6 +735,11 @@ registerDrawing("LineDrawing", LineDrawing);
 var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
     (0, _inherits3.default)(CircleDrawing, _Drawing2);
 
+    /**
+     * 圈的默认attribute
+     * @static
+     * @type {Object}
+     */
     function CircleDrawing(option) {
         (0, _classCallCheck3.default)(this, CircleDrawing);
 
@@ -728,6 +748,12 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
         _this10.type = "circle";
         return _this10;
     }
+    /**
+     * 圈选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(CircleDrawing, [{
         key: 'initialize',
@@ -748,23 +774,27 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "transparent",
-                stroke: "black",
-                r: "10px",
-                "stroke-width": "1px"
-            };
+            return CircleDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                stroke: "red"
-            };
+            return CircleDrawing.selectedAttrs;
         }
     }]);
     return CircleDrawing;
 }(Drawing);
+
+CircleDrawing.defaultAttrs = {
+    fill: "transparent",
+    stroke: "black",
+    r: "10px",
+    "stroke-width": "1px"
+};
+CircleDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("CircleDrawing", CircleDrawing);
 
@@ -775,6 +805,11 @@ registerDrawing("CircleDrawing", CircleDrawing);
 var DotDrawing = exports.DotDrawing = function (_Drawing3) {
     (0, _inherits3.default)(DotDrawing, _Drawing3);
 
+    /**
+     * 点默认的attribute
+     * @static
+     * @type {Object}
+     */
     function DotDrawing(option) {
         (0, _classCallCheck3.default)(this, DotDrawing);
 
@@ -783,6 +818,12 @@ var DotDrawing = exports.DotDrawing = function (_Drawing3) {
         _this12.type = "dot";
         return _this12;
     }
+    /**
+     * 点选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(DotDrawing, [{
         key: 'initialize',
@@ -798,22 +839,26 @@ var DotDrawing = exports.DotDrawing = function (_Drawing3) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "black",
-                stroke: "black",
-                r: "5px"
-            };
+            return DotDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                stroke: "red"
-            };
+            return DotDrawing.selectedAttrs;
         }
     }]);
     return DotDrawing;
 }(Drawing);
+
+DotDrawing.defaultAttrs = {
+    fill: "black",
+    stroke: "black",
+    r: "5px"
+};
+DotDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("DotDrawing", DotDrawing);
 
@@ -824,6 +869,11 @@ registerDrawing("DotDrawing", DotDrawing);
 var RectDrawing = exports.RectDrawing = function (_Drawing4) {
     (0, _inherits3.default)(RectDrawing, _Drawing4);
 
+    /**
+     * 矩形默认的attribute
+     * @static
+     * @type {Object}
+     */
     function RectDrawing(option) {
         (0, _classCallCheck3.default)(this, RectDrawing);
 
@@ -832,6 +882,12 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
         _this14.type = "rect";
         return _this14;
     }
+    /**
+     * 矩形选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(RectDrawing, [{
         key: 'initialize',
@@ -847,16 +903,20 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {};
+            return RectDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {};
+            return RectDrawing.selectedAttrs;
         }
     }]);
     return RectDrawing;
 }(Drawing);
+
+RectDrawing.defaultAttrs = {};
+RectDrawing.selectedAttrs = {};
+
 
 registerDrawing("RectDrawing", RectDrawing);
 
@@ -954,6 +1014,12 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
      * @param {string|function} option.label - link的label
      * @param {object} option.labelAttrs - label的attributes
      * */
+
+    /**
+     * 带箭头link的默认attribute
+     * @static
+     * @type {Object}
+     */
     function ArrowLinkDrawing(option) {
         (0, _classCallCheck3.default)(this, ArrowLinkDrawing);
 
@@ -975,6 +1041,12 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         _this18.labelSelection = null;
         return _this18;
     }
+    /**
+     * 带箭头link的选中attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(ArrowLinkDrawing, [{
         key: 'initialize',
@@ -1048,21 +1120,25 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "black",
-                stroke: "black"
-            };
+            return ArrowLinkDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                stroke: "red"
-            };
+            return ArrowLinkDrawing.selectedAttrs;
         }
     }]);
     return ArrowLinkDrawing;
 }(Drawing);
+
+ArrowLinkDrawing.defaultAttrs = {
+    fill: "black",
+    stroke: "black"
+};
+ArrowLinkDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
 
@@ -1084,6 +1160,12 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
      * @param {string|function} option.label - link的label
      * @param {object} option.labelAttrs - label的attributes
      * */
+
+    /**
+     * link的默认attribute
+     * @static
+     * @type {Object}
+     */
     function LinkDrawing(option) {
         (0, _classCallCheck3.default)(this, LinkDrawing);
 
@@ -1105,6 +1187,12 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
         _this20.labelSelection = null;
         return _this20;
     }
+    /**
+     * link的选中attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(LinkDrawing, [{
         key: 'initialize',
@@ -1165,22 +1253,26 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "none",
-                "stroke-width": "2px",
-                stroke: "black"
-            };
+            return LinkDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                stroke: "red"
-            };
+            return LinkDrawing.selectedAttrs;
         }
     }]);
     return LinkDrawing;
 }(Drawing);
+
+LinkDrawing.defaultAttrs = {
+    fill: "none",
+    "stroke-width": "2px",
+    stroke: "black"
+};
+LinkDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("LinkDrawing", LinkDrawing);
 
@@ -1191,6 +1283,11 @@ registerDrawing("LinkDrawing", LinkDrawing);
 var PathDrawing = exports.PathDrawing = function (_Drawing8) {
     (0, _inherits3.default)(PathDrawing, _Drawing8);
 
+    /**
+     * path默认的attribute
+     * @static
+     * @type {Object}
+     */
     function PathDrawing(option) {
         (0, _classCallCheck3.default)(this, PathDrawing);
 
@@ -1200,6 +1297,12 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
         _this22.d = (0, _objectPath.get)(option, "d", []);
         return _this22;
     }
+    /**
+     * path选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(PathDrawing, [{
         key: 'initialize',
@@ -1232,16 +1335,20 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {};
+            return PathDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {};
+            return PathDrawing.selectedAttrs;
         }
     }]);
     return PathDrawing;
 }(Drawing);
+
+PathDrawing.defaultAttrs = {};
+PathDrawing.selectedAttrs = {};
+
 
 registerDrawing("PathDrawing", PathDrawing);
 
@@ -1252,6 +1359,11 @@ registerDrawing("PathDrawing", PathDrawing);
 var TextDrawing = exports.TextDrawing = function (_Drawing9) {
     (0, _inherits3.default)(TextDrawing, _Drawing9);
 
+    /**
+     * 文本默认的attribute
+     * @static
+     * @type {Object}
+     */
     function TextDrawing(option) {
         (0, _classCallCheck3.default)(this, TextDrawing);
 
@@ -1260,6 +1372,12 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
         _this25.type = "text";
         return _this25;
     }
+    /**
+     * 文本选中的attribute
+     * @static
+     * @type {Object}
+     */
+
 
     (0, _createClass3.default)(TextDrawing, [{
         key: 'initialize',
@@ -1275,21 +1393,25 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
     }, {
         key: 'defaultAttrs',
         get: function get() {
-            return {
-                fill: "black",
-                "font-size": "20px"
-            };
+            return TextDrawing.defaultAttrs;
         }
     }, {
         key: 'selectedAttrs',
         get: function get() {
-            return {
-                fill: "red"
-            };
+            return TextDrawing.selectedAttrs;
         }
     }]);
     return TextDrawing;
 }(Drawing);
+
+TextDrawing.defaultAttrs = {
+    fill: "black",
+    "font-size": "20px"
+};
+TextDrawing.selectedAttrs = {
+    fill: "red"
+};
+
 
 registerDrawing("TextDrawing", TextDrawing);
 
@@ -1301,36 +1423,47 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
     (0, _inherits3.default)(TextCircleDrawing, _Drawing10);
     (0, _createClass3.default)(TextCircleDrawing, [{
         key: 'defaultCircleAttrs',
+
+        /**
+         * 文本的默认attribute
+         * @static
+         * @type {Object}
+         */
+
+        /**
+         * 圈的默认attribute
+         * @static
+         * @type {Object}
+         */
         get: function get() {
-            return {
-                r: 20,
-                fill: "transparent",
-                stroke: "black"
-            };
+            return TextCircleDrawing.defaultCircleAttrs;
         }
+        /**
+         * 文本选中的attribute
+         * @static
+         * @type {Object}
+         */
+
+        /**
+         * 圈的选中attribute
+         * @static
+         * @type {Object}
+         */
+
     }, {
         key: 'defaultCircleSelectedAttrs',
         get: function get() {
-            return {
-                fill: "transparent",
-                stroke: "red"
-            };
+            return TextCircleDrawing.circleSelectedAttrs;
         }
     }, {
         key: 'defaultTextAttrs',
         get: function get() {
-            return {
-                "text-anchor": "middle",
-                "dominant-baseline": "middle",
-                fill: "black"
-            };
+            return TextCircleDrawing.defaultTextAttrs;
         }
     }, {
         key: 'defaultTextSelectedAttrs',
         get: function get() {
-            return {
-                fill: "red"
-            };
+            return TextCircleDrawing.textSelectedAttrs;
         }
 
         /**
@@ -1428,6 +1561,25 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
     return TextCircleDrawing;
 }(Drawing);
 
+TextCircleDrawing.defaultCircleAttrs = {
+    r: 20,
+    fill: "transparent",
+    stroke: "black"
+};
+TextCircleDrawing.circleSelectedAttrs = {
+    fill: "transparent",
+    stroke: "red"
+};
+TextCircleDrawing.defaultTextAttrs = {
+    "text-anchor": "middle",
+    "dominant-baseline": "middle",
+    fill: "black"
+};
+TextCircleDrawing.textSelectedAttrs = {
+    fill: "red"
+};
+
+
 registerDrawing("TextCircleDrawing", TextCircleDrawing);
 //#endregion
 
@@ -1493,7 +1645,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
             return _react2.default.createElement(
                 Toolbar,
                 {
-                    style: (0, _assign2.default)({}, this.props.style, this.state.selected ? { backgroundColor: "#D6D6D6" } : {}),
+                    style: (0, _assign2.default)({ cursor: "pointer" }, this.props.style, this.state.selected ? { backgroundColor: "#D6D6D6" } : {}),
                     type: this.props.type,
                     onClick: function onClick() {
                         var _props;
@@ -1664,16 +1816,29 @@ var CircleToolbar = exports.CircleToolbar = function (_PureComponent5) {
                         var graph = _this37.props.graph;
 
                         var svg = d3.select(_this37.props.graph.ele);
-                        svg.on("mousedown", function () {
-                            var point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
-                            var drawing = new CircleDrawing({
-                                attrs: {
-                                    cx: point.x,
-                                    cy: point.y
+                        svg.on("mousedown", (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                            var point, drawing;
+                            return _regenerator2.default.wrap(function _callee$(_context) {
+                                while (1) {
+                                    switch (_context.prev = _context.next) {
+                                        case 0:
+                                            point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                            drawing = new CircleDrawing({
+                                                attrs: {
+                                                    cx: point.x,
+                                                    cy: point.y
+                                                }
+                                            });
+                                            _context.next = 4;
+                                            return graph.doActionsAsync([new DrawAction(drawing)]);
+
+                                        case 4:
+                                        case 'end':
+                                            return _context.stop();
+                                    }
                                 }
-                            });
-                            graph.doActionsAsync([new DrawAction(drawing)]);
-                        });
+                            }, _callee, _this37);
+                        })));
                     },
                     type: this.type },
                 _react2.default.createElement('circle', { cx: 20, cy: 20, r: 8, stroke: "#888888", fill: "#888888" })
@@ -1824,6 +1989,76 @@ var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
     return ArrowLinkToolbar;
 }(_react.PureComponent);
 
+ArrowLinkToolbar.propTypes = {
+    onClick: _propTypes2.default.func,
+    style: _propTypes2.default.object,
+    graph: _propTypes2.default.object.isRequired
+};
+
+var TextCircleToolbar = exports.TextCircleToolbar = function (_PureComponent8) {
+    (0, _inherits3.default)(TextCircleToolbar, _PureComponent8);
+
+    function TextCircleToolbar() {
+        (0, _classCallCheck3.default)(this, TextCircleToolbar);
+        return (0, _possibleConstructorReturn3.default)(this, (TextCircleToolbar.__proto__ || (0, _getPrototypeOf2.default)(TextCircleToolbar)).apply(this, arguments));
+    }
+
+    (0, _createClass3.default)(TextCircleToolbar, [{
+        key: 'render',
+        value: function render() {
+            var _this43 = this;
+
+            return _react2.default.createElement(
+                DrawingToolbar,
+                { style: this.props.style,
+                    onClick: function onClick() {
+                        var graph = _this43.props.graph;
+
+                        var svg = d3.select(graph.ele);
+                        svg.on("mousedown", (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+                            var point, drawing;
+                            return _regenerator2.default.wrap(function _callee2$(_context2) {
+                                while (1) {
+                                    switch (_context2.prev = _context2.next) {
+                                        case 0:
+                                            point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                            drawing = new TextCircleDrawing({
+                                                circleAttrs: {
+                                                    cx: point.x,
+                                                    cy: point.y
+                                                },
+                                                text: "A"
+                                            });
+                                            _context2.next = 4;
+                                            return graph.doActionsAsync([new DrawAction(drawing)]);
+
+                                        case 4:
+                                        case 'end':
+                                            return _context2.stop();
+                                    }
+                                }
+                            }, _callee2, _this43);
+                        })));
+                    },
+                    type: this.type },
+                _react2.default.createElement('circle', { cx: 20, cy: 20, r: 14, stroke: "black", fill: "transparent" }),
+                _react2.default.createElement(
+                    'text',
+                    { x: 20, y: 20, fill: "black", style: { fontSize: 12 }, textAnchor: "middle",
+                        dominantBaseline: "middle" },
+                    'A'
+                )
+            );
+        }
+    }, {
+        key: 'type',
+        get: function get() {
+            return "TextCircleDrawing";
+        }
+    }]);
+    return TextCircleToolbar;
+}(_react.PureComponent);
+
 //#endregion
 
 //#region D3Graph
@@ -1832,7 +2067,7 @@ var ArrowLinkToolbar = exports.ArrowLinkToolbar = function (_PureComponent7) {
  * */
 
 
-ArrowLinkToolbar.propTypes = {
+TextCircleToolbar.propTypes = {
     onClick: _propTypes2.default.func,
     style: _propTypes2.default.object,
     graph: _propTypes2.default.object.isRequired
@@ -1852,8 +2087,9 @@ var D3Graph = function (_Component) {
          * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
          * @property {object} playingOption - mode===playing时有效
          * @property {Function} renderToolbar - 绘图的工具栏
-         * @property {Number} scale - 缩放比例,默认是1(1个单位对应一个像素)
-         * @property {Number} interval - action的执行时间间隔
+         * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
+         * @property {?Number} interval [1] - action的执行时间间隔
+         * @property {?Function} onAction [null] - action的回调函数,函数包含一个参数 action
          * */
         get: function get() {
             return this.state.scale;
@@ -1863,25 +2099,25 @@ var D3Graph = function (_Component) {
     function D3Graph(props) {
         (0, _classCallCheck3.default)(this, D3Graph);
 
-        var _this42 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
+        var _this44 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
 
-        _this42.ele = null;
+        _this44.ele = null;
         //画布中已有的图形
-        _this42.shapes = [];
+        _this44.shapes = [];
         //已经选中的图形的id
-        _this42.selectedShapes = [];
+        _this44.selectedShapes = [];
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
-        _this42.playingTimer = null;
+        _this44.playingTimer = null;
         //播放的索引
-        _this42.playingIndex = 0;
+        _this44.playingIndex = 0;
         //正在播放的action
-        _this42.playingActions = [];
+        _this44.playingActions = [];
         //播放选项
-        _this42.playingOption = null;
+        _this44.playingOption = null;
         //执行action的timter
-        _this42.timer = null;
-        _this42.state = {
+        _this44.timer = null;
+        _this44.state = {
             //inputAction的属性
             inputProperties: [],
             //是否显示用户输入
@@ -1895,9 +2131,10 @@ var D3Graph = function (_Component) {
             //原点
             original: props.original,
             //坐标系类型
-            coordinateType: props.coordinateType
+            coordinateType: props.coordinateType,
+            attrs: props.attrs
         };
-        return _this42;
+        return _this44;
     }
 
     /**
@@ -1960,41 +2197,41 @@ var D3Graph = function (_Component) {
     }, {
         key: 'doActionsAsync',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(actions) {
-                var _this43 = this;
+            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(actions) {
+                var _this45 = this;
 
                 var action;
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 action = actions.shift();
 
                                 if (!action) {
-                                    _context2.next = 5;
+                                    _context4.next = 5;
                                     break;
                                 }
 
-                                _context2.next = 4;
+                                _context4.next = 4;
                                 return this.doActionAsync(action);
 
                             case 4:
                                 if (!action.canBreak) {
                                     //next
-                                    this.timer = setTimeout((0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                                        return _regenerator2.default.wrap(function _callee$(_context) {
+                                    this.timer = setTimeout((0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+                                        return _regenerator2.default.wrap(function _callee3$(_context3) {
                                             while (1) {
-                                                switch (_context.prev = _context.next) {
+                                                switch (_context3.prev = _context3.next) {
                                                     case 0:
-                                                        _context.next = 2;
-                                                        return _this43.doActionsAsync(actions);
+                                                        _context3.next = 2;
+                                                        return _this45.doActionsAsync(actions);
 
                                                     case 2:
                                                     case 'end':
-                                                        return _context.stop();
+                                                        return _context3.stop();
                                                 }
                                             }
-                                        }, _callee, _this43);
+                                        }, _callee3, _this45);
                                     })), action.nextInterval ? action.nextInterval : this.state.interval);
                                 } else {
                                     //保存后续的action,等待继续执行
@@ -2003,14 +2240,14 @@ var D3Graph = function (_Component) {
 
                             case 5:
                             case 'end':
-                                return _context2.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee2, this);
+                }, _callee4, this);
             }));
 
             function doActionsAsync(_x5) {
-                return _ref.apply(this, arguments);
+                return _ref3.apply(this, arguments);
             }
 
             return doActionsAsync;
@@ -2018,23 +2255,23 @@ var D3Graph = function (_Component) {
     }, {
         key: 'doActionAsync',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(action) {
-                var _this44 = this;
+            var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(action) {
+                var _this46 = this;
 
                 var index, id, shape, _id, _shape, _id2, _shape2;
 
-                return _regenerator2.default.wrap(function _callee5$(_context5) {
+                return _regenerator2.default.wrap(function _callee7$(_context7) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context7.prev = _context7.next) {
                             case 0:
-                                _context5.t0 = action.type;
-                                _context5.next = _context5.t0 === actionTypeEnums.draw ? 3 : _context5.t0 === actionTypeEnums.redraw ? 6 : _context5.t0 === actionTypeEnums.select ? 9 : _context5.t0 === actionTypeEnums.unselect ? 20 : _context5.t0 === actionTypeEnums.delete ? 26 : _context5.t0 === actionTypeEnums.clear ? 31 : _context5.t0 === actionTypeEnums.input ? 34 : 37;
+                                _context7.t0 = action.type;
+                                _context7.next = _context7.t0 === actionTypeEnums.draw ? 3 : _context7.t0 === actionTypeEnums.redraw ? 6 : _context7.t0 === actionTypeEnums.select ? 9 : _context7.t0 === actionTypeEnums.unselect ? 20 : _context7.t0 === actionTypeEnums.delete ? 26 : _context7.t0 === actionTypeEnums.clear ? 31 : _context7.t0 === actionTypeEnums.input ? 34 : 37;
                                 break;
 
                             case 3:
                                 this.shapes.push(action.params);
                                 this.drawShapes([action.params]);
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 6:
                                 index = this.shapes.findIndex(function (f) {
@@ -2045,22 +2282,22 @@ var D3Graph = function (_Component) {
                                     this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], action.params.state);
                                     this.drawShapes([this.shapes[index]]);
                                 }
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 9:
                                 id = action.params;
                                 shape = this.findShapeById(id);
 
                                 if (!shape.selected) {
-                                    _context5.next = 16;
+                                    _context7.next = 16;
                                     break;
                                 }
 
-                                _context5.next = 14;
+                                _context7.next = 14;
                                 return this.doActionAsync(new UnSelectAction(id));
 
                             case 14:
-                                _context5.next = 18;
+                                _context7.next = 18;
                                 break;
 
                             case 16:
@@ -2070,24 +2307,24 @@ var D3Graph = function (_Component) {
                                     this.selectedShapes.map(function (f) {
                                         return f.id;
                                     }).forEach(function () {
-                                        var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(i) {
-                                            return _regenerator2.default.wrap(function _callee3$(_context3) {
+                                        var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(i) {
+                                            return _regenerator2.default.wrap(function _callee5$(_context5) {
                                                 while (1) {
-                                                    switch (_context3.prev = _context3.next) {
+                                                    switch (_context5.prev = _context5.next) {
                                                         case 0:
-                                                            _context3.next = 2;
-                                                            return _this44.doActionAsync(new UnSelectAction(i));
+                                                            _context5.next = 2;
+                                                            return _this46.doActionAsync(new UnSelectAction(i));
 
                                                         case 2:
                                                         case 'end':
-                                                            return _context3.stop();
+                                                            return _context5.stop();
                                                     }
                                                 }
-                                            }, _callee3, _this44);
+                                            }, _callee5, _this46);
                                         }));
 
                                         return function (_x7) {
-                                            return _ref4.apply(this, arguments);
+                                            return _ref6.apply(this, arguments);
                                         };
                                     }());
                                     this.selectedShapes = [shape];
@@ -2097,7 +2334,7 @@ var D3Graph = function (_Component) {
 
                             case 18:
                                 this.drawShapes([shape]);
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 20:
                                 _id = action.params;
@@ -2108,7 +2345,7 @@ var D3Graph = function (_Component) {
                                     return f.id !== _id;
                                 });
                                 this.drawShapes([_shape]);
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 26:
                                 _id2 = action.params;
@@ -2127,55 +2364,59 @@ var D3Graph = function (_Component) {
                                 //     delete shape.selection;
                                 // }
                                 _shape2.remove();
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 31:
                                 this.shapes.forEach(function () {
-                                    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(shape) {
-                                        return _regenerator2.default.wrap(function _callee4$(_context4) {
+                                    var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(shape) {
+                                        return _regenerator2.default.wrap(function _callee6$(_context6) {
                                             while (1) {
-                                                switch (_context4.prev = _context4.next) {
+                                                switch (_context6.prev = _context6.next) {
                                                     case 0:
-                                                        _context4.next = 2;
-                                                        return _this44.doActionAsync(new DeleteAction(shape.id));
+                                                        _context6.next = 2;
+                                                        return _this46.doActionAsync(new DeleteAction(shape.id));
 
                                                     case 2:
                                                     case 'end':
-                                                        return _context4.stop();
+                                                        return _context6.stop();
                                                 }
                                             }
-                                        }, _callee4, _this44);
+                                        }, _callee6, _this46);
                                     }));
 
                                     return function (_x8) {
-                                        return _ref5.apply(this, arguments);
+                                        return _ref7.apply(this, arguments);
                                     };
                                 }());
                                 this.selectedShapes = [];
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 34:
-                                _context5.next = 36;
+                                _context7.next = 36;
                                 return this.showUserInputPromise(action);
 
                             case 36:
-                                return _context5.abrupt('break', 37);
+                                return _context7.abrupt('break', 37);
 
                             case 37:
                                 this.setState((0, _immutabilityHelper2.default)(this.state, {
                                     actions: { $push: [action] }
-                                }));
+                                }), function () {
+                                    if (_this46.props.onAction) {
+                                        _this46.props.onAction(action);
+                                    }
+                                });
 
                             case 38:
                             case 'end':
-                                return _context5.stop();
+                                return _context7.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee7, this);
             }));
 
             function doActionAsync(_x6) {
-                return _ref3.apply(this, arguments);
+                return _ref5.apply(this, arguments);
             }
 
             return doActionAsync;
@@ -2189,10 +2430,10 @@ var D3Graph = function (_Component) {
     }, {
         key: 'showUserInputPromise',
         value: function showUserInputPromise(action) {
-            var _this45 = this;
+            var _this47 = this;
 
             return new _promise2.default(function (resolve) {
-                _this45.setState({
+                _this47.setState({
                     showUserInput: true,
                     inputProperties: action.params
                 }, function () {
@@ -2208,7 +2449,7 @@ var D3Graph = function (_Component) {
     }, {
         key: 'hideUserInput',
         value: function hideUserInput(nextActionOption) {
-            var _this46 = this;
+            var _this48 = this;
 
             var params = this.state.inputProperties.map(function (property) {
                 return {
@@ -2221,23 +2462,23 @@ var D3Graph = function (_Component) {
                 inputProperties: []
             }, function () {
                 //执行下一个action
-                if (_this46._leftActions.length > 0) {
+                if (_this48._leftActions.length > 0) {
                     params.forEach(function (p) {
-                        (0, _objectPath.set)(_this46._leftActions[0].params, p.path, p.value);
+                        (0, _objectPath.set)(_this48._leftActions[0].params, p.path, p.value);
                     });
                 }
-                _this46.doActionsAsync(_this46._leftActions);
+                _this48.doActionsAsync(_this48._leftActions);
             });
         }
     }, {
         key: 'drawShapes',
         value: function drawShapes(shapes) {
-            var _this47 = this;
+            var _this49 = this;
 
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
-                    shape.initialize(_this47);
+                    shape.initialize(_this49);
                 }
                 shape.render();
             });
@@ -2296,27 +2537,30 @@ var D3Graph = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this48 = this;
+            var _this50 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
-                _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref6) {
-                        return _this48.ele = _ref6;
-                    } }, this.props.attrs)),
+                _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref8) {
+                        return _this50.ele = _ref8;
+                    } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this48.hideUserInput(value);
+                        _this50.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this49 = this;
+            var _this51 = this;
 
             var newState = {};
+            if (nextProps.attrs) {
+                newState.attrs = nextProps.attrs;
+            }
             if (this.state.interval !== nextProps.interval) {
                 newState.interval = nextProps.interval;
             }
@@ -2328,7 +2572,7 @@ var D3Graph = function (_Component) {
             }
             var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this49.doActionsAsync(nextProps.actions);
+                    _this51.doActionsAsync(nextProps.actions);
                 }
             };
             var keys = (0, _keys2.default)(newState);
@@ -2350,14 +2594,14 @@ var D3Graph = function (_Component) {
                 clearTimeout(this.timer);
             }
         }
-    }, {
-        key: 'shouldComponentUpdate',
-        value: function shouldComponentUpdate(nextProps, nextState) {
-            if (this.state.showUserInput !== nextState.showUserInput) {
-                return true;
-            }
-            return false;
-        }
+
+        // shouldComponentUpdate(nextProps, nextState) {
+        //     if (this.state.showUserInput !== nextState.showUserInput) {
+        //         return true;
+        //     }
+        //     return false;
+        // }
+
     }]);
     return D3Graph;
 }(_react.Component);
@@ -2399,7 +2643,8 @@ D3Graph.propTypes = {
     }),
     renderToolbar: _propTypes2.default.func,
     scale: _propTypes2.default.number,
-    interval: _propTypes2.default.number
+    interval: _propTypes2.default.number,
+    onAction: _propTypes2.default.func
 };
 D3Graph.defaultProps = {
     attrs: {
@@ -2422,6 +2667,7 @@ D3Graph.defaultProps = {
         return null;
     },
     scale: 1,
-    interval: 1
+    interval: 1,
+    onAction: null
 };
 exports.default = D3Graph;
