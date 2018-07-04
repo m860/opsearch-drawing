@@ -642,6 +642,24 @@ var Drawing = exports.Drawing = function () {
             result["shape-id"] = this.id;
             return result;
         }
+
+        /**
+         * 将图形数据序列化
+         * @return {{type: String, id: String, attrs: Object, text: (String|Function)}}
+         */
+
+    }, {
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                option: {
+                    id: this.id,
+                    attrs: this.attrs,
+                    text: this.text
+                }
+            };
+        }
     }, {
         key: 'defaultAttrs',
         get: function get() {
@@ -681,7 +699,7 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
 
         var _this8 = (0, _possibleConstructorReturn3.default)(this, (LineDrawing.__proto__ || (0, _getPrototypeOf2.default)(LineDrawing)).call(this, option));
 
-        _this8.type = "line";
+        _this8.type = "LineDrawing";
         return _this8;
     }
     /**
@@ -745,7 +763,7 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
 
         var _this10 = (0, _possibleConstructorReturn3.default)(this, (CircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(CircleDrawing)).call(this, option));
 
-        _this10.type = "circle";
+        _this10.type = "CircleDrawing";
         return _this10;
     }
     /**
@@ -815,7 +833,7 @@ var DotDrawing = exports.DotDrawing = function (_Drawing3) {
 
         var _this12 = (0, _possibleConstructorReturn3.default)(this, (DotDrawing.__proto__ || (0, _getPrototypeOf2.default)(DotDrawing)).call(this, option));
 
-        _this12.type = "dot";
+        _this12.type = "DotDrawing";
         return _this12;
     }
     /**
@@ -879,7 +897,7 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
 
         var _this14 = (0, _possibleConstructorReturn3.default)(this, (RectDrawing.__proto__ || (0, _getPrototypeOf2.default)(RectDrawing)).call(this, option));
 
-        _this14.type = "rect";
+        _this14.type = "RectDrawing";
         return _this14;
     }
     /**
@@ -932,7 +950,7 @@ var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
 
         var _this16 = (0, _possibleConstructorReturn3.default)(this, (NumberScaleDrawing.__proto__ || (0, _getPrototypeOf2.default)(NumberScaleDrawing)).call(this, option));
 
-        _this16.type = "number-scale";
+        _this16.type = "NumberScaleDrawing";
         _this16.original = (0, _objectPath.get)(option, "original", {
             x: 20,
             y: 280
@@ -1025,7 +1043,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
 
         var _this18 = (0, _possibleConstructorReturn3.default)(this, (ArrowLinkDrawing.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing)).call(this, option));
 
-        _this18.type = "arrow-link";
+        _this18.type = "ArrowLinkDrawing";
         _this18.sourceId = (0, _objectPath.get)(option, "sourceId");
         if (!_this18.sourceId) {
             throw new Error('ArrowLinkDrawing option require sourceId property');
@@ -1171,7 +1189,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
 
         var _this20 = (0, _possibleConstructorReturn3.default)(this, (LinkDrawing.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing)).call(this, option));
 
-        _this20.type = "link";
+        _this20.type = "LinkDrawing";
         _this20.sourceId = (0, _objectPath.get)(option, "sourceId");
         if (!_this20.sourceId) {
             throw new Error('LinkDrawing option require sourceId property');
@@ -1293,7 +1311,7 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
 
         var _this22 = (0, _possibleConstructorReturn3.default)(this, (PathDrawing.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing)).call(this, option));
 
-        _this22.type = "path";
+        _this22.type = "PathDrawing";
         _this22.d = (0, _objectPath.get)(option, "d", []);
         return _this22;
     }
@@ -1369,7 +1387,7 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
 
         var _this25 = (0, _possibleConstructorReturn3.default)(this, (TextDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing)).call(this, option));
 
-        _this25.type = "text";
+        _this25.type = "TextDrawing";
         return _this25;
     }
     /**
@@ -1489,7 +1507,7 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
          * */
         var _this27 = (0, _possibleConstructorReturn3.default)(this, (TextCircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing)).call(this, option));
 
-        _this27.type = "text-circle";
+        _this27.type = "TextCircleDrawing";
         /**
          * 圆圈的属性
          * @member {Object}
@@ -2481,6 +2499,25 @@ var D3Graph = function (_Component) {
                     shape.initialize(_this49);
                 }
                 shape.render();
+            });
+        }
+
+        /**
+         * 获取图形数据
+         * @return {*[]}
+         */
+
+    }, {
+        key: 'getDrawingData',
+        value: function getDrawingData() {
+            var actions = this.state.actions.filter(function (f) {
+                return f.type === actionTypeEnums.draw;
+            });
+            return actions.map(function (item) {
+                return {
+                    type: item.type,
+                    params: item.params.toData()
+                };
             });
         }
     }, {

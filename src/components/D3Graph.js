@@ -502,6 +502,20 @@ export class Drawing {
         return result;
     }
 
+    /**
+     * 将图形数据序列化
+     * @return {{type: String, id: String, attrs: Object, text: (String|Function)}}
+     */
+    toData() {
+        return {
+            type: this.type,
+            option: {
+                id: this.id,
+                attrs: this.attrs,
+                text: this.text
+            }
+        }
+    }
 }
 
 /**
@@ -529,7 +543,7 @@ export class LineDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "line";
+        this.type = "LineDrawing";
     }
 
     get defaultAttrs() {
@@ -578,7 +592,7 @@ export class CircleDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "circle";
+        this.type = "CircleDrawing";
     }
 
     get defaultAttrs() {
@@ -630,7 +644,7 @@ export class DotDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "dot";
+        this.type = "DotDrawing";
     }
 
     get defaultAttrs() {
@@ -672,7 +686,7 @@ export class RectDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "rect"
+        this.type = "RectDrawing"
     }
 
     get defaultAttrs() {
@@ -700,7 +714,7 @@ registerDrawing("RectDrawing", RectDrawing);
 export class NumberScaleDrawing extends Drawing {
     constructor(option) {
         super(option);
-        this.type = "number-scale";
+        this.type = "NumberScaleDrawing";
         this.original = getPath(option, "original", {
             x: 20,
             y: 280
@@ -826,7 +840,7 @@ export class ArrowLinkDrawing extends Drawing {
      * */
     constructor(option) {
         super(option);
-        this.type = "arrow-link";
+        this.type = "ArrowLinkDrawing";
         this.sourceId = getPath(option, "sourceId");
         if (!this.sourceId) {
             throw new Error(`ArrowLinkDrawing option require sourceId property`);
@@ -958,7 +972,7 @@ export class LinkDrawing extends Drawing {
      * */
     constructor(option) {
         super(option);
-        this.type = "link";
+        this.type = "LinkDrawing";
         this.sourceId = getPath(option, "sourceId");
         if (!this.sourceId) {
             throw new Error(`LinkDrawing option require sourceId property`);
@@ -1055,7 +1069,7 @@ export class PathDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "path";
+        this.type = "PathDrawing";
         this.d = getPath(option, "d", []);
     }
 
@@ -1116,7 +1130,7 @@ export class TextDrawing extends Drawing {
 
     constructor(option) {
         super(option);
-        this.type = "text";
+        this.type = "TextDrawing";
     }
 
     get defaultAttrs() {
@@ -1213,7 +1227,7 @@ export class TextCircleDrawing extends Drawing {
          * 绘制的类型
          * @member {String}
          * */
-        this.type = "text-circle";
+        this.type = "TextCircleDrawing";
         /**
          * 圆圈的属性
          * @member {Object}
@@ -1937,6 +1951,20 @@ export default class D3Graph extends Component {
             }
             shape.render();
         })
+    }
+
+    /**
+     * 获取图形数据
+     * @return {*[]}
+     */
+    getDrawingData() {
+        const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
+        return actions.map((item) => {
+            return {
+                type: item.type,
+                params: item.params.toData()
+            }
+        });
     }
 
     play(actions, playingOps) {

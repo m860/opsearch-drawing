@@ -36,13 +36,14 @@ import data from '../test/drawing-data'
 import update from 'immutability-helper'
 import UserInput from "./components/UserInput";
 
-LineDrawing.selectedAttrs={
-    stroke:"blue"
+LineDrawing.selectedAttrs = {
+    stroke: "blue"
 };
 
 class Example extends Component {
     constructor(props) {
         super(props);
+        this.graph = null;
         this.state = {
             interval: 1,
             actions: [],
@@ -61,7 +62,8 @@ class Example extends Component {
                 style: {
                     backgroundColor: "#cccccc"
                 }
-            }
+            },
+            drawingData: null
         };
     }
 
@@ -488,6 +490,7 @@ class Example extends Component {
                     </button>
                 </div>
                 <D3Graph actions={this.state.actions}
+                         ref={ref => this.graph = ref}
                          renderToolbar={(graph) => {
                              return [
                                  <NoneToolbar key={"none"} graph={graph}/>,
@@ -504,6 +507,18 @@ class Example extends Component {
                          attrs={this.state.attrs}
                          selectMode={this.state.selectMode}
                          interval={this.state.interval}/>
+                <div>
+                    <div>
+                        <button type="button" onClick={() => {
+                            const data = this.graph.getDrawingData();
+                            this.setState({
+                                drawingData: data
+                            });
+                        }}>显示图形数据
+                        </button>
+                    </div>
+                    <div>{JSON.stringify(this.state.drawingData)}</div>
+                </div>
             </div>
         )
     }
