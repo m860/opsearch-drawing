@@ -1932,14 +1932,14 @@ export default class D3Graph extends Component {
         this.setState({
             showUserInput: false,
             inputProperties: []
-        }, () => {
+        }, async () => {
             //执行下一个action
             if (this._leftActions.length > 0) {
                 params.forEach(p => {
                     setPath(this._leftActions[0].params, p.path, p.value)
                 });
             }
-            this.doActionsAsync(this._leftActions);
+            await this.doActionsAsync(this._leftActions);
         })
     }
 
@@ -1964,6 +1964,16 @@ export default class D3Graph extends Component {
                 type: item.type,
                 params: item.params.toData()
             }
+        });
+    }
+
+    /**
+     * 清除画布,这个方法除了会把画布上的内容清除以外还会重置内部的action状态
+     */
+    async clear() {
+        await this.doActionAsync(new ClearAction());
+        this.setState({
+            actions: []
         });
     }
 
@@ -2055,8 +2065,8 @@ export default class D3Graph extends Component {
         }
     }
 
-    componentDidMount() {
-        this.doActionsAsync(this.props.actions);
+    async componentDidMount() {
+        await this.doActionsAsync(this.props.actions);
     }
 
     componentWillUnmount() {

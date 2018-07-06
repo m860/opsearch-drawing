@@ -2478,15 +2478,27 @@ var D3Graph = function (_Component) {
             this.setState({
                 showUserInput: false,
                 inputProperties: []
-            }, function () {
-                //执行下一个action
-                if (_this48._leftActions.length > 0) {
-                    params.forEach(function (p) {
-                        (0, _objectPath.set)(_this48._leftActions[0].params, p.path, p.value);
-                    });
-                }
-                _this48.doActionsAsync(_this48._leftActions);
-            });
+            }, (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
+                return _regenerator2.default.wrap(function _callee8$(_context8) {
+                    while (1) {
+                        switch (_context8.prev = _context8.next) {
+                            case 0:
+                                //执行下一个action
+                                if (_this48._leftActions.length > 0) {
+                                    params.forEach(function (p) {
+                                        (0, _objectPath.set)(_this48._leftActions[0].params, p.path, p.value);
+                                    });
+                                }
+                                _context8.next = 3;
+                                return _this48.doActionsAsync(_this48._leftActions);
+
+                            case 3:
+                            case 'end':
+                                return _context8.stop();
+                        }
+                    }
+                }, _callee8, _this48);
+            })));
         }
     }, {
         key: 'drawShapes',
@@ -2520,6 +2532,41 @@ var D3Graph = function (_Component) {
                 };
             });
         }
+
+        /**
+         * 清除画布,这个方法除了会把画布上的内容清除以外还会重置内部的action状态
+         */
+
+    }, {
+        key: 'clear',
+        value: function () {
+            var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
+                return _regenerator2.default.wrap(function _callee9$(_context9) {
+                    while (1) {
+                        switch (_context9.prev = _context9.next) {
+                            case 0:
+                                _context9.next = 2;
+                                return this.doActionAsync(new ClearAction());
+
+                            case 2:
+                                this.setState({
+                                    actions: []
+                                });
+
+                            case 3:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+
+            function clear() {
+                return _ref9.apply(this, arguments);
+            }
+
+            return clear;
+        }()
     }, {
         key: 'play',
         value: function play(actions, playingOps) {
@@ -2579,8 +2626,8 @@ var D3Graph = function (_Component) {
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
-                _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref8) {
-                        return _this50.ele = _ref8;
+                _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref10) {
+                        return _this50.ele = _ref10;
                     } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
@@ -2621,9 +2668,29 @@ var D3Graph = function (_Component) {
         }
     }, {
         key: 'componentDidMount',
-        value: function componentDidMount() {
-            this.doActionsAsync(this.props.actions);
-        }
+        value: function () {
+            var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10() {
+                return _regenerator2.default.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                _context10.next = 2;
+                                return this.doActionsAsync(this.props.actions);
+
+                            case 2:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this);
+            }));
+
+            function componentDidMount() {
+                return _ref11.apply(this, arguments);
+            }
+
+            return componentDidMount;
+        }()
     }, {
         key: 'componentWillUnmount',
         value: function componentWillUnmount() {

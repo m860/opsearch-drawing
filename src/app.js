@@ -486,7 +486,14 @@ class Example extends Component {
                                         type: "clear"
                                     }])
                                 }, this.exec.bind(this))
-                            }}>clear
+                            }}>clear(ClearAction)
+                    </button>
+                    <button type="button"
+                            onClick={() => {
+                                if (this.graph) {
+                                    this.graph.clear();
+                                }
+                            }}>clear(real clear)
                     </button>
                 </div>
                 <D3Graph actions={this.state.actions}
