@@ -102,6 +102,10 @@ function registerDrawing(name, drawing) {
     drawingIndex[name] = drawing;
 }
 
+function copy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 function isNullOrUndefined(value) {
     if (value === undefined || value === null) {
         return true;
@@ -210,6 +214,13 @@ class Action {
          * @type {boolean}
          */
         this.canBreak = false;
+    }
+
+    toData() {
+        return {
+            type: this.type,
+            params: this.params.toData ? [this.params.toData()] : this.params
+        }
     }
 }
 
@@ -442,6 +453,7 @@ export class Drawing {
      * 批量更新attrs
      * */
     updateAttrs(selection, attrs) {
+        this.attrs = attrs;
         if (selection) {
             selection.call(self => {
                 for (let key in attrs) {
@@ -511,7 +523,7 @@ export class Drawing {
             type: this.type,
             option: {
                 id: this.id,
-                attrs: this.attrs,
+                attrs: copy(this.attrs),
                 text: this.text
             }
         }
@@ -1311,6 +1323,17 @@ export class TextCircleDrawing extends Drawing {
         const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
         return new Point(circleAttrs.cx, circleAttrs.cy);
     }
+
+    toData() {
+        return {
+            type: this.type,
+            option: {
+                text: this.text,
+                circleAttrs:copy(this.circleAttrs),
+                textAttrs:copy(this.textAttrs),
+            }
+        }
+    }
 }
 
 registerDrawing("TextCircleDrawing", TextCircleDrawing);
@@ -1852,7 +1875,13 @@ export default class D3Graph extends Component {
             case actionTypeEnums.redraw: {
                 const index = this.shapes.findIndex(f => f.id === action.params.id);
                 if (index >= 0) {
-                    this.shapes[index] = update(this.shapes[index], action.params.state);
+                    let state = {};
+                    if (action.params.state) {
+                        for (let key in action.params.state) {
+                            state[key] = {$set: action.params.state[key]}
+                        }
+                    }
+                    this.shapes[index] = update(this.shapes[index], state);
                     this.drawShapes([this.shapes[index]]);
                 }
                 break;
@@ -1981,9 +2010,10 @@ export default class D3Graph extends Component {
     getDrawingData() {
         const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
         return actions.map((item) => {
+            const shape=this.findShapeById(item.params.id);
             return {
                 type: item.type,
-                params: item.params.toData()
+                params: [shape.toData()]
             }
         });
     }
