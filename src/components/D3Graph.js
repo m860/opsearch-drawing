@@ -932,6 +932,17 @@ export class ArrowLinkDrawing extends Drawing {
             'Z'
         ];
     }
+
+    toData() {
+        return {
+            type: this.type,
+            option: {
+                sourceId: this.sourceId,
+                targetId: this.targetId,
+                label: this.label
+            }
+        }
+    }
 }
 
 registerDrawing("ArrowLinkDrawing", ArrowLinkDrawing);
@@ -1046,6 +1057,16 @@ export class LinkDrawing extends Drawing {
         this.renderLabel(labelX, labelY);
     }
 
+    toData() {
+        return {
+            type: this.type,
+            option: {
+                sourceId: this.sourceId,
+                targetId: this.targetId,
+                label: this.label
+            }
+        }
+    }
 }
 
 registerDrawing("LinkDrawing", LinkDrawing);
