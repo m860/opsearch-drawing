@@ -2006,7 +2006,7 @@ export default class D3Graph extends Component {
     /**
      * 获取图形数据
      *
-     * @deprecated
+     * @deprecated 请使用`getDrawingActions`代替
      * @return {*[]}
      */
     getDrawingData() {

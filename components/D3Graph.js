@@ -2582,7 +2582,7 @@ var D3Graph = function (_Component) {
         /**
          * 获取图形数据
          *
-         * @deprecated
+         * @deprecated 请使用`getDrawingActions`代替
          * @return {*[]}
          */
 
