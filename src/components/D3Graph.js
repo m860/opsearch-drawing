@@ -2013,7 +2013,7 @@ export default class D3Graph extends Component {
             const shape = this.findShapeById(item.params.id);
             return {
                 type: item.type,
-                params: shape ? [shape.toData()] : [item.params.toData()]
+                params: (shape && shape.toData) ? [shape.toData()] : [item.params.toData()]
             }
         });
     }
