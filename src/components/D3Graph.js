@@ -1696,9 +1696,8 @@ export default class D3Graph extends Component {
      * @property {Array} actions - 所有的操作
      * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
      * @property {object} original - 坐标原点,默认值{x:0,y:0}
-     * @property {screen|math} coordinateType - 坐标系,默认值是屏幕坐标系
+     * @property {screen|math} coordinateType [screen] - 坐标系,默认值是屏幕坐标系
      * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
-     * @property {object} playingOption - mode===playing时有效
      * @property {Function} renderToolbar - 绘图的工具栏
      * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
      * @property {?Number} interval [1] - action的执行时间间隔
@@ -1808,6 +1807,7 @@ export default class D3Graph extends Component {
 
     /**
      * 根据id查找对应的图形
+     * @private
      * */
     findShapeById(id) {
         const index = this.shapes.findIndex(f => f.id === id);
@@ -1820,6 +1820,7 @@ export default class D3Graph extends Component {
 
     /**
      * 根据坐标系计算x值
+     * @private
      * */
     getX(value) {
         return this.state.original.x + parseFloat(value) * this.state.scale;
@@ -1827,6 +1828,7 @@ export default class D3Graph extends Component {
 
     /**
      * 根据坐标系计算y值
+     * @private
      * */
     getY(value) {
         if (this.state.coordinateType === coordinateTypeEnum.screen) {
@@ -1837,6 +1839,7 @@ export default class D3Graph extends Component {
 
     /**
      * 将屏幕坐标转换成对应坐标系坐标
+     * @private
      * */
     getPointFromScreen(screenX, screenY) {
         if (this.state.coordinateType === coordinateTypeEnum.math) {
@@ -1956,6 +1959,7 @@ export default class D3Graph extends Component {
 
     /**
      * 显示用户输入
+     * @private
      * @param action
      */
     showUserInputPromise(action) {
@@ -1971,6 +1975,7 @@ export default class D3Graph extends Component {
 
     /**
      * 隐藏用户输入并执行下一个action
+     * @private
      */
     hideUserInput(nextActionOption) {
         const params = this.state.inputProperties.map(property => {
@@ -2072,6 +2077,7 @@ export default class D3Graph extends Component {
 
     /**
      * 执行下一个下一个action
+     * @private
      */
     playNextAction() {
         if (this.playingIndex >= this.playingActions.length) {
@@ -2143,12 +2149,5 @@ export default class D3Graph extends Component {
             clearTimeout(this.timer);
         }
     }
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (this.state.showUserInput !== nextState.showUserInput) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 }
 //#endregion
