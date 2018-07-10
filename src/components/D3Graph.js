@@ -1329,8 +1329,8 @@ export class TextCircleDrawing extends Drawing {
             type: this.type,
             option: {
                 text: this.text,
-                circleAttrs:copy(this.circleAttrs),
-                textAttrs:copy(this.textAttrs),
+                circleAttrs: copy(this.circleAttrs),
+                textAttrs: copy(this.textAttrs),
             }
         }
     }
@@ -2010,10 +2010,10 @@ export default class D3Graph extends Component {
     getDrawingData() {
         const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
         return actions.map((item) => {
-            const shape=this.findShapeById(item.params.id);
+            const shape = this.findShapeById(item.params.id);
             return {
                 type: item.type,
-                params: [shape.toData()]
+                params: shape ? [shape.toData()] : [item.params.toData()]
             }
         });
     }

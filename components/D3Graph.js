@@ -2596,7 +2596,7 @@ var D3Graph = function (_Component) {
                 var shape = _this50.findShapeById(item.params.id);
                 return {
                     type: item.type,
-                    params: [shape.toData()]
+                    params: shape ? [shape.toData()] : []
                 };
             });
         }
