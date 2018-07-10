@@ -2581,6 +2581,8 @@ var D3Graph = function (_Component) {
 
         /**
          * 获取图形数据
+         *
+         * @deprecated
          * @return {*[]}
          */
 
@@ -2589,11 +2591,34 @@ var D3Graph = function (_Component) {
         value: function getDrawingData() {
             var _this50 = this;
 
+            console.warn('getDrawingData \u65B9\u6CD5\u5C06\u5728\u4E0B\u4E00\u4E2A\u7248\u672C\u5220\u9664\u6389,\u8BF7\u4F7F\u7528 getDrawingActions \u4EE3\u66FF');
             var actions = this.state.actions.filter(function (f) {
                 return f.type === actionTypeEnums.draw;
             });
             return actions.map(function (item) {
                 var shape = _this50.findShapeById(item.params.id);
+                return {
+                    type: item.type,
+                    params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
+                };
+            });
+        }
+
+        /**
+         * 获取所有绘图的action
+         * @return {*[]}
+         */
+
+    }, {
+        key: 'getDrawingActions',
+        value: function getDrawingActions() {
+            var _this51 = this;
+
+            var actions = this.state.actions.filter(function (f) {
+                return f.type === actionTypeEnums.draw;
+            });
+            return actions.map(function (item) {
+                var shape = _this51.findShapeById(item.params.id);
                 return {
                     type: item.type,
                     params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
@@ -2689,25 +2714,25 @@ var D3Graph = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this51 = this;
+            var _this52 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
                 _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref10) {
-                        return _this51.ele = _ref10;
+                        return _this52.ele = _ref10;
                     } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this51.hideUserInput(value);
+                        _this52.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this52 = this;
+            var _this53 = this;
 
             var newState = {};
             if (nextProps.attrs) {
@@ -2724,7 +2749,7 @@ var D3Graph = function (_Component) {
             }
             var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this52.doActionsAsync(nextProps.actions);
+                    _this53.doActionsAsync(nextProps.actions);
                 }
             };
             var keys = (0, _keys2.default)(newState);

@@ -2005,9 +2005,27 @@ export default class D3Graph extends Component {
 
     /**
      * 获取图形数据
+     *
+     * @deprecated
      * @return {*[]}
      */
     getDrawingData() {
+        console.warn(`getDrawingData 方法将在下一个版本删除掉,请使用 getDrawingActions 代替`);
+        const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
+        return actions.map((item) => {
+            const shape = this.findShapeById(item.params.id);
+            return {
+                type: item.type,
+                params: (shape && shape.toData) ? [shape.toData()] : [item.params.toData()]
+            }
+        });
+    }
+
+    /**
+     * 获取所有绘图的action
+     * @return {*[]}
+     */
+    getDrawingActions() {
         const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
         return actions.map((item) => {
             const shape = this.findShapeById(item.params.id);
