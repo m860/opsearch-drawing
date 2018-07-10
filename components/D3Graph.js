@@ -33,10 +33,6 @@ var _assign = require('babel-runtime/core-js/object/assign');
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -49,6 +45,10 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -56,6 +56,10 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
 
 exports.fromDrawing = fromDrawing;
 exports.fromActions = fromActions;
@@ -182,6 +186,10 @@ function registerDrawing(name, drawing) {
     drawingIndex[name] = drawing;
 }
 
+function copy(obj) {
+    return JSON.parse((0, _stringify2.default)(obj));
+}
+
 function isNullOrUndefined(value) {
     if (value === undefined || value === null) {
         return true;
@@ -269,30 +277,43 @@ var Point = function Point(x, y) {
  * */
 
 
-var Action = function Action(type, params, ops) {
-    (0, _classCallCheck3.default)(this, Action);
+var Action = function () {
+    function Action(type, params, ops) {
+        (0, _classCallCheck3.default)(this, Action);
 
-    /**
-     * action的类型,是一个枚举值
-     * @member {actionTypeEnums}
-     * */
-    this.type = type;
-    /**
-     * action的参数
-     * @member {Array}
-     * */
-    this.params = params;
-    /**
-     * playing模式执行下一步时的时间间隔,默认没有
-     * @member {?Number}
-     * */
-    this.nextInterval = (0, _objectPath.get)(ops, "nextInterval", null);
-    /**
-     * 是否允许中断操作
-     * @type {boolean}
-     */
-    this.canBreak = false;
-};
+        /**
+         * action的类型,是一个枚举值
+         * @member {actionTypeEnums}
+         * */
+        this.type = type;
+        /**
+         * action的参数
+         * @member {Array}
+         * */
+        this.params = params;
+        /**
+         * playing模式执行下一步时的时间间隔,默认没有
+         * @member {?Number}
+         * */
+        this.nextInterval = (0, _objectPath.get)(ops, "nextInterval", null);
+        /**
+         * 是否允许中断操作
+         * @type {boolean}
+         */
+        this.canBreak = false;
+    }
+
+    (0, _createClass3.default)(Action, [{
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                params: this.params.toData ? [this.params.toData()] : this.params
+            };
+        }
+    }]);
+    return Action;
+}();
 
 /**
  * 用户输入action,中断操作
@@ -573,6 +594,7 @@ var Drawing = exports.Drawing = function () {
     }, {
         key: 'updateAttrs',
         value: function updateAttrs(selection, attrs) {
+            this.attrs = attrs;
             if (selection) {
                 selection.call(function (self) {
                     for (var key in attrs) {
@@ -655,7 +677,7 @@ var Drawing = exports.Drawing = function () {
                 type: this.type,
                 option: {
                     id: this.id,
-                    attrs: this.attrs,
+                    attrs: copy(this.attrs),
                     text: this.text
                 }
             };
@@ -1136,6 +1158,18 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             return ['M ' + this.graph.getX(startPoint.x) + ' ' + this.graph.getY(startPoint.y), 'L ' + this.graph.getX(q2x) + ' ' + this.graph.getY(q2y), 'L ' + this.graph.getX(q1x) + ' ' + this.graph.getY(q1y), 'L ' + this.graph.getX(endPoint.x) + ' ' + this.graph.getY(endPoint.y), 'L ' + this.graph.getX(q3x) + ' ' + this.graph.getY(q3y), 'L ' + this.graph.getX(q2x) + ' ' + this.graph.getY(q2y), 'L ' + this.graph.getX(startPoint.x) + ' ' + this.graph.getY(startPoint.y), 'Z'];
         }
     }, {
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                option: {
+                    sourceId: this.sourceId,
+                    targetId: this.targetId,
+                    label: this.label
+                }
+            };
+        }
+    }, {
         key: 'defaultAttrs',
         get: function get() {
             return ArrowLinkDrawing.defaultAttrs;
@@ -1267,6 +1301,18 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             var labelX = Math.min(p1.x, p2.x) + hx;
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
+        }
+    }, {
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                option: {
+                    sourceId: this.sourceId,
+                    targetId: this.targetId,
+                    label: this.label
+                }
+            };
         }
     }, {
         key: 'defaultAttrs',
@@ -1574,6 +1620,18 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
         value: function getLinkPoint() {
             var circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
             return new Point(circleAttrs.cx, circleAttrs.cy);
+        }
+    }, {
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                option: {
+                    text: this.text,
+                    circleAttrs: copy(this.circleAttrs),
+                    textAttrs: copy(this.textAttrs)
+                }
+            };
         }
     }]);
     return TextCircleDrawing;
@@ -2276,7 +2334,7 @@ var D3Graph = function (_Component) {
             var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(action) {
                 var _this46 = this;
 
-                var index, id, shape, _id, _shape, _id2, _shape2;
+                var index, state, key, id, shape, _id, _shape, _id2, _shape2;
 
                 return _regenerator2.default.wrap(function _callee7$(_context7) {
                     while (1) {
@@ -2297,7 +2355,14 @@ var D3Graph = function (_Component) {
                                 });
 
                                 if (index >= 0) {
-                                    this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], action.params.state);
+                                    state = {};
+
+                                    if (action.params.state) {
+                                        for (key in action.params.state) {
+                                            state[key] = { $set: action.params.state[key] };
+                                        }
+                                    }
+                                    this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], state);
                                     this.drawShapes([this.shapes[index]]);
                                 }
                                 return _context7.abrupt('break', 37);
@@ -2522,13 +2587,16 @@ var D3Graph = function (_Component) {
     }, {
         key: 'getDrawingData',
         value: function getDrawingData() {
+            var _this50 = this;
+
             var actions = this.state.actions.filter(function (f) {
                 return f.type === actionTypeEnums.draw;
             });
             return actions.map(function (item) {
+                var shape = _this50.findShapeById(item.params.id);
                 return {
                     type: item.type,
-                    params: item.params.toData()
+                    params: [shape.toData()]
                 };
             });
         }
@@ -2621,25 +2689,25 @@ var D3Graph = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this50 = this;
+            var _this51 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
                 _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref10) {
-                        return _this50.ele = _ref10;
+                        return _this51.ele = _ref10;
                     } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this50.hideUserInput(value);
+                        _this51.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this51 = this;
+            var _this52 = this;
 
             var newState = {};
             if (nextProps.attrs) {
@@ -2656,7 +2724,7 @@ var D3Graph = function (_Component) {
             }
             var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this51.doActionsAsync(nextProps.actions);
+                    _this52.doActionsAsync(nextProps.actions);
                 }
             };
             var keys = (0, _keys2.default)(newState);
