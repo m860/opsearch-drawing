@@ -740,6 +740,23 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
             this.selection = d3.select(graph.ele).append("line");
             this.selection.on("click", function () {
                 _this9.select();
+            }).on("mouseover", function (a, b, eles) {
+                if (eles.length > 0) {
+                    var e = d3.select(eles[0]);
+                    var width = parseFloat(e.attr("stroke-width"));
+                    if (width < 8) {
+                        _this9._originalWidth = width;
+                        e.attr("stroke-width", 8);
+                    }
+                }
+            }).on("mouseout", function (a, b, eles) {
+                if (eles.length > 0) {
+                    if (_this9._originalWidth) {
+                        var e = d3.select(eles[0]);
+                        e.attr("stroke-width", _this9._originalWidth);
+                        delete _this9._originalWidth;
+                    }
+                }
             });
         }
     }, {
@@ -1099,6 +1116,26 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             this.selection = d3.select(graph.ele).append("path");
             this.selection.on("click", function () {
                 _this19.select();
+            }).on("mouseover", function (a, b, eles) {
+                if (eles.length > 0) {
+                    var e = d3.select(eles[0]);
+                    var width = parseFloat(e.attr("stroke-width"));
+
+                    if (width < 8 || isNaN(width)) {
+                        _this19._originalWidth = width;
+                        e.attr("stroke-width", 8);
+                    }
+                }
+            }).on("mouseout", function (a, b, eles) {
+                if (eles.length > 0) {
+                    var e = d3.select(eles[0]);
+                    if (_this19._originalWidth) {
+                        e.attr("stroke-width", _this19._originalWidth);
+                    } else if (isNaN(_this19._originalWidth)) {
+                        e.attr("stroke-width", null);
+                    }
+                    delete _this19._originalWidth;
+                }
             });
             this.labelSelection = d3.select(graph.ele).append("text");
         }
@@ -1257,6 +1294,23 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             this.selection = d3.select(graph.ele).append("line");
             this.selection.on("click", function () {
                 _this21.select();
+            }).on("mouseover", function (a, b, eles) {
+                if (eles.length > 0) {
+                    var e = d3.select(eles[0]);
+                    var width = parseFloat(e.attr("stroke-width"));
+                    if (width < 8) {
+                        _this21._originalWidth = width;
+                        e.attr("stroke-width", 8);
+                    }
+                }
+            }).on("mouseout", function (a, b, eles) {
+                if (eles.length > 0) {
+                    if (_this21._originalWidth) {
+                        var e = d3.select(eles[0]);
+                        e.attr("stroke-width", _this21._originalWidth);
+                        delete _this21._originalWidth;
+                    }
+                }
             });
             this.labelSelection = d3.select(graph.ele).append("text");
         }
