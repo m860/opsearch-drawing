@@ -1674,19 +1674,11 @@ var Toolbar = exports.Toolbar = function (_PureComponent) {
         value: function render() {
             return _react2.default.createElement(
                 'svg',
-                (0, _extends3.default)({}, this.attrs, {
+                (0, _extends3.default)({}, this.props.attrs, {
                     onClick: this.props.onClick,
                     style: this.props.style }),
                 this.props.children
             );
-        }
-    }, {
-        key: 'attrs',
-        get: function get() {
-            return {
-                width: 40,
-                height: 40
-            };
         }
     }]);
     return Toolbar;
@@ -1695,7 +1687,14 @@ var Toolbar = exports.Toolbar = function (_PureComponent) {
 Toolbar.propTypes = {
     children: _propTypes2.default.any,
     onClick: _propTypes2.default.func,
-    style: _propTypes2.default.object
+    style: _propTypes2.default.object,
+    attrs: _propTypes2.default.object
+};
+Toolbar.defaultProps = {
+    attrs: {
+        width: 40,
+        height: 40
+    }
 };
 
 var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
@@ -1723,6 +1722,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
                 {
                     style: (0, _assign2.default)({ cursor: "pointer" }, this.props.style, this.state.selected ? { backgroundColor: "#D6D6D6" } : {}),
                     type: this.props.type,
+                    attrs: this.props.attrs,
                     onClick: function onClick() {
                         var _props;
 
@@ -1759,7 +1759,8 @@ DrawingToolbar.propTypes = {
     onClick: _propTypes2.default.func,
     //绘制的类型:如LineDrawing
     type: _propTypes2.default.string,
-    style: _propTypes2.default.object
+    style: _propTypes2.default.object,
+    attrs: _propTypes2.default.object
 };
 
 var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
@@ -1778,6 +1779,9 @@ var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
             return _react2.default.createElement(
                 DrawingToolbar,
                 { style: this.props.style,
+                    attrs: (0, _extends3.default)({}, Toolbar.defaultProps.attrs, {
+                        viewBox: "0 0 512.001 512.001"
+                    }),
                     onClick: function onClick() {
                         var graph = _this33.props.graph;
 
@@ -1785,11 +1789,9 @@ var NoneToolbar = exports.NoneToolbar = function (_PureComponent3) {
                         svg.on("mousedown", null).on("mousemove", null).on("mouseup", null);
                     },
                     type: this.type },
-                _react2.default.createElement(
-                    'text',
-                    { y: 20, fontSize: 12 },
-                    'none'
-                )
+                _react2.default.createElement('path', {
+                    style: { transform: "scale(0.5)", transformOrigin: "center" },
+                    d: 'M429.742,319.31L82.49,0l-0.231,471.744l105.375-100.826l61.89,141.083l96.559-42.358l-61.89-141.083L429.742,319.31z M306.563,454.222l-41.62,18.259l-67.066-152.879l-85.589,81.894l0.164-333.193l245.264,225.529l-118.219,7.512L306.563,454.222z' })
             );
         }
     }, {
@@ -2743,6 +2745,9 @@ var D3Graph = function (_Component) {
             var newState = {};
             if (nextProps.attrs) {
                 newState.attrs = nextProps.attrs;
+            }
+            if (nextProps.coordinateType !== this.state.coordinateType) {
+                newState.coordinateType = { $set: nextProps.coordinateType };
             }
             if (this.state.interval !== nextProps.interval) {
                 newState.interval = nextProps.interval;

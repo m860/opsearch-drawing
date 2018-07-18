@@ -1344,20 +1344,20 @@ export class Toolbar extends PureComponent {
     static propTypes = {
         children: PropTypes.any,
         onClick: PropTypes.func,
-        style: PropTypes.object
+        style: PropTypes.object,
+        attrs: PropTypes.object
     };
 
-
-    get attrs() {
-        return {
+    static defaultProps = {
+        attrs: {
             width: 40,
             height: 40
-        };
-    }
+        }
+    };
 
     render() {
         return (
-            <svg {...this.attrs}
+            <svg {...this.props.attrs}
                  onClick={this.props.onClick}
                  style={this.props.style}>
                 {this.props.children}
@@ -1372,7 +1372,8 @@ export class DrawingToolbar extends PureComponent {
         onClick: PropTypes.func,
         //绘制的类型:如LineDrawing
         type: PropTypes.string,
-        style: PropTypes.object
+        style: PropTypes.object,
+        attrs: PropTypes.object
     };
 
     constructor(props) {
@@ -1388,6 +1389,7 @@ export class DrawingToolbar extends PureComponent {
             <Toolbar
                 style={Object.assign({cursor: "pointer"}, this.props.style, this.state.selected ? {backgroundColor: "#D6D6D6"} : {})}
                 type={this.props.type}
+                attrs={this.props.attrs}
                 onClick={(...args) => {
                     emitter.emit(EVENT_TOOLBAR_CHANGE, this.props.type);
                     this.props.onClick && this.props.onClick(...args)
@@ -1426,6 +1428,10 @@ export class NoneToolbar extends PureComponent {
     render() {
         return (
             <DrawingToolbar style={this.props.style}
+                            attrs={{
+                                ...Toolbar.defaultProps.attrs,
+                                viewBox: "0 0 512.001 512.001"
+                            }}
                             onClick={() => {
                                 const {graph} = this.props;
                                 const svg = d3.select(graph.ele);
@@ -1434,7 +1440,9 @@ export class NoneToolbar extends PureComponent {
                                     .on("mouseup", null)
                             }}
                             type={this.type}>
-                <text y={20} fontSize={12}>none</text>
+                <path
+                    style={{transform: "scale(0.5)", transformOrigin: "center"}}
+                    d="M429.742,319.31L82.49,0l-0.231,471.744l105.375-100.826l61.89,141.083l96.559-42.358l-61.89-141.083L429.742,319.31z M306.563,454.222l-41.62,18.259l-67.066-152.879l-85.589,81.894l0.164-333.193l245.264,225.529l-118.219,7.512L306.563,454.222z"/>
             </DrawingToolbar>
         );
     }
