@@ -54,7 +54,7 @@ class Example extends Component {
                 x: 0,
                 y: 0
             },
-            coordinateType: "screen",
+            coordinateType: "math",
             actionJson: "",
             selectMode: "single",
             attrs: {
@@ -66,7 +66,8 @@ class Example extends Component {
                 }
             },
             drawingData: null,
-            manualActionText: ""
+            manualActionText: "",
+            showTextCircleTool: true
         };
     }
 
@@ -509,6 +510,14 @@ class Example extends Component {
                                         }
                                     }}>clear(real clear)
                             </button>
+                            <button type="button"
+                                    onClick={() => {
+                                        this.setState({
+                                            showTextCircleTool: !this.state.showTextCircleTool
+                                        })
+                                    }}>
+                                隐藏/显示TextCircle Tool
+                            </button>
                         </div>
                     </div>
                     <div style={{flex: 1}}>
@@ -532,6 +541,7 @@ class Example extends Component {
                                         })
                                     }
                                     catch (ex) {
+                                        console.log(ex)
                                     }
                                 }
                             }}>执行
@@ -543,14 +553,17 @@ class Example extends Component {
                 <D3Graph actions={this.state.actions}
                          ref={ref => this.graph = ref}
                          renderToolbar={(graph) => {
-                             return [
+                             let tools = [
                                  <NoneToolbar key={"none"} graph={graph}/>,
                                  <CircleToolbar key={"circle"} graph={graph}/>,
                                  <LineToolbar key={"line"} graph={graph}/>,
                                  <LinkToolbar key={"link"} graph={graph}/>,
-                                 <ArrowLinkToolbar key={"arrowLink"} graph={graph}/>,
-                                 <TextCircleToolbar key={"textCircle"} graph={graph}/>,
+                                 <ArrowLinkToolbar key={"arrowLink"} graph={graph}/>
                              ];
+                             if (this.state.showTextCircleTool) {
+                                 tools.push(<TextCircleToolbar key={"textCircle"} graph={graph}/>)
+                             }
+                             return tools;
                          }}
                          onAction={action => {
                              console.log(action);

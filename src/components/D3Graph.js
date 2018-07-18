@@ -2117,6 +2117,9 @@ export default class D3Graph extends Component {
         if (nextProps.attrs) {
             newState.attrs = nextProps.attrs;
         }
+        if (nextProps.coordinateType !== this.state.coordinateType) {
+            newState.coordinateType = {$set: nextProps.coordinateType};
+        }
         if (this.state.interval !== nextProps.interval) {
             newState.interval = nextProps.interval;
         }
