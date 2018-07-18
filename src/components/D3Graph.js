@@ -571,6 +571,23 @@ export class LineDrawing extends Drawing {
         this.selection = d3.select(graph.ele).append("line");
         this.selection.on("click", () => {
             this.select();
+        }).on("mouseover", (a, b, eles) => {
+            if (eles.length > 0) {
+                const e = d3.select(eles[0]);
+                const width = parseFloat(e.attr("stroke-width"));
+                if (width < 8) {
+                    this._originalWidth = width;
+                    e.attr("stroke-width", 8)
+                }
+            }
+        }).on("mouseout", (a, b, eles) => {
+            if (eles.length > 0) {
+                if (this._originalWidth) {
+                    const e = d3.select(eles[0]);
+                    e.attr("stroke-width", this._originalWidth);
+                    delete this._originalWidth;
+                }
+            }
         })
     }
 
@@ -883,6 +900,27 @@ export class ArrowLinkDrawing extends Drawing {
         this.selection = d3.select(graph.ele).append("path");
         this.selection.on("click", () => {
             this.select();
+        }).on("mouseover", (a, b, eles) => {
+            if (eles.length > 0) {
+                const e = d3.select(eles[0]);
+                const width = parseFloat(e.attr("stroke-width"));
+
+                if (width < 8 || isNaN(width)) {
+                    this._originalWidth = width;
+                    e.attr("stroke-width", 8)
+                }
+            }
+        }).on("mouseout", (a, b, eles) => {
+            if (eles.length > 0) {
+                const e = d3.select(eles[0]);
+                if (this._originalWidth) {
+                    e.attr("stroke-width", this._originalWidth);
+                }
+                else if (isNaN(this._originalWidth)) {
+                    e.attr("stroke-width", null);
+                }
+                delete this._originalWidth;
+            }
         });
         this.labelSelection = d3.select(graph.ele).append("text");
     }
@@ -1026,6 +1064,23 @@ export class LinkDrawing extends Drawing {
         this.selection = d3.select(graph.ele).append("line");
         this.selection.on("click", () => {
             this.select();
+        }).on("mouseover", (a, b, eles) => {
+            if (eles.length > 0) {
+                const e = d3.select(eles[0]);
+                const width = parseFloat(e.attr("stroke-width"));
+                if (width < 8) {
+                    this._originalWidth = width;
+                    e.attr("stroke-width", 8)
+                }
+            }
+        }).on("mouseout", (a, b, eles) => {
+            if (eles.length > 0) {
+                if (this._originalWidth) {
+                    const e = d3.select(eles[0]);
+                    e.attr("stroke-width", this._originalWidth);
+                    delete this._originalWidth;
+                }
+            }
         });
         this.labelSelection = d3.select(graph.ele).append("text");
     }
