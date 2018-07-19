@@ -1383,6 +1383,7 @@ export class TextCircleDrawing extends Drawing {
         return {
             type: this.type,
             option: {
+                id: this.id,
                 text: this.text,
                 circleAttrs: copy(this.circleAttrs),
                 textAttrs: copy(this.textAttrs),
