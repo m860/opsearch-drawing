@@ -987,6 +987,7 @@ export class ArrowLinkDrawing extends Drawing {
         return {
             type: this.type,
             option: {
+                id: this.id,
                 sourceId: this.sourceId,
                 targetId: this.targetId,
                 label: this.label
@@ -1128,6 +1129,7 @@ export class LinkDrawing extends Drawing {
         return {
             type: this.type,
             option: {
+                id: this.id,
                 sourceId: this.sourceId,
                 targetId: this.targetId,
                 label: this.label

@@ -1200,6 +1200,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             return {
                 type: this.type,
                 option: {
+                    id: this.id,
                     sourceId: this.sourceId,
                     targetId: this.targetId,
                     label: this.label
@@ -1362,6 +1363,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             return {
                 type: this.type,
                 option: {
+                    id: this.id,
                     sourceId: this.sourceId,
                     targetId: this.targetId,
                     label: this.label
