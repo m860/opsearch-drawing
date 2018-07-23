@@ -485,30 +485,33 @@ export class Drawing {
     }
 
     combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
-        let result = Object.assign({}, defaultAttrs, attrs, this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
+        let result = Object.assign({},
+            defaultAttrs,
+            attrs,
+            this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
         if (!isNullOrUndefined(result.x)) {
-            result.x = this.graph.getX(result.x);
+            result.x = this.graph.toScreenX(result.x);
         }
         if (!isNullOrUndefined(result.y)) {
-            result.y = this.graph.getY(result.y);
+            result.y = this.graph.toScreenY(result.y);
         }
         if (!isNullOrUndefined(result.x1)) {
-            result.x1 = this.graph.getX(result.x1);
+            result.x1 = this.graph.toScreenX(result.x1);
         }
         if (!isNullOrUndefined(result.x2)) {
-            result.x2 = this.graph.getX(result.x2);
+            result.x2 = this.graph.toScreenX(result.x2);
         }
         if (!isNullOrUndefined(result.y1)) {
-            result.y1 = this.graph.getY(result.y1);
+            result.y1 = this.graph.toScreenY(result.y1);
         }
         if (!isNullOrUndefined(result.y2)) {
-            result.y2 = this.graph.getY(result.y2);
+            result.y2 = this.graph.toScreenY(result.y2);
         }
         if (!isNullOrUndefined(result.cx)) {
-            result.cx = this.graph.getX(result.cx);
+            result.cx = this.graph.toScreenX(result.cx);
         }
         if (!isNullOrUndefined(result.cy)) {
-            result.cy = this.graph.getY(result.cy);
+            result.cy = this.graph.toScreenY(result.cy);
         }
         result["shape-id"] = this.id;
         return result;
@@ -641,7 +644,9 @@ export class CircleDrawing extends Drawing {
     }
 
     getLinkPoint() {
-        return new Point(parseFloat(this.attrs.cx), parseFloat(this.attrs.cy));
+        const x = this.graph.toLocalX(parseFloat(this.attrs.cx));
+        const y = this.graph.toLocalY(parseFloat(this.attrs.cy));
+        return new Point(x, y);
     }
 
 }
@@ -939,8 +944,8 @@ export class ArrowLinkDrawing extends Drawing {
                 this.labelSelection.text(this.label);
             }
             const attrs = Object.assign({
-                x: this.graph.getX(x),
-                y: this.graph.getY(y)
+                x: this.graph.toScreenX(x),
+                y: this.graph.toScreenY(y)
             }, this.labelAttrs);
             this.updateAttrs(this.labelSelection, attrs);
         }
@@ -972,13 +977,13 @@ export class ArrowLinkDrawing extends Drawing {
         const q3x = endPoint.x + (distance * (diffX - diffY)) / a;
         const q3y = endPoint.y + (distance * (diffX + diffY)) / a;
         return [
-            `M ${this.graph.getX(startPoint.x)} ${this.graph.getY(startPoint.y)}`,
-            `L ${this.graph.getX(q2x)} ${this.graph.getY(q2y)}`,
-            `L ${this.graph.getX(q1x)} ${this.graph.getY(q1y)}`,
-            `L ${this.graph.getX(endPoint.x)} ${this.graph.getY(endPoint.y)}`,
-            `L ${this.graph.getX(q3x)} ${this.graph.getY(q3y)}`,
-            `L ${this.graph.getX(q2x)} ${this.graph.getY(q2y)}`,
-            `L ${this.graph.getX(startPoint.x)} ${this.graph.getY(startPoint.y)}`,
+            `M ${this.graph.toScreenX(startPoint.x)} ${this.graph.toScreenY(startPoint.y)}`,
+            `L ${this.graph.toScreenX(q2x)} ${this.graph.toScreenY(q2y)}`,
+            `L ${this.graph.toScreenX(q1x)} ${this.graph.toScreenY(q1y)}`,
+            `L ${this.graph.toScreenX(endPoint.x)} ${this.graph.toScreenY(endPoint.y)}`,
+            `L ${this.graph.toScreenX(q3x)} ${this.graph.toScreenY(q3y)}`,
+            `L ${this.graph.toScreenX(q2x)} ${this.graph.toScreenY(q2y)}`,
+            `L ${this.graph.toScreenX(startPoint.x)} ${this.graph.toScreenY(startPoint.y)}`,
             'Z'
         ];
     }
@@ -1100,8 +1105,8 @@ export class LinkDrawing extends Drawing {
                 this.labelSelection.text(this.label);
             }
             const attrs = Object.assign({
-                x: this.graph.getX(x),
-                y: this.graph.getY(y)
+                x: this.graph.toScreenX(x),
+                y: this.graph.toScreenY(y)
             }, this.labelAttrs);
             this.updateAttrs(this.labelSelection, attrs);
         }
@@ -1183,9 +1188,9 @@ export class PathDrawing extends Drawing {
         if (!this.attrs.d) {
             let d = this.d.map((point, index) => {
                 if (index === 0) {
-                    return `M ${this.graph.getX(point.x)} ${this.graph.getY(point.y)}`
+                    return `M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`
                 }
-                return `L ${this.graph.getX(point.x)} ${this.graph.getY(point.y)}`;
+                return `L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`;
             });
             d.push("Z");
             this.attrs.d = d.join(" ");
@@ -1378,7 +1383,9 @@ export class TextCircleDrawing extends Drawing {
 
     getLinkPoint() {
         const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
-        return new Point(circleAttrs.cx, circleAttrs.cy);
+        const x = this.graph.toLocalX(parseFloat(circleAttrs.cx));
+        const y = this.graph.toLocalY(parseFloat(circleAttrs.cy));
+        return new Point(x, y);
     }
 
     toData() {
@@ -1524,7 +1531,10 @@ export class LineToolbar extends PureComponent {
                                 const {graph} = this.props;
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
-                                    const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                    const point = {
+                                        x: graph.toLocalX(d3.event.offsetX),
+                                        y: graph.toLocalY(d3.event.offsetY)
+                                    };
                                     const drawing = new LineDrawing({
                                         attrs: {
                                             x1: point.x,
@@ -1540,7 +1550,10 @@ export class LineToolbar extends PureComponent {
                                 })
                                     .on("mousemove", () => {
                                         if (this._id) {
-                                            const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                            const point = {
+                                                x: graph.toLocalX(d3.event.offsetX),
+                                                y: graph.toLocalY(d3.event.offsetY)
+                                            };
                                             graph.doActionsAsync([
                                                 new ReDrawAction(this._id, {
                                                     attrs: {
@@ -1580,7 +1593,10 @@ export class CircleToolbar extends PureComponent {
                                 const {graph} = this.props;
                                 const svg = d3.select(this.props.graph.ele);
                                 svg.on("mousedown", async () => {
-                                    const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                    const point = {
+                                        x: graph.toLocalX(d3.event.offsetX),
+                                        y: graph.toLocalY(d3.event.offsetY)
+                                    }
                                     const drawing = new CircleDrawing({
                                         attrs: {
                                             cx: point.x,
@@ -1610,13 +1626,18 @@ export class LinkToolbar extends PureComponent {
         return "LinkDrawing";
     }
 
-    getShapeID(ele) {
-        try {
-            return ele.attributes['shape-id'].nodeValue;
+    getShapeID(event) {
+        const {path} = event;
+        for (let i = 0; i < path.length; i++) {
+            const ele = path[i];
+            if (ele && ele.attributes) {
+                const node = ele.attributes["shape-id"];
+                if (node) {
+                    return node.nodeValue;
+                }
+            }
         }
-        catch (ex) {
-            return null;
-        }
+        return null
     }
 
     render() {
@@ -1627,10 +1648,10 @@ export class LinkToolbar extends PureComponent {
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const event = d3.event;
-                                    this._sourceID = this.getShapeID(event.target);
+                                    this._sourceID = this.getShapeID(event);
                                 }).on("mouseup", () => {
                                     const event = d3.event;
-                                    const targetID = this.getShapeID(event.target);
+                                    const targetID = this.getShapeID(event);
                                     if (this._sourceID && targetID) {
                                         graph.doActionsAsync([
                                             new DrawAction(new LinkDrawing({
@@ -1727,7 +1748,10 @@ export class TextCircleToolbar extends PureComponent {
                                 const {graph} = this.props;
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", async () => {
-                                    const point = graph.getPointFromScreen(d3.event.offsetX, d3.event.offsetY);
+                                    const point = {
+                                        x: graph.toLocalX(d3.event.offsetX),
+                                        y: graph.toLocalY(d3.event.offsetY)
+                                    };
                                     const drawing = new TextCircleDrawing({
                                         circleAttrs: {
                                             cx: point.x,
@@ -1750,6 +1774,31 @@ export class TextCircleToolbar extends PureComponent {
     }
 }
 
+export class MoveToolbar extends PureComponent {
+    static propTypes = {
+        onClick: PropTypes.func,
+        style: PropTypes.object,
+        graph: PropTypes.object.isRequired
+    };
+
+    render() {
+        return (
+            <DrawingToolbar style={this.props.style}
+                            attrs={{
+                                ...Toolbar.defaultProps.attrs,
+                                viewBox: "0 0 32 32"
+                            }}>
+                <g transform="translate(20,20) scale(0.5,0.5) translate(-20,-20)">
+                    <polygon points="18,20 18,26 22,26 16,32 10,26 14,26 14,20" fill="#4E4E50"/>
+                    <polygon points="14,12 14,6 10,6 16,0 22,6 18,6 18,12" fill="#4E4E50"/>
+                    <polygon points="12,18 6,18 6,22 0,16 6,10 6,14 12,14" fill="#4E4E50"/>
+                    <polygon points="20,14 26,14 26,10 32,16 26,22 26,18 20,18" fill="#4E4E50"/>
+                </g>
+            </DrawingToolbar>
+        );
+    }
+}
+
 //#endregion
 
 //#region D3Graph
@@ -1761,7 +1810,7 @@ export default class D3Graph extends Component {
      * @property {object} attrs - svg的属性
      * @property {Array} actions - 所有的操作
      * @property {single|multiple} selectMode [single] - 选择模式,是多选还是单选
-     * @property {object} original - 坐标原点,默认值{x:0,y:0}
+     * @property {object} original - 坐标原点(屏幕坐标),默认值{x:0,y:0}
      * @property {screen|math} coordinateType [screen] - 坐标系,默认值是屏幕坐标系
      * @property {none|playing} mode - 模式,默认是:none,如果是playing,则是样式模式,会一步一步的演示绘图过程
      * @property {Function} renderToolbar - 绘图的工具栏
@@ -1885,18 +1934,20 @@ export default class D3Graph extends Component {
     }
 
     /**
-     * 根据坐标系计算x值
+     * 将输入的坐标转换成屏幕坐标
+     * @property {number} value - 如果坐标是屏幕坐标系就输入屏幕坐标,如果是数学坐标系就输入数学坐标
      * @private
      * */
-    getX(value) {
+    toScreenX(value) {
         return this.state.original.x + parseFloat(value) * this.state.scale;
     }
 
     /**
-     * 根据坐标系计算y值
+     * 将输入的坐标转成屏幕坐标
+     * @property {number} value - 如果坐标是屏幕坐标系就输入屏幕坐标,如果是数学坐标系就输入数学坐标
      * @private
      * */
-    getY(value) {
+    toScreenY(value) {
         if (this.state.coordinateType === coordinateTypeEnum.screen) {
             return this.state.original.y + parseFloat(value) * this.state.scale;
         }
@@ -1904,17 +1955,27 @@ export default class D3Graph extends Component {
     }
 
     /**
-     * 将屏幕坐标转换成对应坐标系坐标
-     * @private
-     * */
-    getPointFromScreen(screenX, screenY) {
+     * 将屏幕坐标转换成图形对应的坐标
+     * @param screenX
+     * @return {number}
+     */
+    toLocalX(screenX) {
         if (this.state.coordinateType === coordinateTypeEnum.math) {
-            return {
-                x: (screenX - this.state.original.x) / this.state.scale,
-                y: (this.state.original.y - screenY) / this.state.scale
-            }
+            return (screenX - this.state.original.x) / this.state.scale;
         }
-        return {x: screenX / this.state.scale, y: screenY / this.state.scale};
+        return screenX / this.state.scale;
+    }
+
+    /**
+     * 将屏幕坐标转换成图形对应的坐标
+     * @param screenY
+     * @return {number}
+     */
+    toLocalY(screenY) {
+        if (this.state.coordinateType === coordinateTypeEnum.math) {
+            return (this.state.original.y - screenY) / this.state.scale;
+        }
+        return screenY / this.state.scale;
     }
 
     async doActionsAsync(actions) {
@@ -1995,7 +2056,9 @@ export default class D3Graph extends Component {
                 //     shape.selection.remove();
                 //     delete shape.selection;
                 // }
-                shape.remove();
+                if (shape) {
+                    shape.remove();
+                }
                 break;
             }
             case actionTypeEnums.clear: {

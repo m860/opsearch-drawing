@@ -27,7 +27,8 @@ import D3Graph, {
     ArrowLinkToolbar,
     TextCircleDrawing,
     InputAction,
-    TextCircleToolbar
+    TextCircleToolbar,
+    MoveToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -46,6 +47,9 @@ class Example extends Component {
     constructor(props) {
         super(props);
         this.graph = null;
+        this.numberScale = new NumberScaleDrawing({
+            id: "number-scale"
+        });
         this.state = {
             interval: 1,
             actions: [],
@@ -54,7 +58,7 @@ class Example extends Component {
                 x: 0,
                 y: 0
             },
-            coordinateType: "math",
+            coordinateType: "screen",
             actionJson: "",
             selectMode: "single",
             attrs: {
@@ -67,35 +71,41 @@ class Example extends Component {
             },
             drawingData: null,
             manualActionText: "",
-            showTextCircleTool: true
+            showTextCircleTool: true,
         };
     }
 
     randomX() {
-        const fn = d3.randomUniform(20, 380);
+        const fn = this.state.coordinateType === "screen" ?
+            d3.randomUniform(20, 280) :
+            d3.randomUniform(0, 10);
         return Math.floor(fn())
     }
 
     randomY() {
-        const fn = d3.randomUniform(20, 280);
+        const fn = this.state.coordinateType === "screen" ?
+            d3.randomUniform(20, 280) :
+            d3.randomUniform(0, 10);
         return Math.floor(fn());
     }
 
     exec() {
         try {
             const actions = fromActions(JSON.parse(this.state.actionJson));
+            console.log(actions);
             this.setState({
                 actions: actions,
                 manualActionText: JSON.stringify(actions.map(item => {
-                    let state = item.params.toData().option;
-                    delete state.id;
-                    return {
-                        type: "redraw",
-                        params: [item.params.id, state]
-                    };
+                    if (item.params.toData) {
+                        let state = item.params.toData().option;
+                        delete state.id;
+                        return {
+                            type: "redraw",
+                            params: [item.params.id, state]
+                        };
+                    }
+                    return {};
                 }))
-            }, () => {
-                this.setState({})
             })
         }
         catch (ex) {
@@ -141,6 +151,7 @@ class Example extends Component {
                         <option value="multiple">multiple</option>
                     </select>
                 </div>
+
                 <div>
                     <label>刻度尺</label>
                     <input type="text" value={this.state.scale} onChange={({target: {value}}) => {
@@ -176,9 +187,46 @@ class Example extends Component {
                 <div>
                     <label>坐标系</label>
                     <select value={this.state.coordinateType} onChange={({target: {value}}) => {
-                        this.setState({
+                        let newState = {
                             coordinateType: value
-                        })
+                        };
+                        if (value === "math") {
+                            newState.original = {
+                                x: 20,
+                                y: 280
+                            };
+                            newState.scale = 20;
+                        }
+                        else {
+                            newState.original = {
+                                x: 0,
+                                y: 0
+                            };
+                            newState.scale = 1;
+                        }
+                        this.setState(newState, () => {
+                            if (value === "math") {
+                                //show number scale
+                                this.setState({
+                                    actionJson: JSON.stringify([{
+                                        type: "draw",
+                                        params: [{
+                                            type:"NumberScaleDrawing",
+                                            option:this.numberScale
+                                        }]
+                                    }])
+                                }, this.exec.bind(this));
+                            }
+                            else {
+                                //remove number scale
+                                this.setState({
+                                    actionJson: JSON.stringify([{
+                                        type: "delete",
+                                        params: [this.numberScale.id]
+                                    }])
+                                }, this.exec.bind(this))
+                            }
+                        });
                     }}>
                         <option value="screen">screen</option>
                         <option value="math">math</option>
@@ -552,9 +600,11 @@ class Example extends Component {
 
                 <D3Graph actions={this.state.actions}
                          ref={ref => this.graph = ref}
+                         coordinateType={this.state.coordinateType}
                          renderToolbar={(graph) => {
                              let tools = [
                                  <NoneToolbar key={"none"} graph={graph}/>,
+                                 <MoveToolbar key="move" graph={graph}/>,
                                  <CircleToolbar key={"circle"} graph={graph}/>,
                                  <LineToolbar key={"line"} graph={graph}/>,
                                  <LinkToolbar key={"link"} graph={graph}/>,
@@ -568,6 +618,8 @@ class Example extends Component {
                          onAction={action => {
                              console.log(action);
                          }}
+                         original={this.state.original}
+                         scale={this.state.scale}
                          attrs={this.state.attrs}
                          selectMode={this.state.selectMode}
                          interval={this.state.interval}/>
