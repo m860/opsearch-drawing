@@ -46,8 +46,3 @@ const actions = [{
 	}];
 const ins = fromActions(actions);
 ```
-
-## TODO
-
-- [ ] 实现中断action
-- [x] playing模式时目前支持全局的时间间隔控制,需要添加每步的时间控制
