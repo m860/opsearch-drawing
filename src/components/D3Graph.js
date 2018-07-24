@@ -1596,7 +1596,8 @@ export class CircleToolbar extends PureComponent {
                                     const point = {
                                         x: graph.toLocalX(d3.event.offsetX),
                                         y: graph.toLocalY(d3.event.offsetY)
-                                    }
+                                    };
+                                    console.log("draw circle", `mouse point : ${d3.event.offsetX},${d3.event.offsetY},point:${point.x},${point.y}`)
                                     const drawing = new CircleDrawing({
                                         attrs: {
                                             cx: point.x,
@@ -2247,7 +2248,7 @@ export default class D3Graph extends Component {
             newState.attrs = nextProps.attrs;
         }
         if (nextProps.coordinateType !== this.state.coordinateType) {
-            newState.coordinateType = {$set: nextProps.coordinateType};
+            newState.coordinateType = nextProps.coordinateType;
         }
         if (this.state.interval !== nextProps.interval) {
             newState.interval = nextProps.interval;
