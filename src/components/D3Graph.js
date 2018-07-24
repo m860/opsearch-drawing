@@ -44,26 +44,25 @@ type ActionOptionType = {
  * action枚举
  * @readonly
  * @enum {string}
- * @property {string} draw - 绘画
- * @property {string} redraw - 重绘/更新
- * @property {string} select - 选择
- * @property {string} unselect - 反选
- * @property {string} delete - 删除
- * @property {string} clear - 清除所有图形
- * @property {string} undo - 撤销
- * @property {string} data - 数据操作
- * @property {string} input - 用户输入操作
  * */
 export const actionTypeEnums = {
+    /**绘画*/
     draw: "draw",
+    /**重绘/更新*/
     redraw: "redraw",
+    /**选择*/
     select: "select",
+    /**反选*/
     unselect: "unselect",
+    /**删除*/
     delete: "delete",
+    /**清除所有图形*/
     clear: "clear",
     // move: "move",
     // undo: "undo",
-    data: "data",
+    // /**绘画*/
+    // data: "data",
+    /**输入*/
     input: "input"
 };
 
