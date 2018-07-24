@@ -1965,6 +1965,7 @@ export default class D3Graph extends Component {
 
     /**
      * 将屏幕坐标转换成图形对应的坐标
+     * @private
      * @param screenX
      * @return {number}
      */
@@ -1977,6 +1978,7 @@ export default class D3Graph extends Component {
 
     /**
      * 将屏幕坐标转换成图形对应的坐标
+     * @private
      * @param screenY
      * @return {number}
      */
