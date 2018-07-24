@@ -2390,6 +2390,7 @@ var D3Graph = function (_Component) {
 
         /**
          * 将屏幕坐标转换成图形对应的坐标
+         * @private
          * @param screenX
          * @return {number}
          */
@@ -2405,6 +2406,7 @@ var D3Graph = function (_Component) {
 
         /**
          * 将屏幕坐标转换成图形对应的坐标
+         * @private
          * @param screenY
          * @return {number}
          */
