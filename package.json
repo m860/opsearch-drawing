@@ -1,5 +1,5 @@
 {
-  "name": "@m860/opserarch-drawing",
+  "name": "@m860/opsearch-drawing",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/m860/opserarch-drawing.git"
+    "url": "git+https://github.com/m860/opsearch-drawing.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/m860/opserarch-drawing/issues"
+    "url": "https://github.com/m860/opsearch-drawing/issues"
   },
-  "homepage": "https://github.com/m860/opserarch-drawing#readme",
+  "homepage": "https://github.com/m860/opsearch-drawing#readme",
   "devDependencies": {
     "autoprefixer": "^7.2.3",
     "babel-cli": "^6.26.0",
