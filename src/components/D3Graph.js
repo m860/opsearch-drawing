@@ -748,11 +748,11 @@ registerDrawing("RectDrawing", RectDrawing);
 export class NumberScaleDrawing extends Drawing {
     /**
      * @constructor
-     * @param {object} option
-     * @param {?{x:number,y:number}} option.original [{x:20,y:280}] - 刻度尺的原点位置,此原点的位置必须和D3Graph的original的原点位置保持一致
-     * @param {?number} option.xAxisLength [360] - x轴的长度
-     * @param {?number} option.yAxisLength [260] - y轴的长度
-     * @param {?number} option.scale [20] - 刻度尺中每个刻度对应多少个像素
+     * @param {object} [option]
+     * @param {?{x:number,y:number}} [option.original={x:20,y:280}] - 刻度尺的原点位置,此原点的位置必须和D3Graph的original的原点位置保持一致
+     * @param {?number} [option.xAxisLength=360] - x轴的长度
+     * @param {?number} [option.yAxisLength=260] - y轴的长度
+     * @param {?number} [option.scale=20] - 刻度尺中每个刻度对应多少个像素
      */
     constructor(option) {
         super(option);
