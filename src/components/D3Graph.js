@@ -1615,6 +1615,7 @@ export class LineToolbar extends PureComponent {
                                         x: graph.toLocalX(d3.event.offsetX),
                                         y: graph.toLocalY(d3.event.offsetY)
                                     };
+                                    console.log(point)
                                     const drawing = new LineDrawing({
                                         attrs: {
                                             x1: point.x,
@@ -1637,8 +1638,8 @@ export class LineToolbar extends PureComponent {
                                             graph.doActionsAsync([
                                                 new ReDrawAction(this._id, {
                                                     attrs: {
-                                                        x2: {$set: point.x},
-                                                        y2: {$set: point.y}
+                                                        x2: point.x,
+                                                        y2: point.y
                                                     }
                                                 })
                                             ])
@@ -2091,7 +2092,7 @@ export default class D3Graph extends Component {
                     let state = {};
                     if (action.params.state) {
                         for (let key in action.params.state) {
-                            state[key] = {$set: action.params.state[key]}
+                            state[key] = {$set: Object.assign({}, this.shapes[index][key], action.params.state[key])}
                         }
                     }
                     this.shapes[index] = update(this.shapes[index], state);
