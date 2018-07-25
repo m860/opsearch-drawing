@@ -631,10 +631,10 @@ export class LineDrawing extends Drawing {
             this.attrs.y1 += vec.y;
             this.attrs.y2 += vec.y;
             this.selection
-                .attr("x1", this.attrs.x1)
-                .attr("y1", this.attrs.y1)
-                .attr("x2", this.attrs.x2)
-                .attr("y2", this.attrs.y2);
+                .attr("x1", this.graph.toScreenX(this.attrs.x1))
+                .attr("y1", this.graph.toScreenY(this.attrs.y1))
+                .attr("x2", this.graph.toScreenX(this.attrs.x2))
+                .attr("y2", this.graph.toScreenY(this.attrs.y2));
             emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
@@ -685,8 +685,8 @@ export class CircleDrawing extends Drawing {
     }
 
     getLinkPoint() {
-        const x = this.graph.toLocalX(parseFloat(this.attrs.cx));
-        const y = this.graph.toLocalY(parseFloat(this.attrs.cy));
+        const x = parseFloat(this.attrs.cx);
+        const y = parseFloat(this.attrs.cy);
         return new Point(x, y);
     }
 
@@ -695,8 +695,8 @@ export class CircleDrawing extends Drawing {
             this.attrs.cx += vec.x;
             this.attrs.cy += vec.y;
             this.selection
-                .attr("cx", this.attrs.cx)
-                .attr("cy", this.attrs.cy);
+                .attr("cx", this.graph.toScreenX(this.attrs.cx))
+                .attr("cy", this.graph.toScreenY(this.attrs.cy));
             emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
@@ -750,8 +750,8 @@ export class DotDrawing extends Drawing {
             this.attrs.cx += vec.x;
             this.attrs.cy += vec.y;
             this.selection
-                .attr("cx", this.attrs.cx)
-                .attr("cy", this.attrs.cy);
+                .attr("cx", this.graph.toScreenX(this.attrs.cx))
+                .attr("cy", this.graph.toScreenY(this.attrs.cy));
             emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
@@ -1444,8 +1444,8 @@ export class TextCircleDrawing extends Drawing {
 
     getLinkPoint() {
         const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
-        const x = this.graph.toLocalX(parseFloat(circleAttrs.cx));
-        const y = this.graph.toLocalY(parseFloat(circleAttrs.cy));
+        const x = parseFloat(circleAttrs.cx);
+        const y = parseFloat(circleAttrs.cy);
         return new Point(x, y);
     }
 
@@ -1465,10 +1465,10 @@ export class TextCircleDrawing extends Drawing {
         if (this.selection) {
             this.circleAttrs.cx += vec.x;
             this.circleAttrs.cy += vec.y;
-            this.circleSelection.attr("cx", this.circleAttrs.cx)
-                .attr("cy", this.circleAttrs.cy);
-            this.textSelection.attr("x", this.circleAttrs.cx)
-                .attr("y", this.circleAttrs.cy);
+            this.circleSelection.attr("cx", this.graph.toScreenX(this.circleAttrs.cx))
+                .attr("cy", this.graph.toScreenY(this.circleAttrs.cy));
+            this.textSelection.attr("x", this.graph.toScreenX(this.circleAttrs.cx))
+                .attr("y", this.graph.toScreenY(this.circleAttrs.cy));
         }
     }
 }
@@ -1574,19 +1574,19 @@ export class NoneToolbar extends PureComponent {
                                 graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("click", () => {
-                                        const target = d3.event.target;
-                                        if (target) {
-                                            if (target.attributes) {
-                                                const shapeId = target.attributes["shape-id"] ? target.attributes["shape-id"].value : null;
-                                                if (shapeId) {
-                                                    const shape = this.props.graph.findShapeById(shapeId);
-                                                    if (shape) {
-                                                        shape.select();
-                                                    }
+                                    const target = d3.event.target;
+                                    if (target) {
+                                        if (target.attributes) {
+                                            const shapeId = target.attributes["shape-id"] ? target.attributes["shape-id"].value : null;
+                                            if (shapeId) {
+                                                const shape = this.props.graph.findShapeById(shapeId);
+                                                if (shape) {
+                                                    shape.select();
                                                 }
                                             }
                                         }
-                                    })
+                                    }
+                                })
                             }}
                             type={this.type}>
                 <path
@@ -1891,13 +1891,12 @@ export class MoveToolbar extends PureComponent {
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const target = d3.event.target;
-                                    console.dir(d3.event);
                                     if (target) {
                                         const shape = this.findShape(target);
                                         if (shape) {
                                             this._mouseDownPoint = {
-                                                x: d3.event.offsetX,
-                                                y: d3.event.offsetY
+                                                x: graph.toLocalX(d3.event.offsetX),
+                                                y: graph.toLocalY(d3.event.offsetY)
                                             };
                                             this._shape = shape;
                                         }
@@ -1906,14 +1905,15 @@ export class MoveToolbar extends PureComponent {
                                 })
                                     .on("mousemove", () => {
                                         if (this._mouseDownPoint) {
+                                            const point = {
+                                                x: graph.toLocalX(d3.event.offsetX),
+                                                y: graph.toLocalY(d3.event.offsetY)
+                                            };
                                             const vec = {
-                                                x: d3.event.offsetX - this._mouseDownPoint.x,
-                                                y: d3.event.offsetY - this._mouseDownPoint.y
+                                                x: point.x - this._mouseDownPoint.x,
+                                                y: point.y - this._mouseDownPoint.y
                                             };
-                                            this._mouseDownPoint = {
-                                                x: d3.event.offsetX,
-                                                y: d3.event.offsetY
-                                            };
+                                            this._mouseDownPoint = point;
                                             if (this._shape) {
                                                 this._shape.moveTo(vec);
                                             }
@@ -1922,8 +1922,8 @@ export class MoveToolbar extends PureComponent {
                                     .on("mouseup", () => {
                                         if (this._mouseDownPoint) {
                                             const vec = {
-                                                x: d3.event.offsetX - this._mouseDownPoint.x,
-                                                y: d3.event.offsetY - this._mouseDownPoint.y
+                                                x: graph.toLocalX(d3.event.offsetX) - this._mouseDownPoint.x,
+                                                y: graph.toLocalY(d3.event.offsetY) - this._mouseDownPoint.y
                                             };
                                             delete this._mouseDownPoint;
                                             if (this._shape) {
