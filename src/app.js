@@ -581,6 +581,9 @@ class Example extends Component {
                                                 }]),
                                             }, this.exec.bind(this));
                                         }
+                                        else {
+                                            alert("请选择一个图形")
+                                        }
                                     }}>平移(10,10)
                             </button>
                         </div>
