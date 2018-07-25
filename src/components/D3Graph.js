@@ -21,6 +21,8 @@ import UserInput from "./UserInput"
 const emitter = new EventEmitter();
 //toolbar 按钮切换
 const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
+//图形的位置发生变化
+const EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
 //#endregion
 
 /**
@@ -559,7 +561,7 @@ export class Drawing {
      * @param position
      */
     moveTo(vec) {
-        throw new Error("not implementation");
+        //throw new Error("not implementation");
     }
 }
 
@@ -602,9 +604,7 @@ export class LineDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("line");
-        this.selection.on("click", () => {
-            this.select();
-        }).on("mouseover", (a, b, eles) => {
+        this.selection.on("mouseover", (a, b, eles) => {
             if (eles.length > 0) {
                 const e = d3.select(eles[0]);
                 const width = parseFloat(e.attr("stroke-width"));
@@ -635,6 +635,7 @@ export class LineDrawing extends Drawing {
                 .attr("y1", this.attrs.y1)
                 .attr("x2", this.attrs.x2)
                 .attr("y2", this.attrs.y2);
+            emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
 }
@@ -681,9 +682,6 @@ export class CircleDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("circle");
-        this.selection.on("click", () => {
-            this.select();
-        })
     }
 
     getLinkPoint() {
@@ -696,9 +694,10 @@ export class CircleDrawing extends Drawing {
         if (this.selection) {
             this.attrs.cx += vec.x;
             this.attrs.cy += vec.y;
-            this.selection.transition()
+            this.selection
                 .attr("cx", this.attrs.cx)
                 .attr("cy", this.attrs.cy);
+            emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
 }
@@ -744,18 +743,16 @@ export class DotDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("circle");
-        this.selection.on("click", () => {
-            this.select();
-        })
     }
 
     moveTo(vec) {
         if (this.selection) {
             this.attrs.cx += vec.x;
             this.attrs.cy += vec.y;
-            this.selection.transition()
+            this.selection
                 .attr("cx", this.attrs.cx)
                 .attr("cy", this.attrs.cy);
+            emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
 }
@@ -795,9 +792,6 @@ export class RectDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("path");
-        this.selection.on("click", () => {
-            this.select();
-        });
     }
 }
 
@@ -972,9 +966,7 @@ export class ArrowLinkDrawing extends Drawing {
         this.source = this.graph.findShapeById(this.sourceId);
         this.target = this.graph.findShapeById(this.targetId);
         this.selection = d3.select(graph.ele).append("path");
-        this.selection.on("click", () => {
-            this.select();
-        }).on("mouseover", (a, b, eles) => {
+        this.selection.on("mouseover", (a, b, eles) => {
             if (eles.length > 0) {
                 const e = d3.select(eles[0]);
                 const width = parseFloat(e.attr("stroke-width"));
@@ -1122,6 +1114,7 @@ export class LinkDrawing extends Drawing {
         this.label = getPath(option, "label");
         this.labelAttrs = getPath(option, "labelAttrs");
         this.labelSelection = null;
+        this.listeners = [];
     }
 
     get defaultAttrs() {
@@ -1137,9 +1130,7 @@ export class LinkDrawing extends Drawing {
         this.source = this.graph.findShapeById(this.sourceId);
         this.target = this.graph.findShapeById(this.targetId);
         this.selection = d3.select(graph.ele).append("line");
-        this.selection.on("click", () => {
-            this.select();
-        }).on("mouseover", (a, b, eles) => {
+        this.selection.on("mouseover", (a, b, eles) => {
             if (eles.length > 0) {
                 const e = d3.select(eles[0]);
                 const width = parseFloat(e.attr("stroke-width"));
@@ -1158,6 +1149,13 @@ export class LinkDrawing extends Drawing {
             }
         });
         this.labelSelection = d3.select(graph.ele).append("text");
+        this.listeners.push(
+            emitter.addListener(EVENT_DRAWING_POSITION_CHANGE, shape => {
+                if (shape.id === this.sourceId || shape.id === this.targetId) {
+                    this.render();
+                }
+            })
+        )
     }
 
     remove() {
@@ -1166,6 +1164,7 @@ export class LinkDrawing extends Drawing {
             this.labelSelection.remove();
         }
         this.labelSelection = null;
+        this.listeners.forEach(listener => listener.remove());
     }
 
     renderLabel(x, y) {
@@ -1248,9 +1247,6 @@ export class PathDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("path");
-        this.selection.on("click", () => {
-            this.select();
-        });
     }
 
     render() {
@@ -1308,9 +1304,6 @@ export class TextDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("text");
-        this.selection.on("click", () => {
-            this.select();
-        });
     }
 }
 
@@ -1437,7 +1430,6 @@ export class TextCircleDrawing extends Drawing {
         this.circleSelection = this.selection.append("circle");
         //add text
         this.textSelection = this.selection.append("text");
-        this.selection.on("click", this.select.bind(this));
     }
 
     render() {
@@ -1579,10 +1571,22 @@ export class NoneToolbar extends PureComponent {
                             }}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
-                                svg.on("mousedown", null)
-                                    .on("mousemove", null)
-                                    .on("mouseup", null)
+                                svg.on("click", () => {
+                                        const target = d3.event.target;
+                                        if (target) {
+                                            if (target.attributes) {
+                                                const shapeId = target.attributes["shape-id"] ? target.attributes["shape-id"].value : null;
+                                                if (shapeId) {
+                                                    const shape = this.props.graph.findShapeById(shapeId);
+                                                    if (shape) {
+                                                        shape.select();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    })
                             }}
                             type={this.type}>
                 <path
@@ -1609,6 +1613,7 @@ export class LineToolbar extends PureComponent {
             <DrawingToolbar style={this.props.style}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const point = {
@@ -1672,6 +1677,7 @@ export class CircleToolbar extends PureComponent {
             <DrawingToolbar style={this.props.style}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(this.props.graph.ele);
                                 svg.on("mousedown", async () => {
                                     const point = {
@@ -1727,6 +1733,7 @@ export class LinkToolbar extends PureComponent {
             <DrawingToolbar style={this.props.style}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const event = d3.event;
@@ -1786,6 +1793,7 @@ export class ArrowLinkToolbar extends PureComponent {
             <DrawingToolbar style={this.props.style}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", () => {
                                     const event = d3.event;
@@ -1828,6 +1836,7 @@ export class TextCircleToolbar extends PureComponent {
             <DrawingToolbar style={this.props.style}
                             onClick={() => {
                                 const {graph} = this.props;
+                                graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", async () => {
                                     const point = {
@@ -1858,14 +1867,72 @@ export class TextCircleToolbar extends PureComponent {
 
 export class MoveToolbar extends PureComponent {
     static propTypes = {
-        onClick: PropTypes.func,
         style: PropTypes.object,
         graph: PropTypes.object.isRequired
     };
 
+    findShape(ele) {
+        if (ele.attributes) {
+            const shapeId = ele.attributes["shape-id"] ? ele.attributes["shape-id"].value : null;
+            console.log("MoveAction", `shape-id=${shapeId}`);
+            if (shapeId) {
+                return this.props.graph.findShapeById(shapeId);
+            }
+        }
+        return null;
+    }
+
     render() {
         return (
             <DrawingToolbar style={this.props.style}
+                            onClick={() => {
+                                const {graph} = this.props;
+                                graph.removeAllSvgEvent();
+                                const svg = d3.select(graph.ele);
+                                svg.on("mousedown", () => {
+                                    const target = d3.event.target;
+                                    console.dir(d3.event);
+                                    if (target) {
+                                        const shape = this.findShape(target);
+                                        if (shape) {
+                                            this._mouseDownPoint = {
+                                                x: d3.event.offsetX,
+                                                y: d3.event.offsetY
+                                            };
+                                            this._shape = shape;
+                                        }
+                                    }
+
+                                })
+                                    .on("mousemove", () => {
+                                        if (this._mouseDownPoint) {
+                                            const vec = {
+                                                x: d3.event.offsetX - this._mouseDownPoint.x,
+                                                y: d3.event.offsetY - this._mouseDownPoint.y
+                                            };
+                                            this._mouseDownPoint = {
+                                                x: d3.event.offsetX,
+                                                y: d3.event.offsetY
+                                            };
+                                            if (this._shape) {
+                                                this._shape.moveTo(vec);
+                                            }
+                                        }
+                                    })
+                                    .on("mouseup", () => {
+                                        if (this._mouseDownPoint) {
+                                            const vec = {
+                                                x: d3.event.offsetX - this._mouseDownPoint.x,
+                                                y: d3.event.offsetY - this._mouseDownPoint.y
+                                            };
+                                            delete this._mouseDownPoint;
+                                            if (this._shape) {
+                                                this._shape.moveTo(vec);
+                                                delete this._shape;
+                                            }
+                                        }
+                                    })
+                            }}
                             attrs={{
                                 ...Toolbar.defaultProps.attrs,
                                 viewBox: "0 0 32 32"
@@ -2372,6 +2439,14 @@ export default class D3Graph extends Component {
         if (this.timer) {
             clearTimeout(this.timer);
         }
+    }
+
+    removeAllSvgEvent() {
+        const svg = d3.select(this.ele);
+        svg.on("click", null)
+            .on("mousedown", null)
+            .on("mousemove", null)
+            .on("mouseup", null)
     }
 }
 //#endregion
