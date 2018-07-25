@@ -58,7 +58,8 @@ export const actionTypeEnums = {
     delete: "delete",
     /**清除所有图形*/
     clear: "clear",
-    // move: "move",
+    /**移动*/
+    move: "move",
     // undo: "undo",
     // /**绘画*/
     // data: "data",
@@ -340,6 +341,26 @@ export class ReDrawAction extends Action {
 }
 
 actionIndex[actionTypeEnums.redraw] = ReDrawAction;
+
+/**
+ * 移动action
+ */
+export class MoveAction extends Action {
+    /**
+     * @constructor
+     * @param {string} shapeId - 需要移动的图形的id
+     * @param {object} vec - 位移
+     */
+    constructor(shapeId, vec) {
+        super(actionTypeEnums.move, {
+            id: shapeId,
+            vec: vec
+        })
+    }
+}
+
+actionIndex[actionTypeEnums.move] = MoveAction;
+
 //#endregion
 
 //#region Drawing
@@ -427,7 +448,8 @@ export class Drawing {
      * 绘制,更新selection相关
      * */
     render() {
-        this.updateAttrs(this.selection, this.combineAttrs(this.defaultAttrs, this.attrs, this.selectedAttrs, null));
+        const attrs = this.combineAttrs(this.defaultAttrs, this.attrs, this.selectedAttrs, null);
+        this.updateAttrs(this.selection, attrs);
         if (this.text) {
             this.selection.text(this.text);
         }
@@ -452,7 +474,6 @@ export class Drawing {
      * 批量更新attrs
      * */
     updateAttrs(selection, attrs) {
-        this.attrs = attrs;
         if (selection) {
             selection.call(self => {
                 for (let key in attrs) {
@@ -486,8 +507,10 @@ export class Drawing {
     combineAttrs(defaultAttrs = {}, attrs = {}, defaultSelectedAttrs, selectedAttrs) {
         let result = Object.assign({},
             defaultAttrs,
-            attrs,
-            this.selected ? Object.assign({}, defaultSelectedAttrs, selectedAttrs) : {});
+            attrs);
+        if (this.selected) {
+            result = Object.assign({}, result, defaultSelectedAttrs, selectedAttrs);
+        }
         if (!isNullOrUndefined(result.x)) {
             result.x = this.graph.toScreenX(result.x);
         }
@@ -529,6 +552,14 @@ export class Drawing {
                 text: this.text
             }
         }
+    }
+
+    /**
+     * 移动图形到目标位置
+     * @param position
+     */
+    moveTo(vec) {
+        throw new Error("not implementation");
     }
 }
 
@@ -648,6 +679,15 @@ export class CircleDrawing extends Drawing {
         return new Point(x, y);
     }
 
+    moveTo(vec) {
+        if (this.selection) {
+            this.attrs.cx += vec.x;
+            this.attrs.cy += vec.y;
+            this.selection.transition()
+                .attr("cx", this.attrs.cx)
+                .attr("cy", this.attrs.cy);
+        }
+    }
 }
 
 registerDrawing("CircleDrawing", CircleDrawing);
@@ -696,6 +736,15 @@ export class DotDrawing extends Drawing {
         })
     }
 
+    moveTo(vec) {
+        if (this.selection) {
+            this.attrs.cx += vec.x;
+            this.attrs.cy += vec.y;
+            this.selection.transition()
+                .attr("cx", this.attrs.cx)
+                .attr("cy", this.attrs.cy);
+        }
+    }
 }
 
 registerDrawing("DotDrawing", DotDrawing);
@@ -2081,6 +2130,14 @@ export default class D3Graph extends Component {
             case actionTypeEnums.input: {
                 //显示用户输入
                 await this.showUserInputPromise(action);
+                break;
+            }
+            case actionTypeEnums.move: {
+                console.log('move action', action);
+                const shape = this.shapes.find(f => f.id === action.params.id);
+                if (shape) {
+                    shape.moveTo(action.params.vec);
+                }
                 break;
             }
         }
