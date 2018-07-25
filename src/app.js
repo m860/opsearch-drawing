@@ -28,7 +28,7 @@ import D3Graph, {
     TextCircleDrawing,
     InputAction,
     TextCircleToolbar,
-    MoveToolbar
+    MoveToolbar, MoveAction, actionTypeEnums
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -211,8 +211,8 @@ class Example extends Component {
                                     actionJson: JSON.stringify([{
                                         type: "draw",
                                         params: [{
-                                            type:"NumberScaleDrawing",
-                                            option:this.numberScale
+                                            type: "NumberScaleDrawing",
+                                            option: this.numberScale
                                         }]
                                     }])
                                 }, this.exec.bind(this));
@@ -565,6 +565,26 @@ class Example extends Component {
                                         })
                                     }}>
                                 隐藏/显示TextCircle Tool
+                            </button>
+                            <button type="button"
+                                    onClick={() => {
+                                        const selected = this.graph.getSelectedShapes();
+                                        if (selected.length > 0) {
+                                            const first = selected[0];
+                                            this.setState({
+                                                actionJson: JSON.stringify([{
+                                                    type: actionTypeEnums.move,
+                                                    params: [first.id, {
+                                                        x: 10,
+                                                        y: 10
+                                                    }]
+                                                }]),
+                                            }, this.exec.bind(this));
+                                        }
+                                        else {
+                                            alert("请选择一个图形")
+                                        }
+                                    }}>平移(10,10)
                             </button>
                         </div>
                     </div>
