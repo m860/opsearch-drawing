@@ -624,6 +624,19 @@ export class LineDrawing extends Drawing {
         })
     }
 
+    moveTo(vec) {
+        if (this.selection) {
+            this.attrs.x1 += vec.x;
+            this.attrs.x2 += vec.x;
+            this.attrs.y1 += vec.y;
+            this.attrs.y2 += vec.y;
+            this.selection
+                .attr("x1", this.attrs.x1)
+                .attr("y1", this.attrs.y1)
+                .attr("x2", this.attrs.x2)
+                .attr("y2", this.attrs.y2);
+        }
+    }
 }
 
 registerDrawing("LineDrawing", LineDrawing);
@@ -1453,6 +1466,17 @@ export class TextCircleDrawing extends Drawing {
                 circleAttrs: copy(this.circleAttrs),
                 textAttrs: copy(this.textAttrs),
             }
+        }
+    }
+
+    moveTo(vec) {
+        if (this.selection) {
+            this.circleAttrs.cx += vec.x;
+            this.circleAttrs.cy += vec.y;
+            this.circleSelection.attr("cx", this.circleAttrs.cx)
+                .attr("cy", this.circleAttrs.cy);
+            this.textSelection.attr("x", this.circleAttrs.cx)
+                .attr("y", this.circleAttrs.cy);
         }
     }
 }
