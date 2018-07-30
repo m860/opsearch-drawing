@@ -1443,9 +1443,11 @@ export class TextCircleDrawing extends Drawing {
     }
 
     getLinkPoint() {
-        const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
-        const x = parseFloat(circleAttrs.cx);
-        const y = parseFloat(circleAttrs.cy);
+        // console.log("TextCircleDrawing",this.circleAttrs);
+        // const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
+        // console.log("circle attrs",circleAttrs);
+        const x = parseFloat(this.circleAttrs.cx);
+        const y = parseFloat(this.circleAttrs.cy);
         return new Point(x, y);
     }
 
@@ -1469,6 +1471,7 @@ export class TextCircleDrawing extends Drawing {
                 .attr("cy", this.graph.toScreenY(this.circleAttrs.cy));
             this.textSelection.attr("x", this.graph.toScreenX(this.circleAttrs.cx))
                 .attr("y", this.graph.toScreenY(this.circleAttrs.cy));
+            emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
         }
     }
 }
@@ -1718,6 +1721,7 @@ export class LinkToolbar extends PureComponent {
         const {path} = event;
         for (let i = 0; i < path.length; i++) {
             const ele = path[i];
+            console.dir(ele)
             if (ele && ele.attributes) {
                 const node = ele.attributes["shape-id"];
                 if (node) {
@@ -1839,10 +1843,12 @@ export class TextCircleToolbar extends PureComponent {
                                 graph.removeAllSvgEvent();
                                 const svg = d3.select(graph.ele);
                                 svg.on("mousedown", async () => {
+                                    console.log("TextCircleToolbar", `click point : ${d3.event.offsetX},${d3.event.offsetY}`)
                                     const point = {
                                         x: graph.toLocalX(d3.event.offsetX),
                                         y: graph.toLocalY(d3.event.offsetY)
                                     };
+                                    console.log("TextCircleToolbar", `local point : ${point.x},${point.y}`)
                                     const drawing = new TextCircleDrawing({
                                         circleAttrs: {
                                             cx: point.x,
@@ -2159,9 +2165,17 @@ export default class D3Graph extends Component {
                     let state = {};
                     if (action.params.state) {
                         for (let key in action.params.state) {
-                            state[key] = {$set: Object.assign({}, this.shapes[index][key], action.params.state[key])}
+                            console.log("redraw",`${key} typeof ${typeof this.shapes[index][key]}`)
+                            switch (typeof this.shapes[index][key]) {
+                                case "object":
+                                    state[key] = {$set: Object.assign({}, this.shapes[index][key], action.params.state[key])};
+                                    break;
+                                default:
+                                    state[key] = {$set: action.params.state[key]};
+                            }
                         }
                     }
+                    console.log("redraw new state", state);
                     this.shapes[index] = update(this.shapes[index], state);
                     this.drawShapes([this.shapes[index]]);
                 }
