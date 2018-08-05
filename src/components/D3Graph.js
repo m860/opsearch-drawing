@@ -1253,9 +1253,9 @@ export class PathDrawing extends Drawing {
         if (!this.attrs.d) {
             let d = this.d.map((point, index) => {
                 if (index === 0) {
-                    return `M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`
+                    return `M ${this.graph.toLocalX(point.x)} ${this.graph.toLocalY(point.y)}`
                 }
-                return `L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`;
+                return `L ${this.graph.toLocalX(point.x)} ${this.graph.toLocalY(point.y)}`;
             });
             d.push("Z");
             this.attrs.d = d.join(" ");
@@ -2165,7 +2165,7 @@ export default class D3Graph extends Component {
                     let state = {};
                     if (action.params.state) {
                         for (let key in action.params.state) {
-                            console.log("redraw",`${key} typeof ${typeof this.shapes[index][key]}`)
+                            console.log("redraw", `${key} typeof ${typeof this.shapes[index][key]}`)
                             switch (typeof this.shapes[index][key]) {
                                 case "object":
                                     state[key] = {$set: Object.assign({}, this.shapes[index][key], action.params.state[key])};
