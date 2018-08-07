@@ -951,6 +951,7 @@ export class ArrowLinkDrawing extends Drawing {
         this.label = getPath(option, "label");
         this.labelAttrs = getPath(option, "labelAttrs");
         this.labelSelection = null;
+        this.listeners=[];
     }
 
     get defaultAttrs() {
@@ -989,6 +990,13 @@ export class ArrowLinkDrawing extends Drawing {
             }
         });
         this.labelSelection = d3.select(graph.ele).append("text");
+        this.listeners.push(
+            emitter.addListener(EVENT_DRAWING_POSITION_CHANGE, shape => {
+                if (shape.id === this.sourceId || shape.id === this.targetId) {
+                    this.render();
+                }
+            })
+        )
     }
 
     remove() {
@@ -1516,6 +1524,255 @@ export class DrawingToolbar extends PureComponent {
         attrs: PropTypes.object
     };
 
+    static getShapeID = (event) => {
+        console.dir(event);
+        const ele = event.target;
+        if (ele.attributes) {
+            const node = ele.attributes["shape-id"];
+            if (node) {
+                return node.nodeValue;
+            }
+        }
+        return null
+    }
+
+    static findShape = (graph, ele) => {
+        if (ele.attributes) {
+            const shapeId = ele.attributes["shape-id"] ? ele.attributes["shape-id"].value : null;
+            console.log("MoveAction", `shape-id=${shapeId}`);
+            if (shapeId) {
+                return graph.findShapeById(shapeId);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Toolbar的handler
+     * @type {{setNoneHandler: DrawingToolbar.handlers.setNoneHandler, setLineDrawHandler: DrawingToolbar.handlers.setLineDrawHandler, setCircleDrawHandler: DrawingToolbar.handlers.setCircleDrawHandler, setLinkDrawHandler: DrawingToolbar.handlers.setLinkDrawHandler, setArrowLinkDrawHandler: DrawingToolbar.handlers.setArrowLinkDrawHandler, setTextCircleDrawHandler: DrawingToolbar.handlers.setTextCircleDrawHandler, setMoveHandler: DrawingToolbar.handlers.setMoveHandler}}
+     */
+    static handlers = {
+        /**
+         * 移除到画布的所有操作
+         * @param graph
+         */
+        setNoneHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("click", () => {
+                const target = d3.event.target;
+                if (target) {
+                    if (target.attributes) {
+                        const shapeId = target.attributes["shape-id"] ? target.attributes["shape-id"].value : null;
+                        if (shapeId) {
+                            const shape = graph.findShapeById(shapeId);
+                            if (shape) {
+                                shape.select();
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        /**
+         * 画线
+         * @param graph
+         */
+        setLineDrawHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", () => {
+                const point = {
+                    x: graph.toLocalX(d3.event.offsetX),
+                    y: graph.toLocalY(d3.event.offsetY)
+                };
+                const drawing = new LineDrawing({
+                    attrs: {
+                        x1: point.x,
+                        y1: point.y,
+                        x2: point.x,
+                        y2: point.y
+                    }
+                });
+                this._id = drawing.id;
+                graph.doActionsAsync([
+                    new DrawAction(drawing)
+                ])
+            })
+                .on("mousemove", () => {
+                    if (this._id) {
+                        const point = {
+                            x: graph.toLocalX(d3.event.offsetX),
+                            y: graph.toLocalY(d3.event.offsetY)
+                        };
+                        graph.doActionsAsync([
+                            new ReDrawAction(this._id, {
+                                attrs: {
+                                    x2: point.x,
+                                    y2: point.y
+                                }
+                            })
+                        ])
+                    }
+                })
+                .on("mouseup", () => {
+                    delete this._id;
+                })
+        },
+        /**
+         * 画圈
+         * @param graph
+         */
+        setCircleDrawHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", async () => {
+                const point = {
+                    x: graph.toLocalX(d3.event.offsetX),
+                    y: graph.toLocalY(d3.event.offsetY)
+                };
+                console.log("draw circle", `mouse point : ${d3.event.offsetX},${d3.event.offsetY},point:${point.x},${point.y}`)
+                const drawing = new CircleDrawing({
+                    attrs: {
+                        cx: point.x,
+                        cy: point.y
+                    }
+                })
+                await graph.doActionsAsync([
+                    new DrawAction(drawing)
+                ])
+            })
+        },
+        /**
+         * 画link
+         * @param graph
+         */
+        setLinkDrawHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", () => {
+                const event = d3.event;
+                console.dir(this);
+                this._sourceID = DrawingToolbar.getShapeID(event);
+            }).on("mouseup", () => {
+                const event = d3.event;
+                const targetID = DrawingToolbar.getShapeID(event);
+                if (this._sourceID && targetID) {
+                    graph.doActionsAsync([
+                        new DrawAction(new LinkDrawing({
+                            sourceId: this._sourceID,
+                            targetId: targetID
+                        }))
+                    ])
+                }
+                delete this._sourceID;
+            })
+        },
+        /**
+         * 画带箭头的link
+         * @param graph
+         */
+        setArrowLinkDrawHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", () => {
+                const event = d3.event;
+                this._sourceID = DrawingToolbar.getShapeID(event);
+                console.log(`arrow link source id = ${this._sourceID}`)
+            }).on("mouseup", () => {
+                const event = d3.event;
+                const targetID = DrawingToolbar.getShapeID(event);
+                console.log(`arrow link target id = ${targetID}`);
+                if (this._sourceID && targetID) {
+                    graph.doActionsAsync([
+                        new DrawAction(new ArrowLinkDrawing({
+                            sourceId: this._sourceID,
+                            targetId: targetID
+                        }))
+                    ])
+                }
+                delete this._sourceID;
+            })
+        },
+        /**
+         * 画带圈的文本
+         * @param graph
+         */
+        setTextCircleDrawHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", async () => {
+                console.log("TextCircleToolbar", `click point : ${d3.event.offsetX},${d3.event.offsetY}`)
+                const point = {
+                    x: graph.toLocalX(d3.event.offsetX),
+                    y: graph.toLocalY(d3.event.offsetY)
+                };
+                console.log("TextCircleToolbar", `local point : ${point.x},${point.y}`)
+                const drawing = new TextCircleDrawing({
+                    circleAttrs: {
+                        cx: point.x,
+                        cy: point.y
+                    },
+                    text: "A"
+                })
+                await graph.doActionsAsync([
+                    new DrawAction(drawing)
+                ])
+            })
+        },
+        /**
+         * 移动
+         * @param graph
+         */
+        setMoveHandler: function (graph) {
+            graph.removeAllSvgEvent();
+            const svg = d3.select(graph.ele);
+            svg.on("mousedown", () => {
+                const target = d3.event.target;
+                if (target) {
+                    const shape = DrawingToolbar.findShape(graph, target);
+                    if (shape) {
+                        this._mouseDownPoint = {
+                            x: graph.toLocalX(d3.event.offsetX),
+                            y: graph.toLocalY(d3.event.offsetY)
+                        };
+                        this._shape = shape;
+                    }
+                }
+
+            })
+                .on("mousemove", () => {
+                    if (this._mouseDownPoint) {
+                        const point = {
+                            x: graph.toLocalX(d3.event.offsetX),
+                            y: graph.toLocalY(d3.event.offsetY)
+                        };
+                        const vec = {
+                            x: point.x - this._mouseDownPoint.x,
+                            y: point.y - this._mouseDownPoint.y
+                        };
+                        this._mouseDownPoint = point;
+                        if (this._shape) {
+                            this._shape.moveTo(vec);
+                        }
+                    }
+                })
+                .on("mouseup", () => {
+                    if (this._mouseDownPoint) {
+                        const vec = {
+                            x: graph.toLocalX(d3.event.offsetX) - this._mouseDownPoint.x,
+                            y: graph.toLocalY(d3.event.offsetY) - this._mouseDownPoint.y
+                        };
+                        delete this._mouseDownPoint;
+                        if (this._shape) {
+                            this._shape.moveTo(vec);
+                            delete this._shape;
+                        }
+                    }
+                })
+        }
+    };
+
     constructor(props) {
         super(props);
         this.listener = null;
@@ -1572,25 +1829,7 @@ export class NoneToolbar extends PureComponent {
                                 ...Toolbar.defaultProps.attrs,
                                 viewBox: "0 0 512.001 512.001"
                             }}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("click", () => {
-                                    const target = d3.event.target;
-                                    if (target) {
-                                        if (target.attributes) {
-                                            const shapeId = target.attributes["shape-id"] ? target.attributes["shape-id"].value : null;
-                                            if (shapeId) {
-                                                const shape = this.props.graph.findShapeById(shapeId);
-                                                if (shape) {
-                                                    shape.select();
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                            }}
+                            onClick={DrawingToolbar.handlers.setNoneHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <path
                     style={{transform: "scale(0.5)", transformOrigin: "center"}}
@@ -1614,49 +1853,7 @@ export class LineToolbar extends PureComponent {
     render() {
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("mousedown", () => {
-                                    const point = {
-                                        x: graph.toLocalX(d3.event.offsetX),
-                                        y: graph.toLocalY(d3.event.offsetY)
-                                    };
-                                    console.log(point)
-                                    const drawing = new LineDrawing({
-                                        attrs: {
-                                            x1: point.x,
-                                            y1: point.y,
-                                            x2: point.x,
-                                            y2: point.y
-                                        }
-                                    });
-                                    this._id = drawing.id;
-                                    graph.doActionsAsync([
-                                        new DrawAction(drawing)
-                                    ])
-                                })
-                                    .on("mousemove", () => {
-                                        if (this._id) {
-                                            const point = {
-                                                x: graph.toLocalX(d3.event.offsetX),
-                                                y: graph.toLocalY(d3.event.offsetY)
-                                            };
-                                            graph.doActionsAsync([
-                                                new ReDrawAction(this._id, {
-                                                    attrs: {
-                                                        x2: point.x,
-                                                        y2: point.y
-                                                    }
-                                                })
-                                            ])
-                                        }
-                                    })
-                                    .on("mouseup", () => {
-                                        delete this._id;
-                                    })
-                            }}
+                            onClick={DrawingToolbar.handlers.setLineDrawHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <line x1={10} y1={10} x2={30} y2={30} stroke={"#888888"}></line>
             </DrawingToolbar>
@@ -1678,27 +1875,7 @@ export class CircleToolbar extends PureComponent {
     render() {
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(this.props.graph.ele);
-                                svg.on("mousedown", async () => {
-                                    const point = {
-                                        x: graph.toLocalX(d3.event.offsetX),
-                                        y: graph.toLocalY(d3.event.offsetY)
-                                    };
-                                    console.log("draw circle", `mouse point : ${d3.event.offsetX},${d3.event.offsetY},point:${point.x},${point.y}`)
-                                    const drawing = new CircleDrawing({
-                                        attrs: {
-                                            cx: point.x,
-                                            cy: point.y
-                                        }
-                                    })
-                                    await graph.doActionsAsync([
-                                        new DrawAction(drawing)
-                                    ])
-                                })
-                            }}
+                            onClick={DrawingToolbar.handlers.setCircleDrawHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <circle cx={20} cy={20} r={8} stroke={"#888888"} fill={"#888888"}></circle>
             </DrawingToolbar>
@@ -1717,45 +1894,25 @@ export class LinkToolbar extends PureComponent {
         return "LinkDrawing";
     }
 
-    getShapeID(event) {
-        const {path} = event;
-        for (let i = 0; i < path.length; i++) {
-            const ele = path[i];
-            console.dir(ele)
-            if (ele && ele.attributes) {
-                const node = ele.attributes["shape-id"];
-                if (node) {
-                    return node.nodeValue;
-                }
-            }
-        }
-        return null
-    }
+    // getShapeID(event) {
+    //     const {path} = event;
+    //     for (let i = 0; i < path.length; i++) {
+    //         const ele = path[i];
+    //         console.dir(ele)
+    //         if (ele && ele.attributes) {
+    //             const node = ele.attributes["shape-id"];
+    //             if (node) {
+    //                 return node.nodeValue;
+    //             }
+    //         }
+    //     }
+    //     return null
+    // }
 
     render() {
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("mousedown", () => {
-                                    const event = d3.event;
-                                    this._sourceID = this.getShapeID(event);
-                                }).on("mouseup", () => {
-                                    const event = d3.event;
-                                    const targetID = this.getShapeID(event);
-                                    if (this._sourceID && targetID) {
-                                        graph.doActionsAsync([
-                                            new DrawAction(new LinkDrawing({
-                                                sourceId: this._sourceID,
-                                                targetId: targetID
-                                            }))
-                                        ])
-                                    }
-                                    delete this._sourceID;
-                                })
-                            }}
+                            onClick={DrawingToolbar.handlers.setLinkDrawHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <circle cx={10} cy={10} r={2} stroke={"#888888"} fill={"#888888"}></circle>
                 <circle cx={30} cy={30} r={2} stroke={"#888888"} fill={"#888888"}></circle>
@@ -1776,15 +1933,6 @@ export class ArrowLinkToolbar extends PureComponent {
         return "ArrowLinkDrawing";
     }
 
-    getShapeID(ele) {
-        try {
-            return ele.attributes['shape-id'].nodeValue;
-        }
-        catch (ex) {
-            return null;
-        }
-    }
-
     render() {
         const arrowPoint = getArrowPoints({x: 20, y: 25}, {x: 30, y: 30}, 5);
         const arrowPath = arrowPoint.map((p, i) => {
@@ -1795,27 +1943,7 @@ export class ArrowLinkToolbar extends PureComponent {
         });
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("mousedown", () => {
-                                    const event = d3.event;
-                                    this._sourceID = this.getShapeID(event.target);
-                                }).on("mouseup", () => {
-                                    const event = d3.event;
-                                    const targetID = this.getShapeID(event.target);
-                                    if (this._sourceID && targetID) {
-                                        graph.doActionsAsync([
-                                            new DrawAction(new ArrowLinkDrawing({
-                                                sourceId: this._sourceID,
-                                                targetId: targetID
-                                            }))
-                                        ])
-                                    }
-                                    delete this._sourceID;
-                                })
-                            }}
+                            onClick={DrawingToolbar.handlers.setArrowLinkDrawHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <path d="M 10 10 S 20 15, 20 20 S 20 25, 30 30" stroke={"#888888"} fill={"transparent"}></path>
                 <path d={[...arrowPath, "Z"].join(" ")} stroke={"#888888"} fill={"#888888"}></path>
@@ -1838,29 +1966,7 @@ export class TextCircleToolbar extends PureComponent {
     render() {
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("mousedown", async () => {
-                                    console.log("TextCircleToolbar", `click point : ${d3.event.offsetX},${d3.event.offsetY}`)
-                                    const point = {
-                                        x: graph.toLocalX(d3.event.offsetX),
-                                        y: graph.toLocalY(d3.event.offsetY)
-                                    };
-                                    console.log("TextCircleToolbar", `local point : ${point.x},${point.y}`)
-                                    const drawing = new TextCircleDrawing({
-                                        circleAttrs: {
-                                            cx: point.x,
-                                            cy: point.y
-                                        },
-                                        text: "A"
-                                    })
-                                    await graph.doActionsAsync([
-                                        new DrawAction(drawing)
-                                    ])
-                                })
-                            }}
+                            onClick={DrawingToolbar.handlers.setTextCircleDrawHandler.bind(this, this.props.graph)}
                             type={this.type}>
                 <circle cx={20} cy={20} r={14} stroke={"black"} fill={"transparent"}></circle>
                 <text x={20} y={20} fill={"black"} style={{fontSize: 12}} textAnchor={"middle"}
@@ -1877,68 +1983,10 @@ export class MoveToolbar extends PureComponent {
         graph: PropTypes.object.isRequired
     };
 
-    findShape(ele) {
-        if (ele.attributes) {
-            const shapeId = ele.attributes["shape-id"] ? ele.attributes["shape-id"].value : null;
-            console.log("MoveAction", `shape-id=${shapeId}`);
-            if (shapeId) {
-                return this.props.graph.findShapeById(shapeId);
-            }
-        }
-        return null;
-    }
-
     render() {
         return (
             <DrawingToolbar style={this.props.style}
-                            onClick={() => {
-                                const {graph} = this.props;
-                                graph.removeAllSvgEvent();
-                                const svg = d3.select(graph.ele);
-                                svg.on("mousedown", () => {
-                                    const target = d3.event.target;
-                                    if (target) {
-                                        const shape = this.findShape(target);
-                                        if (shape) {
-                                            this._mouseDownPoint = {
-                                                x: graph.toLocalX(d3.event.offsetX),
-                                                y: graph.toLocalY(d3.event.offsetY)
-                                            };
-                                            this._shape = shape;
-                                        }
-                                    }
-
-                                })
-                                    .on("mousemove", () => {
-                                        if (this._mouseDownPoint) {
-                                            const point = {
-                                                x: graph.toLocalX(d3.event.offsetX),
-                                                y: graph.toLocalY(d3.event.offsetY)
-                                            };
-                                            const vec = {
-                                                x: point.x - this._mouseDownPoint.x,
-                                                y: point.y - this._mouseDownPoint.y
-                                            };
-                                            this._mouseDownPoint = point;
-                                            if (this._shape) {
-                                                this._shape.moveTo(vec);
-                                            }
-                                        }
-                                    })
-                                    .on("mouseup", () => {
-                                        if (this._mouseDownPoint) {
-                                            const vec = {
-                                                x: graph.toLocalX(d3.event.offsetX) - this._mouseDownPoint.x,
-                                                y: graph.toLocalY(d3.event.offsetY) - this._mouseDownPoint.y
-                                            };
-                                            delete this._mouseDownPoint;
-                                            if (this._shape) {
-                                                this._shape.moveTo(vec);
-                                                delete this._shape;
-                                            }
-                                        }
-                                    })
-                            }}
+                            onClick={DrawingToolbar.handlers.setMoveHandler.bind(this, this.props.graph)}
                             attrs={{
                                 ...Toolbar.defaultProps.attrs,
                                 viewBox: "0 0 32 32"
