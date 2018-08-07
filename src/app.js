@@ -28,7 +28,8 @@ import D3Graph, {
     TextCircleDrawing,
     InputAction,
     TextCircleToolbar,
-    MoveToolbar, MoveAction, actionTypeEnums
+    MoveToolbar, MoveAction, actionTypeEnums,
+    DrawingToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
 import guid from 'guid'
@@ -585,6 +586,11 @@ class Example extends Component {
                                             alert("请选择一个图形")
                                         }
                                     }}>平移(10,10)
+                            </button>
+                            <button type="button"
+                                    onClick={() => {
+                                        DrawingToolbar.handlers.setMoveHandler(this.graph);
+                                    }}>切换为移动操作
                             </button>
                         </div>
                     </div>

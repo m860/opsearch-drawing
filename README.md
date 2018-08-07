@@ -50,3 +50,25 @@ const actions = [{
 	}];
 const ins = fromActions(actions);
 ```
+
+## 通过代码切换画布的操作
+
+```javascript
+import React,{Component} from "react"
+import D3Graph,{DrawingToolbar} from "@m860/opsearch-drawing"
+
+export default class Test extends Component{
+    constructor(props){
+        super(props);
+        this.graph=null;
+    }
+    render(){
+        <D3Graph ref={ref=>this.graph=ref}></D3Graph>
+    }
+    componentDidMount(){
+        //切换为移动操作
+        DrawingToolbar.handlers.setMoveHandler(this.graph);
+    }
+}
+
+```
