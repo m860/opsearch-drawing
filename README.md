@@ -72,3 +72,9 @@ export default class Test extends Component{
 }
 
 ```
+
+## chanle logs
+
+### 0.0.4
+
+- 优化了link的显示

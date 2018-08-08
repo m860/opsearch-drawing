@@ -217,6 +217,40 @@ function getArrowPoints(startPoint, endPoint) {
 }
 
 /**
+ * 计算link的链接点
+ * @param source
+ * @param target
+ * @return {{p1: {x: *, y: *}, p2: {x: *, y: *}}}
+ * @private
+ */
+function _calculateLinkPoint(source, target) {
+    var q1 = source.getLinkPoint();
+    var q2 = target.getLinkPoint();
+    var p1 = {
+        x: q1.x,
+        y: q2.y
+    };
+    var p2 = {
+        x: q2.x,
+        y: q2.y
+    };
+    if (source.type === "CircleDrawing" || target.type === "TextCircleDrawing") {
+        var r1 = source.r;
+        p1.x = r1 * (q2.x - q1.x) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q1.x;
+        p1.y = r1 * (q2.y - q1.y) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q1.y;
+    }
+    if (target.type === "CircleDrawing" || target.type === "TextCircleDrawing") {
+        var r2 = target.r;
+        p2.x = r2 * (q1.x - q2.x) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q2.x;
+        p2.y = r2 * (q1.y - q2.y) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q2.y;
+    }
+    return {
+        p1: p1,
+        p2: p2
+    };
+}
+
+/**
  * 反序列化drawing
  * */
 function fromDrawing(drawingOps) {
@@ -901,6 +935,11 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
         get: function get() {
             return CircleDrawing.selectedAttrs;
         }
+    }, {
+        key: 'r',
+        get: function get() {
+            return parseFloat(this.selection.attr("r"));
+        }
     }]);
     return CircleDrawing;
 }(Drawing);
@@ -1241,8 +1280,10 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         key: 'render',
         value: function render() {
             //计算link的位置信息
-            var p1 = this.source.getLinkPoint();
-            var p2 = this.target.getLinkPoint();
+            var _calculateLinkPoint2 = _calculateLinkPoint(this.source, this.target),
+                p1 = _calculateLinkPoint2.p1,
+                p2 = _calculateLinkPoint2.p2;
+
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
                 d: { $set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ') }
             });
@@ -1424,8 +1465,12 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
         key: 'render',
         value: function render() {
             //计算link的位置信息
-            var p1 = this.source.getLinkPoint();
-            var p2 = this.target.getLinkPoint();
+            // const p1 = this.source.getLinkPoint();
+            // const p2 = this.target.getLinkPoint();
+            var _calculateLinkPoint3 = _calculateLinkPoint(this.source, this.target),
+                p1 = _calculateLinkPoint3.p1,
+                p2 = _calculateLinkPoint3.p2;
+
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
                 x1: { $set: p1.x },
                 y1: { $set: p1.y },
@@ -1656,6 +1701,11 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
         key: 'defaultTextSelectedAttrs',
         get: function get() {
             return TextCircleDrawing.textSelectedAttrs;
+        }
+    }, {
+        key: 'r',
+        get: function get() {
+            return parseFloat(this.circleSelection.attr("r"));
         }
 
         /**
