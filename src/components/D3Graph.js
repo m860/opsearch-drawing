@@ -151,14 +151,14 @@ function _calculateLinkPoint(source, target) {
     if (source.type === "CircleDrawing"
         || target.type === "TextCircleDrawing") {
         const r1 = source.r;
-        p1.x = q1.x + (r1 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
-        p1.y = q1.y + ((q1.y - q2.y) / (q1.x - q2.x)) * (r1 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+        p1.x = ((r1 * (q2.x - q1.x)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q1.x;
+        p1.y = ((r1 * (q2.y - q1.y)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q1.y;
     }
     if (target.type === "CircleDrawing"
         || target.type === "TextCircleDrawing") {
         const r2 = target.r;
-        p2.x = q2.x - (r2 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
-        p2.y = q2.y - ((q1.y - q2.y) / (q1.x - q2.x)) * (r2 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+        p2.x = ((r2 * (q1.x - q2.x)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q2.x;
+        p2.y = ((r2 * (q1.y - q2.y)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q2.y;
     }
     return {
         p1,
