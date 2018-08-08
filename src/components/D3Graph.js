@@ -131,6 +131,42 @@ function getArrowPoints(startPoint, endPoint, distance = 5) {
 }
 
 /**
+ * 计算link的链接点
+ * @param source
+ * @param target
+ * @return {{p1: {x: *, y: *}, p2: {x: *, y: *}}}
+ * @private
+ */
+function _calculateLinkPoint(source, target) {
+    const q1 = source.getLinkPoint();
+    const q2 = target.getLinkPoint();
+    let p1 = {
+        x: q1.x,
+        y: q2.y
+    };
+    let p2 = {
+        x: q2.x,
+        y: q2.y
+    };
+    if (source.type === "CircleDrawing"
+        || target.type === "TextCircleDrawing") {
+        const r1 = source.r;
+        p1.x = q1.x + (r1 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+        p1.y = q1.y + ((q1.y - q2.y) / (q1.x - q2.x)) * (r1 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+    }
+    if (target.type === "CircleDrawing"
+        || target.type === "TextCircleDrawing") {
+        const r2 = target.r;
+        p2.x = q2.x - (r2 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+        p2.y = q2.y - ((q1.y - q2.y) / (q1.x - q2.x)) * (r2 / Math.sqrt(1 + Math.pow((q1.y - q2.y) / (q1.x - q2.x), 2)));
+    }
+    return {
+        p1,
+        p2
+    }
+}
+
+/**
  * 反序列化drawing
  * */
 export function fromDrawing(drawingOps: DrawingOptionType) {
@@ -679,6 +715,10 @@ export class CircleDrawing extends Drawing {
         return CircleDrawing.selectedAttrs;
     }
 
+    get r() {
+        return parseFloat(this.selection.attr("r"));
+    }
+
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("circle");
@@ -951,7 +991,7 @@ export class ArrowLinkDrawing extends Drawing {
         this.label = getPath(option, "label");
         this.labelAttrs = getPath(option, "labelAttrs");
         this.labelSelection = null;
-        this.listeners=[];
+        this.listeners = [];
     }
 
     get defaultAttrs() {
@@ -1022,8 +1062,7 @@ export class ArrowLinkDrawing extends Drawing {
 
     render() {
         //计算link的位置信息
-        const p1 = this.source.getLinkPoint();
-        const p2 = this.target.getLinkPoint();
+        const {p1, p2} = _calculateLinkPoint(this.source, this.target);
         this.attrs = update(this.attrs, {
             d: {$set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ')}
         });
@@ -1190,8 +1229,9 @@ export class LinkDrawing extends Drawing {
 
     render() {
         //计算link的位置信息
-        const p1 = this.source.getLinkPoint();
-        const p2 = this.target.getLinkPoint();
+        // const p1 = this.source.getLinkPoint();
+        // const p2 = this.target.getLinkPoint();
+        const {p1, p2} = _calculateLinkPoint(this.source, this.target);
         this.attrs = update(this.attrs, {
             x1: {$set: p1.x},
             y1: {$set: p1.y},
@@ -1373,6 +1413,10 @@ export class TextCircleDrawing extends Drawing {
 
     get defaultTextSelectedAttrs() {
         return TextCircleDrawing.textSelectedAttrs;
+    }
+
+    get r() {
+        return parseFloat(this.circleSelection.attr("r"));
     }
 
     /**
