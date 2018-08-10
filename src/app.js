@@ -48,9 +48,7 @@ class Example extends Component {
     constructor(props) {
         super(props);
         this.graph = null;
-        this.numberScale = new NumberScaleDrawing({
-            id: "number-scale"
-        });
+        this.numberScaleId = "number-scale";
         this.state = {
             interval: 1,
             actions: [],
@@ -196,7 +194,7 @@ class Example extends Component {
                                 x: 20,
                                 y: 280
                             };
-                            newState.scale = 20;
+                            newState.scale = 10;
                         }
                         else {
                             newState.original = {
@@ -213,7 +211,10 @@ class Example extends Component {
                                         type: "draw",
                                         params: [{
                                             type: "NumberScaleDrawing",
-                                            option: this.numberScale
+                                            option: new NumberScaleDrawing({
+                                                id: this.numberScaleId,
+                                                scale: newState.scale
+                                            })
                                         }]
                                     }])
                                 }, this.exec.bind(this));
@@ -223,7 +224,7 @@ class Example extends Component {
                                 this.setState({
                                     actionJson: JSON.stringify([{
                                         type: "delete",
-                                        params: [this.numberScale.id]
+                                        params: [this.numberScaleId]
                                     }])
                                 }, this.exec.bind(this))
                             }

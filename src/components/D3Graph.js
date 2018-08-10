@@ -891,6 +891,7 @@ export class NumberScaleDrawing extends Drawing {
             .attr("d", `M ${xEndPoint.x} ${xEndPoint.y} L ${xEndPoint.x} ${xEndPoint.y + 5} L ${xEndPoint.x + 15} ${xEndPoint.y} L ${xEndPoint.x} ${xEndPoint.y - 5} Z`)
         // 画x轴的刻度
         const xScaleCount = Math.floor(Math.abs(xEndPoint.x - originalPoint.x) / this.scale);
+        let preTextPositionWithX = 0;
         Array.apply(null, {length: xScaleCount}).forEach((v, i) => {
             const p1 = new Point(originalPoint.x + this.scale * i, originalPoint.y);
             const p2 = new Point(originalPoint.x + this.scale * i, originalPoint.y - 3)
@@ -902,11 +903,17 @@ export class NumberScaleDrawing extends Drawing {
                 .attr("fill", "none")
                 .attr("stroke", "black")
                 .attr("stroke-width", 1);
-            this.selection.append("text")
-                .text(i)
-                .attr("x", p1.x)
-                .attr("y", p1.y + 10)
-                .attr("style", "font-size:10px")
+            const dis = p1.x - preTextPositionWithX;
+            if (dis >= 20) {
+                preTextPositionWithX = p1.x;
+                this.selection.append("text")
+                    .text(i)
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "middle")
+                    .attr("x", p1.x)
+                    .attr("y", p1.y + 10)
+                    .attr("style", "font-size:10px");
+            }
         })
         //yAxis
         this.selection.append("line")
@@ -921,6 +928,7 @@ export class NumberScaleDrawing extends Drawing {
             .attr("d", `M ${yEndPoint.x} ${yEndPoint.y} L ${yEndPoint.x + 5} ${yEndPoint.y} L ${yEndPoint.x} ${yEndPoint.y - 15} L ${yEndPoint.x - 5} ${yEndPoint.y} Z`)
         //画y轴的刻度
         const yScaleCount = Math.floor(Math.abs(yEndPoint.y - originalPoint.y) / this.scale);
+        let preTextPositionWithY = this.original.y;
         Array.apply(null, {length: yScaleCount}).forEach((v, i) => {
             const p1 = new Point(originalPoint.x, originalPoint.y - this.scale * i);
             const p2 = new Point(originalPoint.x + 3, originalPoint.y - this.scale * i)
@@ -932,11 +940,17 @@ export class NumberScaleDrawing extends Drawing {
                 .attr("fill", "none")
                 .attr("stroke", "black")
                 .attr("stroke-width", 1);
-            this.selection.append("text")
-                .text(i)
-                .attr("x", p1.x - 15)
-                .attr("y", p1.y)
-                .attr("style", "font-size:10px")
+            const dis = preTextPositionWithY - p1.y;
+            if (dis >= 20) {
+                preTextPositionWithY = p1.y;
+                this.selection.append("text")
+                    .text(i)
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "middle")
+                    .attr("x", p1.x - 15)
+                    .attr("y", p1.y)
+                    .attr("style", "font-size:10px");
+            }
         })
     }
 }

@@ -79,3 +79,4 @@ export default class Test extends Component{
 
 - 优化了link的显示
 - 修复了PathDrawing绘制的Bug
+- 调整了刻度尺的显示问题
