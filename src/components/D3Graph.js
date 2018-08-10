@@ -1301,9 +1301,9 @@ export class PathDrawing extends Drawing {
         if (!this.attrs.d) {
             let d = this.d.map((point, index) => {
                 if (index === 0) {
-                    return `M ${this.graph.toLocalX(point.x)} ${this.graph.toLocalY(point.y)}`
+                    return `M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`
                 }
-                return `L ${this.graph.toLocalX(point.x)} ${this.graph.toLocalY(point.y)}`;
+                return `L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`;
             });
             d.push("Z");
             this.attrs.d = d.join(" ");

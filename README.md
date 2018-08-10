@@ -78,3 +78,4 @@ export default class Test extends Component{
 ### 0.0.4
 
 - 优化了link的显示
+- 修复了PathDrawing绘制的Bug
