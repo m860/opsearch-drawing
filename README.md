@@ -73,7 +73,7 @@ export default class Test extends Component{
 
 ```
 
-## chanle logs
+## change logs
 
 ### 0.0.4
 
