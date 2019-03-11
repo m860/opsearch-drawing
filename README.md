@@ -75,6 +75,15 @@ export default class Test extends Component{
 
 ## change logs
 
+### next version
+
+- [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
+- [ ] 箭头链接线支持箭头大小的调整
+- [ ] 链接线支持线两侧文本编辑
+- [ ] 链接线支持虚线
+- [ ] 链接线支持折点编辑
+- [ ] 菱形标记待确认
+
 ### 0.0.4
 
 - 优化了link的显示
