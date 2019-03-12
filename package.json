@@ -7,10 +7,10 @@
     "test": "jest --verbose",
     "dev": "webpack-dev-server --host 0.0.0.0 --progress  --port 3000 --content-base src/",
     "build": "./build.sh",
-    "publish": "npm publish --access public",
     "win-dev": "set NODE_ENV=development&&webpack-dev-server --host 0.0.0.0 --inline --progress --colors --port 3000 --content-base src/",
     "win-build": "set NODE_ENV=production&&webpack --progress --profile --colors",
-    "cm": "git-cz"
+    "cm": "git-cz",
+    "publish": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -57,6 +57,7 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "sass-loader": "^6.0.6",
+    "semantic-release": "^15.13.3",
     "style-loader": "^0.19.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.10.0",
