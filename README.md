@@ -73,6 +73,33 @@ export default class Test extends Component{
 
 ```
 
+## 如何设置链接线的样式
+
+设置链接线的样式通过设置`options.attrs`进行设置.`option.attrs`支持标准的`svg`属性,可以根据需要再进行其他设置
+
+如:设置链接线为红色的虚线
+
+```
+{
+  "type": "draw",
+  "params": [
+    {
+      "type": "ArrowLinkDrawing",
+      "option": {
+        "sourceId": "01a0c9e3-1ccc-96ae-20a6-abd9d76151c7",
+        "targetId": "52ecb986-4ca1-7a0b-7384-f89f57b98979",
+        "label": "abc",
+        "attrs":{
+            "fill":"red", //设置填充色为红色
+            "stroke":"red"//设置边框色为红色
+            "stroke-dasharray":"5,5" //设置为虚线样式
+        }
+      }
+    }
+  ]
+}
+```
+
 ## change logs
 
 ### next version
@@ -89,7 +116,11 @@ export default class Test extends Component{
         "sourceId": "01a0c9e3-1ccc-96ae-20a6-abd9d76151c7",
         "targetId": "52ecb986-4ca1-7a0b-7384-f89f57b98979",
         "label": "abc",
-        "distance": 20//设置箭头的大小为20
+        "distance": 20   //设置箭头的大小为20,
+        "attrs":{
+            "fill":"red", //设置填充色为红色
+            "stroke":"red"//设置边框色为红色,最终箭头链接线将成为红色
+        }
       }
     }
   ]
@@ -97,8 +128,6 @@ export default class Test extends Component{
 ```
 - [ ] 优化箭头的形状,不要做成等边三角形
 - [ ] 链接线支持线两侧文本编辑
-- [ ] 链接线支持虚线:通过设置`option.attrs`来进行设置.`stroke-dasharray`
-- [ ] 链接线支持颜色:通过设置`option.attrs`来进行设置.`stroke` `fill`
 - [ ] 链接线支持折点编辑
 - [ ] 菱形标记待确认
 
