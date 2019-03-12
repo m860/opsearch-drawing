@@ -1217,6 +1217,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         _this16.labelAttrs = (0, _objectPath.get)(option, "labelAttrs");
         _this16.labelSelection = null;
         _this16.listeners = [];
+        _this16.distance = (0, _objectPath.get)(option, "distance", 5);
         return _this16;
     }
     /**
@@ -1295,7 +1296,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
                 p2 = _calculateLinkPoint2.p2;
 
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
-                d: { $set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ') }
+                d: { $set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ') }
             });
             (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
@@ -1304,6 +1305,15 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
         }
+
+        /**
+         * 获取箭头链接的路径
+         * @param startPoint - 开始点
+         * @param endPoint - 结束点
+         * @param distance - 箭头的长度,长度越短箭头越小
+         * @returns {string[]}
+         */
+
     }, {
         key: 'getArrowLinkPath',
         value: function getArrowLinkPath(startPoint, endPoint) {
@@ -1312,12 +1322,22 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             var diffX = startPoint.x - endPoint.x;
             var diffY = startPoint.y - endPoint.y;
             var a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
-            var q1x = endPoint.x + distance * (diffX + diffY) / a;
-            var q1y = endPoint.y + distance * (diffY - diffX) / a;
-            var q2x = endPoint.x + diffX * distance / a;
-            var q2y = endPoint.y + diffY * distance / a;
-            var q3x = endPoint.x + distance * (diffX - diffY) / a;
-            var q3y = endPoint.y + distance * (diffX + diffY) / a;
+            var ex = diffX / a;
+            var ey = diffY / a;
+
+            var q2x = endPoint.x + ex * distance;
+            var q2y = endPoint.y + ey * distance;
+
+            var fx = Math.cos(Math.PI / 2) * ex + Math.sin(Math.PI / 2) * ey;
+            var fy = -Math.sin(Math.PI / 2) * ex + Math.cos(Math.PI / 2) * ey;
+            var q1x = q2x + fx * distance * 0.5;
+            var q1y = q2y + fy * distance * 0.5;
+
+            var gx = Math.cos(-Math.PI / 2) * ex + Math.sin(-Math.PI / 2) * ey;
+            var gy = -Math.sin(-Math.PI / 2) * ex + Math.cos(-Math.PI / 2) * ey;
+            var q3x = q2x + gx * distance * 0.5;
+            var q3y = q2y + gy * distance * 0.5;
+
             return ['M ' + this.graph.toScreenX(startPoint.x) + ' ' + this.graph.toScreenY(startPoint.y), 'L ' + this.graph.toScreenX(q2x) + ' ' + this.graph.toScreenY(q2y), 'L ' + this.graph.toScreenX(q1x) + ' ' + this.graph.toScreenY(q1y), 'L ' + this.graph.toScreenX(endPoint.x) + ' ' + this.graph.toScreenY(endPoint.y), 'L ' + this.graph.toScreenX(q3x) + ' ' + this.graph.toScreenY(q3y), 'L ' + this.graph.toScreenX(q2x) + ' ' + this.graph.toScreenY(q2y), 'L ' + this.graph.toScreenX(startPoint.x) + ' ' + this.graph.toScreenY(startPoint.y), 'Z'];
         }
     }, {
@@ -1329,7 +1349,9 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
                     id: this.id,
                     sourceId: this.sourceId,
                     targetId: this.targetId,
-                    label: this.label
+                    label: this.label,
+                    labelAttrs: this.labelAttrs,
+                    distance: this.distance
                 }
             };
         }

@@ -1100,12 +1100,22 @@ export class ArrowLinkDrawing extends Drawing {
         const diffX = startPoint.x - endPoint.x;
         const diffY = startPoint.y - endPoint.y;
         const a = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
-        const q1x = endPoint.x + (distance * (diffX + diffY)) / a;
-        const q1y = endPoint.y + (distance * (diffY - diffX)) / a;
-        const q2x = endPoint.x + (diffX * distance) / a;
-        const q2y = endPoint.y + (diffY * distance) / a;
-        const q3x = endPoint.x + (distance * (diffX - diffY)) / a;
-        const q3y = endPoint.y + (distance * (diffX + diffY)) / a;
+        const ex = diffX / a;
+        const ey = diffY / a;
+
+        const q2x = endPoint.x + ex * distance;
+        const q2y = endPoint.y + ey * distance;
+
+        const fx = Math.cos(Math.PI / 2) * ex + Math.sin(Math.PI / 2) * ey;
+        const fy = -Math.sin(Math.PI / 2) * ex + Math.cos(Math.PI / 2) * ey;
+        const q1x = q2x + fx * distance * 0.5;
+        const q1y = q2y + fy * distance * 0.5;
+
+        const gx = Math.cos(-Math.PI / 2) * ex + Math.sin(-Math.PI / 2) * ey;
+        const gy = -Math.sin(-Math.PI / 2) * ex + Math.cos(-Math.PI / 2) * ey;
+        const q3x = q2x + gx * distance * 0.5;
+        const q3y = q2y + gy * distance * 0.5;
+
         return [
             `M ${this.graph.toScreenX(startPoint.x)} ${this.graph.toScreenY(startPoint.y)}`,
             `L ${this.graph.toScreenX(q2x)} ${this.graph.toScreenY(q2y)}`,
