@@ -126,7 +126,6 @@ export default class Test extends Component{
   ]
 }
 ```
-- [ ] 优化箭头的形状,不要做成等边三角形
 - [ ] 链接线支持线两侧文本编辑
 - [ ] 链接线支持折点编辑
 - [ ] 菱形标记待确认
