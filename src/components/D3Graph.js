@@ -1006,6 +1006,7 @@ export class ArrowLinkDrawing extends Drawing {
         this.labelAttrs = getPath(option, "labelAttrs");
         this.labelSelection = null;
         this.listeners = [];
+        this.distance = getPath(option, "distance", 5);
     }
 
     get defaultAttrs() {
@@ -1078,7 +1079,7 @@ export class ArrowLinkDrawing extends Drawing {
         //计算link的位置信息
         const {p1, p2} = _calculateLinkPoint(this.source, this.target);
         this.attrs = update(this.attrs, {
-            d: {$set: this.getArrowLinkPath(p1, p2, 5 / this.graph.scale).join(' ')}
+            d: {$set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ')}
         });
         super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
@@ -1124,7 +1125,9 @@ export class ArrowLinkDrawing extends Drawing {
                 id: this.id,
                 sourceId: this.sourceId,
                 targetId: this.targetId,
-                label: this.label
+                label: this.label,
+                labelAttrs: this.labelAttrs,
+                distance: this.distance
             }
         }
     }

@@ -77,9 +77,24 @@ export default class Test extends Component{
 
 ### next version
 
-- [x] 规范commit,集成自动化发布
 - [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
-- [ ] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
+- [x] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
+```
+{
+  "type": "draw",
+  "params": [
+    {
+      "type": "ArrowLinkDrawing",
+      "option": {
+        "sourceId": "01a0c9e3-1ccc-96ae-20a6-abd9d76151c7",
+        "targetId": "52ecb986-4ca1-7a0b-7384-f89f57b98979",
+        "label": "abc",
+        "distance": 20//设置箭头的大小为20
+      }
+    }
+  ]
+}
+```
 - [ ] 优化箭头的形状,不要做成等边三角形
 - [ ] 链接线支持线两侧文本编辑
 - [ ] 链接线支持虚线:通过设置`option.attrs`来进行设置.`stroke-dasharray`
