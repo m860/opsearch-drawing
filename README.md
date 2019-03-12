@@ -79,7 +79,8 @@ export default class Test extends Component{
 
 - [x] 规范commit,集成自动化发布
 - [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
-- [ ] 箭头链接线支持箭头大小的调整
+- [ ] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
+- [ ] 优化箭头的形状,不要做成等边三角形
 - [ ] 链接线支持线两侧文本编辑
 - [ ] 链接线支持虚线:通过设置`option.attrs`来进行设置.`stroke-dasharray`
 - [ ] 链接线支持颜色:通过设置`option.attrs`来进行设置.`stroke` `fill`

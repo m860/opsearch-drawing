@@ -1078,7 +1078,7 @@ export class ArrowLinkDrawing extends Drawing {
         //计算link的位置信息
         const {p1, p2} = _calculateLinkPoint(this.source, this.target);
         this.attrs = update(this.attrs, {
-            d: {$set: this.getArrowLinkPath(p1, p2, 10 / this.graph.scale).join(' ')}
+            d: {$set: this.getArrowLinkPath(p1, p2, 5 / this.graph.scale).join(' ')}
         });
         super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
@@ -1088,6 +1088,13 @@ export class ArrowLinkDrawing extends Drawing {
         this.renderLabel(labelX, labelY);
     }
 
+    /**
+     * 获取箭头链接的路径
+     * @param startPoint - 开始点
+     * @param endPoint - 结束点
+     * @param distance - 箭头的长度,长度越短箭头越小
+     * @returns {string[]}
+     */
     getArrowLinkPath(startPoint, endPoint, distance = 10) {
         const diffX = startPoint.x - endPoint.x;
         const diffY = startPoint.y - endPoint.y;
