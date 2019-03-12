@@ -6,3 +6,4 @@ webpack.config.js
 props.md
 build
 test
+.releaserc
