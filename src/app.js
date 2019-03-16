@@ -564,6 +564,96 @@ class Example extends Component {
                                 }, this.exec.bind(this))
                             }}>随机绘制一个文本
                             </button>
+                            <button type="button" onClick={() => {
+                                const id = guid.raw();
+                                this.setState({
+                                    actionJson: JSON.stringify([
+                                        {
+                                            "type": "draw",
+                                            "params": [
+                                                {
+                                                    "type": "CircleDrawing",
+                                                    "option": {
+                                                        "id": "6f2b983b-8196-f600-5fb9-7710b358ee58",
+                                                        "attrs": {
+                                                            "cx": 197,
+                                                            "cy": 82
+                                                        },
+                                                        "text": ""
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "draw",
+                                            "params": [
+                                                {
+                                                    "type": "CircleDrawing",
+                                                    "option": {
+                                                        "id": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+                                                        "attrs": {
+                                                            "cx": 57,
+                                                            "cy": 82
+                                                        },
+                                                        "text": ""
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "draw",
+                                            "params": [
+                                                {
+                                                    "type": "ArrowLinkDrawing",
+                                                    "option": {
+                                                        "id": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+                                                        "sourceId": "6f2b983b-8196-f600-5fb9-7710b358ee58",
+                                                        "targetId": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+                                                        "distance": 5
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "draw",
+                                            "params": [
+                                                {
+                                                    "type": "LinkTextDrawing",
+                                                    "option": {
+                                                        "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+                                                        "text": "abc",
+                                                        "attrs": {
+                                                            "font-size": 12,
+                                                            "fill": "red",
+                                                            "stroke": "red"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "draw",
+                                            "params": [
+                                                {
+                                                    "type": "LinkTextDrawing",
+                                                    "option": {
+                                                        "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+                                                        "text": "def",
+                                                        "attrs": {
+                                                            "font-size": 12,
+                                                            "fill": "black",
+                                                            "stroke": "black",
+                                                            "dx": 0,
+                                                            "dy": 10
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ])
+                                }, this.exec.bind(this))
+                            }}>绘制箭头链接(两个文本)
+                            </button>
                             <button type="button"
                                     onClick={() => {
                                         this.setState({

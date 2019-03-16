@@ -125,13 +125,108 @@ export default class Test extends Component{
 }
 ```
 
+## 如何给link绘制多个文本
+
+`ArrowLinkDrawing`和`LinkDrawing`的`label`只支持一个文本,如果需要使用多个文本,则不能使用`label`的方式.使用`LinkTextDrawing`进行实现.
+
+`LinkTextDrawing`的位置是基于Link的中心点来定位的,如果需要修改位置,请修改`dx`,`dy`进行调整.
+
+<span style="color:red;font-weight:bold">注意:LinkTextDrawing只有当link初始化好之后(即当Link产生了ID之后)才能进行绘制,否则会报错,在添加的时候一定添加在Link实例之后</span>
+
+```
+[
+  {
+    "type": "draw",
+    "params": [
+      {
+        "type": "CircleDrawing",
+        "option": {
+          "id": "6f2b983b-8196-f600-5fb9-7710b358ee58",
+          "attrs": {
+            "cx": 197,
+            "cy": 82
+          },
+          "text": ""
+        }
+      }
+    ]
+  },
+  {
+    "type": "draw",
+    "params": [
+      {
+        "type": "CircleDrawing",
+        "option": {
+          "id": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+          "attrs": {
+            "cx": 57,
+            "cy": 82
+          },
+          "text": ""
+        }
+      }
+    ]
+  },
+  {
+    "type": "draw",
+    "params": [
+      {
+        "type": "ArrowLinkDrawing",
+        "option": {
+          "id": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+          "sourceId": "6f2b983b-8196-f600-5fb9-7710b358ee58",
+          "targetId": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+          "distance": 5
+        }
+      }
+    ]
+  },
+  {
+    "type": "draw",
+    "params": [
+      {
+        "type": "LinkTextDrawing",
+        "option": {
+          "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+          "text": "abc",
+          "attrs": {
+            "font-size": 12,
+            "fill": "red",
+            "stroke": "red"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "type": "draw",
+    "params": [
+      {
+        "type": "LinkTextDrawing",
+        "option": {
+          "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+          "text": "def",
+          "attrs": {
+            "font-size": 12,
+            "fill": "black",
+            "stroke": "black",
+            "dx": 0,
+            "dy": 10
+          }
+        }
+      }
+    ]
+  }
+]
+```
+
 ## change logs
 
 ### next version
 
 - [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
 - [x] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
-- [ ] 链接线支持多文本编辑
+- [x] 链接线支持多文本编辑
 - [ ] 链接线支持折点编辑
 - [ ] 菱形标记待确认
 
