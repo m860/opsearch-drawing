@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.actionTypeEnums = undefined;
+exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.ActionTypeEnums = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -136,7 +136,7 @@ var EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
  * @readonly
  * @enum {string}
  * */
-var actionTypeEnums = exports.actionTypeEnums = {
+var ActionTypeEnums = exports.ActionTypeEnums = {
     /**绘画*/
     draw: "draw",
     /**重绘/更新*/
@@ -294,7 +294,7 @@ function fromActions(actions) {
             throw new Error('action ' + type + ' is not defined');
         }
         switch (type) {
-            case actionTypeEnums.draw:
+            case ActionTypeEnums.draw:
                 return new (Function.prototype.bind.apply(actionIndex[type], [null].concat((0, _toConsumableArray3.default)(args.map(function (arg) {
                     return fromDrawing(arg);
                 }, ops)))))();
@@ -323,7 +323,7 @@ var Action = function () {
 
         /**
          * action的类型,是一个枚举值
-         * @member {actionTypeEnums}
+         * @member {ActionTypeEnums}
          * */
         this.type = type;
         /**
@@ -374,7 +374,7 @@ var InputAction = exports.InputAction = function (_Action) {
     function InputAction(params, ops) {
         (0, _classCallCheck3.default)(this, InputAction);
 
-        var _this = (0, _possibleConstructorReturn3.default)(this, (InputAction.__proto__ || (0, _getPrototypeOf2.default)(InputAction)).call(this, actionTypeEnums.input, params, ops));
+        var _this = (0, _possibleConstructorReturn3.default)(this, (InputAction.__proto__ || (0, _getPrototypeOf2.default)(InputAction)).call(this, ActionTypeEnums.input, params, ops));
 
         _this.canBreak = true;
         return _this;
@@ -383,7 +383,7 @@ var InputAction = exports.InputAction = function (_Action) {
     return InputAction;
 }(Action);
 
-actionIndex[actionTypeEnums.input] = InputAction;
+actionIndex[ActionTypeEnums.input] = InputAction;
 
 /**
  * 绘图action
@@ -402,13 +402,13 @@ var DrawAction = exports.DrawAction = function (_Action2) {
 
     function DrawAction(drawingOps, ops) {
         (0, _classCallCheck3.default)(this, DrawAction);
-        return (0, _possibleConstructorReturn3.default)(this, (DrawAction.__proto__ || (0, _getPrototypeOf2.default)(DrawAction)).call(this, actionTypeEnums.draw, drawingOps, ops));
+        return (0, _possibleConstructorReturn3.default)(this, (DrawAction.__proto__ || (0, _getPrototypeOf2.default)(DrawAction)).call(this, ActionTypeEnums.draw, drawingOps, ops));
     }
 
     return DrawAction;
 }(Action);
 
-actionIndex[actionTypeEnums.draw] = DrawAction;
+actionIndex[ActionTypeEnums.draw] = DrawAction;
 
 /**
  * 选择action
@@ -424,13 +424,13 @@ var SelectAction = exports.SelectAction = function (_Action3) {
 
     function SelectAction(shapeId, ops) {
         (0, _classCallCheck3.default)(this, SelectAction);
-        return (0, _possibleConstructorReturn3.default)(this, (SelectAction.__proto__ || (0, _getPrototypeOf2.default)(SelectAction)).call(this, actionTypeEnums.select, shapeId, ops));
+        return (0, _possibleConstructorReturn3.default)(this, (SelectAction.__proto__ || (0, _getPrototypeOf2.default)(SelectAction)).call(this, ActionTypeEnums.select, shapeId, ops));
     }
 
     return SelectAction;
 }(Action);
 
-actionIndex[actionTypeEnums.select] = SelectAction;
+actionIndex[ActionTypeEnums.select] = SelectAction;
 
 /**
  * 取消选择action
@@ -446,13 +446,13 @@ var UnSelectAction = exports.UnSelectAction = function (_Action4) {
 
     function UnSelectAction(shapeId, ops) {
         (0, _classCallCheck3.default)(this, UnSelectAction);
-        return (0, _possibleConstructorReturn3.default)(this, (UnSelectAction.__proto__ || (0, _getPrototypeOf2.default)(UnSelectAction)).call(this, actionTypeEnums.unselect, shapeId, ops));
+        return (0, _possibleConstructorReturn3.default)(this, (UnSelectAction.__proto__ || (0, _getPrototypeOf2.default)(UnSelectAction)).call(this, ActionTypeEnums.unselect, shapeId, ops));
     }
 
     return UnSelectAction;
 }(Action);
 
-actionIndex[actionTypeEnums.unselect] = UnSelectAction;
+actionIndex[ActionTypeEnums.unselect] = UnSelectAction;
 
 /**
  * 删除图形action
@@ -468,13 +468,13 @@ var DeleteAction = exports.DeleteAction = function (_Action5) {
 
     function DeleteAction(shapeId, ops) {
         (0, _classCallCheck3.default)(this, DeleteAction);
-        return (0, _possibleConstructorReturn3.default)(this, (DeleteAction.__proto__ || (0, _getPrototypeOf2.default)(DeleteAction)).call(this, actionTypeEnums.delete, shapeId, ops));
+        return (0, _possibleConstructorReturn3.default)(this, (DeleteAction.__proto__ || (0, _getPrototypeOf2.default)(DeleteAction)).call(this, ActionTypeEnums.delete, shapeId, ops));
     }
 
     return DeleteAction;
 }(Action);
 
-actionIndex[actionTypeEnums.delete] = DeleteAction;
+actionIndex[ActionTypeEnums.delete] = DeleteAction;
 
 /**
  * 清除所有的图形action
@@ -490,13 +490,13 @@ var ClearAction = exports.ClearAction = function (_Action6) {
 
     function ClearAction(ops) {
         (0, _classCallCheck3.default)(this, ClearAction);
-        return (0, _possibleConstructorReturn3.default)(this, (ClearAction.__proto__ || (0, _getPrototypeOf2.default)(ClearAction)).call(this, actionTypeEnums.clear, null, ops));
+        return (0, _possibleConstructorReturn3.default)(this, (ClearAction.__proto__ || (0, _getPrototypeOf2.default)(ClearAction)).call(this, ActionTypeEnums.clear, null, ops));
     }
 
     return ClearAction;
 }(Action);
 
-actionIndex[actionTypeEnums.clear] = ClearAction;
+actionIndex[ActionTypeEnums.clear] = ClearAction;
 
 /**
  * 重绘action
@@ -507,7 +507,7 @@ var ReDrawAction = exports.ReDrawAction = function (_Action7) {
 
     function ReDrawAction(shapeId, state, ops) {
         (0, _classCallCheck3.default)(this, ReDrawAction);
-        return (0, _possibleConstructorReturn3.default)(this, (ReDrawAction.__proto__ || (0, _getPrototypeOf2.default)(ReDrawAction)).call(this, actionTypeEnums.redraw, {
+        return (0, _possibleConstructorReturn3.default)(this, (ReDrawAction.__proto__ || (0, _getPrototypeOf2.default)(ReDrawAction)).call(this, ActionTypeEnums.redraw, {
             id: shapeId,
             state: state
         }, ops));
@@ -516,7 +516,7 @@ var ReDrawAction = exports.ReDrawAction = function (_Action7) {
     return ReDrawAction;
 }(Action);
 
-actionIndex[actionTypeEnums.redraw] = ReDrawAction;
+actionIndex[ActionTypeEnums.redraw] = ReDrawAction;
 
 /**
  * 移动action
@@ -532,7 +532,7 @@ var MoveAction = exports.MoveAction = function (_Action8) {
      */
     function MoveAction(shapeId, vec) {
         (0, _classCallCheck3.default)(this, MoveAction);
-        return (0, _possibleConstructorReturn3.default)(this, (MoveAction.__proto__ || (0, _getPrototypeOf2.default)(MoveAction)).call(this, actionTypeEnums.move, {
+        return (0, _possibleConstructorReturn3.default)(this, (MoveAction.__proto__ || (0, _getPrototypeOf2.default)(MoveAction)).call(this, ActionTypeEnums.move, {
             id: shapeId,
             vec: vec
         }));
@@ -541,7 +541,7 @@ var MoveAction = exports.MoveAction = function (_Action8) {
     return MoveAction;
 }(Action);
 
-actionIndex[actionTypeEnums.move] = MoveAction;
+actionIndex[ActionTypeEnums.move] = MoveAction;
 
 //#endregion
 
@@ -2761,7 +2761,7 @@ var D3Graph = function (_Component) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 _context5.t0 = action.type;
-                                _context5.next = _context5.t0 === actionTypeEnums.draw ? 3 : _context5.t0 === actionTypeEnums.redraw ? 6 : _context5.t0 === actionTypeEnums.select ? 26 : _context5.t0 === actionTypeEnums.unselect ? 37 : _context5.t0 === actionTypeEnums.delete ? 43 : _context5.t0 === actionTypeEnums.clear ? 48 : _context5.t0 === actionTypeEnums.input ? 51 : _context5.t0 === actionTypeEnums.move ? 54 : 58;
+                                _context5.next = _context5.t0 === ActionTypeEnums.draw ? 3 : _context5.t0 === ActionTypeEnums.redraw ? 6 : _context5.t0 === ActionTypeEnums.select ? 26 : _context5.t0 === ActionTypeEnums.unselect ? 37 : _context5.t0 === ActionTypeEnums.delete ? 43 : _context5.t0 === ActionTypeEnums.clear ? 48 : _context5.t0 === ActionTypeEnums.input ? 51 : _context5.t0 === ActionTypeEnums.move ? 54 : 58;
                                 break;
 
                             case 3:
@@ -3061,7 +3061,7 @@ var D3Graph = function (_Component) {
 
             console.warn('getDrawingData \u65B9\u6CD5\u5C06\u5728\u4E0B\u4E00\u4E2A\u7248\u672C\u5220\u9664\u6389,\u8BF7\u4F7F\u7528 getDrawingActions \u4EE3\u66FF');
             var actions = this.state.actions.filter(function (f) {
-                return f.type === actionTypeEnums.draw;
+                return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
                 var shape = _this41.findShapeById(item.params.id);
@@ -3083,7 +3083,7 @@ var D3Graph = function (_Component) {
             var _this42 = this;
 
             var actions = this.state.actions.filter(function (f) {
-                return f.type === actionTypeEnums.draw;
+                return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
                 var shape = _this42.findShapeById(item.params.id);
@@ -3279,7 +3279,7 @@ D3Graph.propTypes = {
     attrs: _propTypes2.default.object,
     //action
     actions: _propTypes2.default.arrayOf(_propTypes2.default.shape({
-        type: _propTypes2.default.oneOf((0, _keys2.default)(actionTypeEnums)).isRequired,
+        type: _propTypes2.default.oneOf((0, _keys2.default)(ActionTypeEnums)).isRequired,
         params: _propTypes2.default.any
     })),
     // //默认的图形的样式

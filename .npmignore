@@ -7,3 +7,4 @@ props.md
 build
 test
 .releaserc
+package-lock.json

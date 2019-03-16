@@ -28,7 +28,7 @@ import D3Graph, {
     TextCircleDrawing,
     InputAction,
     TextCircleToolbar,
-    MoveToolbar, MoveAction, actionTypeEnums,
+    MoveToolbar, MoveAction, ActionTypeEnums,
     DrawingToolbar
 } from './components/D3Graph'
 import {set as setPath, get as getPath} from 'object-path'
@@ -575,7 +575,7 @@ class Example extends Component {
                                             const first = selected[0];
                                             this.setState({
                                                 actionJson: JSON.stringify([{
-                                                    type: actionTypeEnums.move,
+                                                    type: ActionTypeEnums.move,
                                                     params: [first.id, {
                                                         x: 10,
                                                         y: 10

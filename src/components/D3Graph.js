@@ -29,14 +29,14 @@ const EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
  * @typedef
  */
 type DrawingOptionType = {
-    type: actionTypeEnums,
+    type: $Values<typeof ActionTypeEnums>,
     option: Object
 };
 /**
  * @typedef
  */
 type ActionOptionType = {
-    type: String,
+    type: string,
     params: Array,
     ops: ?Object
 };
@@ -47,7 +47,7 @@ type ActionOptionType = {
  * @readonly
  * @enum {string}
  * */
-export const actionTypeEnums = {
+export const ActionTypeEnums = {
     /**绘画*/
     draw: "draw",
     /**重绘/更新*/
@@ -210,7 +210,7 @@ export function fromActions(actions: Array<ActionOptionType>) {
             throw new Error(`action ${type} is not defined`);
         }
         switch (type) {
-            case actionTypeEnums.draw:
+            case ActionTypeEnums.draw:
                 return new actionIndex[type](...args.map(arg => fromDrawing(arg), ops));
             default:
                 return new actionIndex[type](...args, ops);
@@ -234,7 +234,7 @@ class Action {
     constructor(type, params, ops) {
         /**
          * action的类型,是一个枚举值
-         * @member {actionTypeEnums}
+         * @member {ActionTypeEnums}
          * */
         this.type = type;
         /**
@@ -275,12 +275,12 @@ export class InputAction extends Action {
      * @param {?Object} ops
      */
     constructor(params, ops) {
-        super(actionTypeEnums.input, params, ops);
+        super(ActionTypeEnums.input, params, ops);
         this.canBreak = true;
     }
 }
 
-actionIndex[actionTypeEnums.input] = InputAction;
+actionIndex[ActionTypeEnums.input] = InputAction;
 
 /**
  * 绘图action
@@ -295,11 +295,11 @@ actionIndex[actionTypeEnums.input] = InputAction;
  * */
 export class DrawAction extends Action {
     constructor(drawingOps, ops) {
-        super(actionTypeEnums.draw, drawingOps, ops)
+        super(ActionTypeEnums.draw, drawingOps, ops)
     }
 }
 
-actionIndex[actionTypeEnums.draw] = DrawAction;
+actionIndex[ActionTypeEnums.draw] = DrawAction;
 
 /**
  * 选择action
@@ -311,11 +311,11 @@ actionIndex[actionTypeEnums.draw] = DrawAction;
  * */
 export class SelectAction extends Action {
     constructor(shapeId, ops) {
-        super(actionTypeEnums.select, shapeId, ops)
+        super(ActionTypeEnums.select, shapeId, ops)
     }
 }
 
-actionIndex[actionTypeEnums.select] = SelectAction;
+actionIndex[ActionTypeEnums.select] = SelectAction;
 
 /**
  * 取消选择action
@@ -327,11 +327,11 @@ actionIndex[actionTypeEnums.select] = SelectAction;
  * */
 export class UnSelectAction extends Action {
     constructor(shapeId, ops) {
-        super(actionTypeEnums.unselect, shapeId, ops)
+        super(ActionTypeEnums.unselect, shapeId, ops)
     }
 }
 
-actionIndex[actionTypeEnums.unselect] = UnSelectAction;
+actionIndex[ActionTypeEnums.unselect] = UnSelectAction;
 
 /**
  * 删除图形action
@@ -343,11 +343,11 @@ actionIndex[actionTypeEnums.unselect] = UnSelectAction;
  * */
 export class DeleteAction extends Action {
     constructor(shapeId, ops) {
-        super(actionTypeEnums.delete, shapeId, ops);
+        super(ActionTypeEnums.delete, shapeId, ops);
     }
 }
 
-actionIndex[actionTypeEnums.delete] = DeleteAction;
+actionIndex[ActionTypeEnums.delete] = DeleteAction;
 
 /**
  * 清除所有的图形action
@@ -359,11 +359,11 @@ actionIndex[actionTypeEnums.delete] = DeleteAction;
  * */
 export class ClearAction extends Action {
     constructor(ops) {
-        super(actionTypeEnums.clear, null, ops);
+        super(ActionTypeEnums.clear, null, ops);
     }
 }
 
-actionIndex[actionTypeEnums.clear] = ClearAction;
+actionIndex[ActionTypeEnums.clear] = ClearAction;
 
 
 /**
@@ -371,14 +371,14 @@ actionIndex[actionTypeEnums.clear] = ClearAction;
  * */
 export class ReDrawAction extends Action {
     constructor(shapeId, state, ops) {
-        super(actionTypeEnums.redraw, {
+        super(ActionTypeEnums.redraw, {
             id: shapeId,
             state: state
         }, ops)
     }
 }
 
-actionIndex[actionTypeEnums.redraw] = ReDrawAction;
+actionIndex[ActionTypeEnums.redraw] = ReDrawAction;
 
 /**
  * 移动action
@@ -390,14 +390,14 @@ export class MoveAction extends Action {
      * @param {object} vec - 位移
      */
     constructor(shapeId, vec) {
-        super(actionTypeEnums.move, {
+        super(ActionTypeEnums.move, {
             id: shapeId,
             vec: vec
         })
     }
 }
 
-actionIndex[actionTypeEnums.move] = MoveAction;
+actionIndex[ActionTypeEnums.move] = MoveAction;
 
 //#endregion
 
@@ -2103,7 +2103,7 @@ export default class D3Graph extends Component {
         attrs: PropTypes.object,
         //action
         actions: PropTypes.arrayOf(PropTypes.shape({
-            type: PropTypes.oneOf(Object.keys(actionTypeEnums)).isRequired,
+            type: PropTypes.oneOf(Object.keys(ActionTypeEnums)).isRequired,
             params: PropTypes.any
         })),
         // //默认的图形的样式
@@ -2280,12 +2280,12 @@ export default class D3Graph extends Component {
 
     async doActionAsync(action) {
         switch (action.type) {
-            case actionTypeEnums.draw: {
+            case ActionTypeEnums.draw: {
                 this.shapes.push(action.params);
                 this.drawShapes([action.params]);
                 break;
             }
-            case actionTypeEnums.redraw: {
+            case ActionTypeEnums.redraw: {
                 const index = this.shapes.findIndex(f => f.id === action.params.id);
                 if (index >= 0) {
                     let state = {};
@@ -2307,7 +2307,7 @@ export default class D3Graph extends Component {
                 }
                 break;
             }
-            case actionTypeEnums.select: {
+            case ActionTypeEnums.select: {
                 const id = action.params;
                 let shape = this.findShapeById(id);
                 if (shape.selected) {
@@ -2329,7 +2329,7 @@ export default class D3Graph extends Component {
                 this.drawShapes([shape]);
                 break;
             }
-            case actionTypeEnums.unselect: {
+            case ActionTypeEnums.unselect: {
                 const id = action.params;
                 let shape = this.findShapeById(id);
                 shape.selected = false;
@@ -2337,7 +2337,7 @@ export default class D3Graph extends Component {
                 this.drawShapes([shape]);
                 break;
             }
-            case actionTypeEnums.delete: {
+            case ActionTypeEnums.delete: {
                 const id = action.params;
                 //删除的图形
                 const shape = this.shapes.find(s => s.id === id);
@@ -2352,19 +2352,19 @@ export default class D3Graph extends Component {
                 }
                 break;
             }
-            case actionTypeEnums.clear: {
+            case ActionTypeEnums.clear: {
                 this.shapes.forEach(async shape => {
                     await this.doActionAsync(new DeleteAction(shape.id))
                 });
                 this.selectedShapes = [];
                 break;
             }
-            case actionTypeEnums.input: {
+            case ActionTypeEnums.input: {
                 //显示用户输入
                 await this.showUserInputPromise(action);
                 break;
             }
-            case actionTypeEnums.move: {
+            case ActionTypeEnums.move: {
                 console.log('move action', action);
                 const shape = this.shapes.find(f => f.id === action.params.id);
                 if (shape) {
@@ -2444,7 +2444,7 @@ export default class D3Graph extends Component {
      */
     getDrawingData() {
         console.warn(`getDrawingData 方法将在下一个版本删除掉,请使用 getDrawingActions 代替`);
-        const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
+        const actions = this.state.actions.filter(f => f.type === ActionTypeEnums.draw);
         return actions.map((item) => {
             const shape = this.findShapeById(item.params.id);
             return {
@@ -2459,7 +2459,7 @@ export default class D3Graph extends Component {
      * @return {*[]}
      */
     getDrawingActions() {
-        const actions = this.state.actions.filter(f => f.type === actionTypeEnums.draw);
+        const actions = this.state.actions.filter(f => f.type === ActionTypeEnums.draw);
         return actions.map((item) => {
             const shape = this.findShapeById(item.params.id);
             return {

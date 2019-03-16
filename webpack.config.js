@@ -41,7 +41,6 @@ module.exports = function (env) {
 				]
 			}
 		})
-		, new webpack.HotModuleReplacementPlugin()
 	];
 	if (isProduction) {
 		plugins.push(new webpack.optimize.UglifyJsPlugin({

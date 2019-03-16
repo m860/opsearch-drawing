@@ -1,7 +1,7 @@
 /**
  * Created by jean.h.ma on 26/04/2018.
  */
-import {fromDrawing, actionTypeEnums, fromActions, SelectAction, UnSelectAction} from '../src/components/D3Graph'
+import {fromDrawing, ActionTypeEnums, fromActions, SelectAction, UnSelectAction} from '../src/components/D3Graph'
 import drawData from './drawing-data'
 
 test('fromDrawing', () => {
