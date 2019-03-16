@@ -126,7 +126,7 @@ export default class Test extends Component{
   ]
 }
 ```
-- [ ] 链接线支持线两侧文本编辑
+- [ ] 链接线支持多文本编辑
 - [ ] 链接线支持折点编辑
 - [ ] 菱形标记待确认
 
