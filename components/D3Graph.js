@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.ActionTypeEnums = undefined;
+exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.LinkTextDrawing = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.ActionTypeEnums = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -1271,7 +1271,11 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             if (this.labelSelection) {
                 this.labelSelection.remove();
             }
+            this.listeners.forEach(function (listener) {
+                return listener.remove();
+            });
             this.labelSelection = null;
+            emitter.emit('remove:' + this.id);
         }
     }, {
         key: 'renderLabel',
@@ -1304,6 +1308,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             var labelX = Math.min(p1.x, p2.x) + hx;
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
+            emitter.emit('render:' + this.id);
         }
 
         /**
@@ -1478,6 +1483,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             this.listeners.forEach(function (listener) {
                 return listener.remove();
             });
+            emitter.emit('remove:' + this.id);
         }
     }, {
         key: 'renderLabel',
@@ -1515,6 +1521,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
             var labelX = Math.min(p1.x, p2.x) + hx;
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
+            emitter.emit('render:' + this.id);
         }
     }, {
         key: 'toData',
@@ -1658,6 +1665,16 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
         value: function initialize(graph) {
             (0, _get3.default)(TextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("text");
+        }
+    }, {
+        key: 'moveTo',
+        value: function moveTo(vec) {
+            if (this.selection) {
+                this.attrs.x += vec.x;
+                this.attrs.y += vec.y;
+                this.selection.attr("x", this.graph.toScreenX(this.attrs.x)).attr("y", this.graph.toScreenY(this.attrs.y));
+                emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
+            }
         }
     }, {
         key: 'defaultAttrs',
@@ -1882,6 +1899,87 @@ TextCircleDrawing.textSelectedAttrs = {
 
 
 registerDrawing("TextCircleDrawing", TextCircleDrawing);
+
+var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
+    (0, _inherits3.default)(LinkTextDrawing, _Drawing11);
+
+    function LinkTextDrawing(option) {
+        (0, _classCallCheck3.default)(this, LinkTextDrawing);
+
+        var _this24 = (0, _possibleConstructorReturn3.default)(this, (LinkTextDrawing.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing)).call(this, option));
+
+        _this24.type = "LinkTextDrawing";
+        _this24.linkID = (0, _objectPath.get)(option, "linkID", null);
+        if (!_this24.linkID) {
+            throw new Error('linkID is required');
+        }
+        _this24.source = null;
+        _this24.target = null;
+        _this24.listeners = [];
+        return _this24;
+    }
+
+    (0, _createClass3.default)(LinkTextDrawing, [{
+        key: 'initialize',
+        value: function initialize(graph) {
+            var _this25 = this;
+
+            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'initialize', this).call(this, graph);
+            this.selection = d3.select(graph.ele).append("text");
+            var link = graph.findShapeById(this.linkID);
+            if (link) {
+                this.source = link.source;
+                this.target = link.target;
+            }
+            //监听link的rerender
+            this.listeners.push(emitter.addListener('remove:' + this.linkID, function () {
+                _this25.remove();
+            }));
+            this.listeners.push(emitter.addListener('render:' + this.linkID, function () {
+                _this25.render();
+            }));
+        }
+
+        // moveTo(vec: Point) {
+        //     if (this.selection) {
+        //         this.attrs.x += vec.x;
+        //         this.attrs.y += vec.y;
+        //         this.selection.attr("x", this.graph.toScreenX(this.attrs.x))
+        //             .attr("y", this.graph.toScreenY(this.attrs.y));
+        //         emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
+        //     }
+        // }
+
+    }, {
+        key: 'render',
+        value: function render() {
+            if (this.source && this.target) {
+                var _calculateLinkPoint4 = _calculateLinkPoint(this.source, this.target),
+                    p1 = _calculateLinkPoint4.p1,
+                    p2 = _calculateLinkPoint4.p2;
+
+                var hx = Math.abs(p1.x - p2.x) / 2;
+                var hy = Math.abs(p1.y - p2.y) / 2;
+                var labelX = Math.min(p1.x, p2.x) + hx;
+                var labelY = Math.min(p1.y, p2.y) + hy;
+                this.attrs.x = this.graph.toScreenX(labelX);
+                this.attrs.y = this.graph.toScreenY(labelY);
+            }
+            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'render', this).call(this);
+        }
+    }, {
+        key: 'remove',
+        value: function remove() {
+            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'remove', this).call(this);
+            this.listeners.forEach(function (listener) {
+                return listener.remove();
+            });
+        }
+    }]);
+    return LinkTextDrawing;
+}(Drawing);
+
+registerDrawing("LinkTextDrawing", LinkTextDrawing);
 //#endregion
 
 //#region Toolbar
@@ -1928,13 +2026,13 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     function DrawingToolbar(props) {
         (0, _classCallCheck3.default)(this, DrawingToolbar);
 
-        var _this25 = (0, _possibleConstructorReturn3.default)(this, (DrawingToolbar.__proto__ || (0, _getPrototypeOf2.default)(DrawingToolbar)).call(this, props));
+        var _this27 = (0, _possibleConstructorReturn3.default)(this, (DrawingToolbar.__proto__ || (0, _getPrototypeOf2.default)(DrawingToolbar)).call(this, props));
 
-        _this25.listener = null;
-        _this25.state = {
+        _this27.listener = null;
+        _this27.state = {
             selected: false
         };
-        return _this25;
+        return _this27;
     }
 
     /**
@@ -1946,7 +2044,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     (0, _createClass3.default)(DrawingToolbar, [{
         key: 'render',
         value: function render() {
-            var _this26 = this;
+            var _this28 = this;
 
             return _react2.default.createElement(
                 Toolbar,
@@ -1957,8 +2055,8 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
                     onClick: function onClick() {
                         var _props;
 
-                        emitter.emit(EVENT_TOOLBAR_CHANGE, _this26.props.type);
-                        _this26.props.onClick && (_props = _this26.props).onClick.apply(_props, arguments);
+                        emitter.emit(EVENT_TOOLBAR_CHANGE, _this28.props.type);
+                        _this28.props.onClick && (_props = _this28.props).onClick.apply(_props, arguments);
                     } },
                 this.props.children
             );
@@ -1966,11 +2064,11 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this27 = this;
+            var _this29 = this;
 
             this.listener = emitter.addListener(EVENT_TOOLBAR_CHANGE, function (type) {
-                _this27.setState({
-                    selected: type === _this27.props.type
+                _this29.setState({
+                    selected: type === _this29.props.type
                 });
             });
         }
@@ -2045,7 +2143,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setLineDrawHandler: function setLineDrawHandler(graph) {
-        var _this45 = this;
+        var _this47 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2062,15 +2160,15 @@ DrawingToolbar.handlers = {
                     y2: point.y
                 }
             });
-            _this45._id = drawing.id;
+            _this47._id = drawing.id;
             graph.doActionsAsync([new DrawAction(drawing)]);
         }).on("mousemove", function () {
-            if (_this45._id) {
+            if (_this47._id) {
                 var point = {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
-                graph.doActionsAsync([new ReDrawAction(_this45._id, {
+                graph.doActionsAsync([new ReDrawAction(_this47._id, {
                     attrs: {
                         x2: point.x,
                         y2: point.y
@@ -2078,7 +2176,7 @@ DrawingToolbar.handlers = {
                 })]);
             }
         }).on("mouseup", function () {
-            delete _this45._id;
+            delete _this47._id;
         });
     },
     /**
@@ -2086,7 +2184,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setCircleDrawHandler: function setCircleDrawHandler(graph) {
-        var _this46 = this;
+        var _this48 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2116,7 +2214,7 @@ DrawingToolbar.handlers = {
                             return _context9.stop();
                     }
                 }
-            }, _callee9, _this46);
+            }, _callee9, _this48);
         })));
     },
     /**
@@ -2124,24 +2222,24 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setLinkDrawHandler: function setLinkDrawHandler(graph) {
-        var _this47 = this;
+        var _this49 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var event = d3.event;
-            console.dir(_this47);
-            _this47._sourceID = DrawingToolbar.getShapeID(event);
+            console.dir(_this49);
+            _this49._sourceID = DrawingToolbar.getShapeID(event);
         }).on("mouseup", function () {
             var event = d3.event;
             var targetID = DrawingToolbar.getShapeID(event);
-            if (_this47._sourceID && targetID) {
+            if (_this49._sourceID && targetID) {
                 graph.doActionsAsync([new DrawAction(new LinkDrawing({
-                    sourceId: _this47._sourceID,
+                    sourceId: _this49._sourceID,
                     targetId: targetID
                 }))]);
             }
-            delete _this47._sourceID;
+            delete _this49._sourceID;
         });
     },
     /**
@@ -2149,25 +2247,25 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setArrowLinkDrawHandler: function setArrowLinkDrawHandler(graph) {
-        var _this48 = this;
+        var _this50 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var event = d3.event;
-            _this48._sourceID = DrawingToolbar.getShapeID(event);
-            console.log('arrow link source id = ' + _this48._sourceID);
+            _this50._sourceID = DrawingToolbar.getShapeID(event);
+            console.log('arrow link source id = ' + _this50._sourceID);
         }).on("mouseup", function () {
             var event = d3.event;
             var targetID = DrawingToolbar.getShapeID(event);
             console.log('arrow link target id = ' + targetID);
-            if (_this48._sourceID && targetID) {
+            if (_this50._sourceID && targetID) {
                 graph.doActionsAsync([new DrawAction(new ArrowLinkDrawing({
-                    sourceId: _this48._sourceID,
+                    sourceId: _this50._sourceID,
                     targetId: targetID
                 }))]);
             }
-            delete _this48._sourceID;
+            delete _this50._sourceID;
         });
     },
     /**
@@ -2175,7 +2273,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setTextCircleDrawHandler: function setTextCircleDrawHandler(graph) {
-        var _this49 = this;
+        var _this51 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2207,7 +2305,7 @@ DrawingToolbar.handlers = {
                             return _context10.stop();
                     }
                 }
-            }, _callee10, _this49);
+            }, _callee10, _this51);
         })));
     },
     /**
@@ -2215,7 +2313,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setMoveHandler: function setMoveHandler(graph) {
-        var _this50 = this;
+        var _this52 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2224,38 +2322,38 @@ DrawingToolbar.handlers = {
             if (target) {
                 var shape = DrawingToolbar.findShape(graph, target);
                 if (shape) {
-                    _this50._mouseDownPoint = {
+                    _this52._mouseDownPoint = {
                         x: graph.toLocalX(d3.event.offsetX),
                         y: graph.toLocalY(d3.event.offsetY)
                     };
-                    _this50._shape = shape;
+                    _this52._shape = shape;
                 }
             }
         }).on("mousemove", function () {
-            if (_this50._mouseDownPoint) {
+            if (_this52._mouseDownPoint) {
                 var point = {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
-                var vec = {
-                    x: point.x - _this50._mouseDownPoint.x,
-                    y: point.y - _this50._mouseDownPoint.y
+                var _vec = {
+                    x: point.x - _this52._mouseDownPoint.x,
+                    y: point.y - _this52._mouseDownPoint.y
                 };
-                _this50._mouseDownPoint = point;
-                if (_this50._shape) {
-                    _this50._shape.moveTo(vec);
+                _this52._mouseDownPoint = point;
+                if (_this52._shape) {
+                    _this52._shape.moveTo(_vec);
                 }
             }
         }).on("mouseup", function () {
-            if (_this50._mouseDownPoint) {
-                var vec = {
-                    x: graph.toLocalX(d3.event.offsetX) - _this50._mouseDownPoint.x,
-                    y: graph.toLocalY(d3.event.offsetY) - _this50._mouseDownPoint.y
+            if (_this52._mouseDownPoint) {
+                var _vec2 = {
+                    x: graph.toLocalX(d3.event.offsetX) - _this52._mouseDownPoint.x,
+                    y: graph.toLocalY(d3.event.offsetY) - _this52._mouseDownPoint.y
                 };
-                delete _this50._mouseDownPoint;
-                if (_this50._shape) {
-                    _this50._shape.moveTo(vec);
-                    delete _this50._shape;
+                delete _this52._mouseDownPoint;
+                if (_this52._shape) {
+                    _this52._shape.moveTo(_vec2);
+                    delete _this52._shape;
                 }
             }
         });
@@ -2574,25 +2672,25 @@ var D3Graph = function (_Component) {
     function D3Graph(props) {
         (0, _classCallCheck3.default)(this, D3Graph);
 
-        var _this35 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
+        var _this37 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
 
-        _this35.ele = null;
+        _this37.ele = null;
         //画布中已有的图形
-        _this35.shapes = [];
+        _this37.shapes = [];
         //已经选中的图形的id
-        _this35.selectedShapes = [];
+        _this37.selectedShapes = [];
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
-        _this35.playingTimer = null;
+        _this37.playingTimer = null;
         //播放的索引
-        _this35.playingIndex = 0;
+        _this37.playingIndex = 0;
         //正在播放的action
-        _this35.playingActions = [];
+        _this37.playingActions = [];
         //播放选项
-        _this35.playingOption = null;
+        _this37.playingOption = null;
         //执行action的timter
-        _this35.timer = null;
-        _this35.state = {
+        _this37.timer = null;
+        _this37.state = {
             //inputAction的属性
             inputProperties: [],
             //是否显示用户输入
@@ -2609,7 +2707,7 @@ var D3Graph = function (_Component) {
             coordinateType: props.coordinateType,
             attrs: props.attrs
         };
-        return _this35;
+        return _this37;
     }
 
     /**
@@ -2694,7 +2792,7 @@ var D3Graph = function (_Component) {
         key: 'doActionsAsync',
         value: function () {
             var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(actions) {
-                var _this36 = this;
+                var _this38 = this;
 
                 var action;
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -2720,14 +2818,14 @@ var D3Graph = function (_Component) {
                                                 switch (_context.prev = _context.next) {
                                                     case 0:
                                                         _context.next = 2;
-                                                        return _this36.doActionsAsync(actions);
+                                                        return _this38.doActionsAsync(actions);
 
                                                     case 2:
                                                     case 'end':
                                                         return _context.stop();
                                                 }
                                             }
-                                        }, _callee, _this36);
+                                        }, _callee, _this38);
                                     })), action.nextInterval ? action.nextInterval : this.state.interval);
                                 } else {
                                     //保存后续的action,等待继续执行
@@ -2752,7 +2850,7 @@ var D3Graph = function (_Component) {
         key: 'doActionAsync',
         value: function () {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(action) {
-                var _this37 = this;
+                var _this39 = this;
 
                 var index, state, key, id, shape, _id, _shape, _id2, _shape2, _shape3;
 
@@ -2849,14 +2947,14 @@ var D3Graph = function (_Component) {
                                                     switch (_context3.prev = _context3.next) {
                                                         case 0:
                                                             _context3.next = 2;
-                                                            return _this37.doActionAsync(new UnSelectAction(i));
+                                                            return _this39.doActionAsync(new UnSelectAction(i));
 
                                                         case 2:
                                                         case 'end':
                                                             return _context3.stop();
                                                     }
                                                 }
-                                            }, _callee3, _this37);
+                                            }, _callee3, _this39);
                                         }));
 
                                         return function (_x7) {
@@ -2912,14 +3010,14 @@ var D3Graph = function (_Component) {
                                                 switch (_context4.prev = _context4.next) {
                                                     case 0:
                                                         _context4.next = 2;
-                                                        return _this37.doActionAsync(new DeleteAction(shape.id));
+                                                        return _this39.doActionAsync(new DeleteAction(shape.id));
 
                                                     case 2:
                                                     case 'end':
                                                         return _context4.stop();
                                                 }
                                             }
-                                        }, _callee4, _this37);
+                                        }, _callee4, _this39);
                                     }));
 
                                     return function (_x8) {
@@ -2951,8 +3049,8 @@ var D3Graph = function (_Component) {
                                 this.setState((0, _immutabilityHelper2.default)(this.state, {
                                     actions: { $push: [action] }
                                 }), function () {
-                                    if (_this37.props.onAction) {
-                                        _this37.props.onAction(action);
+                                    if (_this39.props.onAction) {
+                                        _this39.props.onAction(action);
                                     }
                                 });
 
@@ -2980,10 +3078,10 @@ var D3Graph = function (_Component) {
     }, {
         key: 'showUserInputPromise',
         value: function showUserInputPromise(action) {
-            var _this38 = this;
+            var _this40 = this;
 
             return new _promise2.default(function (resolve) {
-                _this38.setState({
+                _this40.setState({
                     showUserInput: true,
                     inputProperties: action.params
                 }, function () {
@@ -3000,7 +3098,7 @@ var D3Graph = function (_Component) {
     }, {
         key: 'hideUserInput',
         value: function hideUserInput(nextActionOption) {
-            var _this39 = this;
+            var _this41 = this;
 
             var params = this.state.inputProperties.map(function (property) {
                 return {
@@ -3017,31 +3115,31 @@ var D3Graph = function (_Component) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 //执行下一个action
-                                if (_this39._leftActions.length > 0) {
+                                if (_this41._leftActions.length > 0) {
                                     params.forEach(function (p) {
-                                        (0, _objectPath.set)(_this39._leftActions[0].params, p.path, p.value);
+                                        (0, _objectPath.set)(_this41._leftActions[0].params, p.path, p.value);
                                     });
                                 }
                                 _context6.next = 3;
-                                return _this39.doActionsAsync(_this39._leftActions);
+                                return _this41.doActionsAsync(_this41._leftActions);
 
                             case 3:
                             case 'end':
                                 return _context6.stop();
                         }
                     }
-                }, _callee6, _this39);
+                }, _callee6, _this41);
             })));
         }
     }, {
         key: 'drawShapes',
         value: function drawShapes(shapes) {
-            var _this40 = this;
+            var _this42 = this;
 
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
-                    shape.initialize(_this40);
+                    shape.initialize(_this42);
                 }
                 shape.render();
             });
@@ -3057,14 +3155,14 @@ var D3Graph = function (_Component) {
     }, {
         key: 'getDrawingData',
         value: function getDrawingData() {
-            var _this41 = this;
+            var _this43 = this;
 
             console.warn('getDrawingData \u65B9\u6CD5\u5C06\u5728\u4E0B\u4E00\u4E2A\u7248\u672C\u5220\u9664\u6389,\u8BF7\u4F7F\u7528 getDrawingActions \u4EE3\u66FF');
             var actions = this.state.actions.filter(function (f) {
                 return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
-                var shape = _this41.findShapeById(item.params.id);
+                var shape = _this43.findShapeById(item.params.id);
                 return {
                     type: item.type,
                     params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
@@ -3080,13 +3178,13 @@ var D3Graph = function (_Component) {
     }, {
         key: 'getDrawingActions',
         value: function getDrawingActions() {
-            var _this42 = this;
+            var _this44 = this;
 
             var actions = this.state.actions.filter(function (f) {
                 return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
-                var shape = _this42.findShapeById(item.params.id);
+                var shape = _this44.findShapeById(item.params.id);
                 return {
                     type: item.type,
                     params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
@@ -3183,25 +3281,25 @@ var D3Graph = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this43 = this;
+            var _this45 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
                 _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref8) {
-                        return _this43.ele = _ref8;
+                        return _this45.ele = _ref8;
                     } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this43.hideUserInput(value);
+                        _this45.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this44 = this;
+            var _this46 = this;
 
             var newState = {};
             if (nextProps.attrs) {
@@ -3221,7 +3319,7 @@ var D3Graph = function (_Component) {
             }
             var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this44.doActionsAsync(nextProps.actions);
+                    _this46.doActionsAsync(nextProps.actions);
                 }
             };
             var keys = (0, _keys2.default)(newState);
