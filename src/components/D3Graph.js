@@ -41,6 +41,17 @@ type ActionOptionType = {
     ops: ?Object
 };
 
+interface IDrawing {
+    defaultAttrs?: () => Object,
+    selectedAttrs?: () => Object,
+    render: () => void,
+    initialize?: (graph: mixed) => void,
+    remove?: () => void,
+    toData?: () => Object,
+    getLinkPoint?: () => Point,
+    moveTo: (vec: Point) => void
+}
+
 //#region enums
 /**
  * action枚举
@@ -1059,7 +1070,9 @@ export class ArrowLinkDrawing extends Drawing {
         if (this.labelSelection) {
             this.labelSelection.remove();
         }
+        this.listeners.forEach(listener => listener.remove());
         this.labelSelection = null;
+        emitter.emit(`remove:${this.id}`);
     }
 
     renderLabel(x, y) {
@@ -1087,6 +1100,7 @@ export class ArrowLinkDrawing extends Drawing {
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
+        emitter.emit(`render:${this.id}`);
     }
 
     /**
@@ -1246,6 +1260,7 @@ export class LinkDrawing extends Drawing {
         }
         this.labelSelection = null;
         this.listeners.forEach(listener => listener.remove());
+        emitter.emit(`remove:${this.id}`);
     }
 
     renderLabel(x, y) {
@@ -1278,6 +1293,7 @@ export class LinkDrawing extends Drawing {
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
+        emitter.emit(`render:${this.id}`);
     }
 
     toData() {
@@ -1351,7 +1367,7 @@ registerDrawing("PathDrawing", PathDrawing)
 /**
  * 绘制text
  * */
-export class TextDrawing extends Drawing {
+export class TextDrawing extends Drawing implements IDrawing {
     /**
      * 文本默认的attribute
      * @static
@@ -1386,6 +1402,16 @@ export class TextDrawing extends Drawing {
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("text");
+    }
+
+    moveTo(vec: Point) {
+        if (this.selection) {
+            this.attrs.x += vec.x;
+            this.attrs.y += vec.y;
+            this.selection.attr("x", this.graph.toScreenX(this.attrs.x))
+                .attr("y", this.graph.toScreenY(this.attrs.y));
+            emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
+        }
     }
 }
 
@@ -1563,6 +1589,71 @@ export class TextCircleDrawing extends Drawing {
 }
 
 registerDrawing("TextCircleDrawing", TextCircleDrawing);
+
+export class LinkTextDrawing extends Drawing implements IDrawing {
+    constructor(option) {
+        super(option);
+        this.type = "LinkTextDrawing";
+        this.linkID = getPath(option, "linkID", null);
+        if (!this.linkID) {
+            throw new Error(`linkID is required`);
+        }
+        this.source = null;
+        this.target = null;
+        this.listeners = [];
+    }
+
+    initialize(graph) {
+        super.initialize(graph);
+        this.selection = d3.select(graph.ele).append("text");
+        const link = graph.findShapeById(this.linkID);
+        if (link) {
+            this.source = link.source;
+            this.target = link.target;
+        }
+        //监听link的rerender
+        this.listeners.push(
+            emitter.addListener(`remove:${this.linkID}`, () => {
+                this.remove()
+            })
+        );
+        this.listeners.push(
+            emitter.addListener(`render:${this.linkID}`, () => {
+                this.render();
+            })
+        )
+    }
+
+    // moveTo(vec: Point) {
+    //     if (this.selection) {
+    //         this.attrs.x += vec.x;
+    //         this.attrs.y += vec.y;
+    //         this.selection.attr("x", this.graph.toScreenX(this.attrs.x))
+    //             .attr("y", this.graph.toScreenY(this.attrs.y));
+    //         emitter.emit(EVENT_DRAWING_POSITION_CHANGE, this);
+    //     }
+    // }
+
+    render() {
+        if (this.source && this.target) {
+            const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+            const hx = Math.abs(p1.x - p2.x) / 2;
+            const hy = Math.abs(p1.y - p2.y) / 2;
+            const labelX = Math.min(p1.x, p2.x) + hx;
+            const labelY = Math.min(p1.y, p2.y) + hy;
+            this.attrs.x = this.graph.toScreenX(labelX);
+            this.attrs.y = this.graph.toScreenY(labelY);
+        }
+        super.render();
+    }
+
+    remove() {
+        super.remove();
+        this.listeners.forEach(listener => listener.remove());
+    }
+}
+
+registerDrawing("LinkTextDrawing", LinkTextDrawing);
 //#endregion
 
 //#region Toolbar

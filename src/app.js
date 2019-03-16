@@ -544,6 +544,26 @@ class Example extends Component {
                                 }, this.exec.bind(this))
                             }}>随机画一个点,并选中它
                             </button>
+                            <button type="button" onClick={() => {
+                                const id = guid.raw();
+                                this.setState({
+                                    actionJson: JSON.stringify([{
+                                        type: "draw",
+                                        params: [{
+                                            type: "TextDrawing",
+                                            option: {
+                                                id: id,
+                                                attrs: {
+                                                    x: this.randomX(),
+                                                    y: this.randomY(),
+                                                },
+                                                text:"Hello"
+                                            }
+                                        }]
+                                    }])
+                                }, this.exec.bind(this))
+                            }}>随机绘制一个文本
+                            </button>
                             <button type="button"
                                     onClick={() => {
                                         this.setState({
