@@ -75,7 +75,7 @@ export default class Test extends Component{
 
 ## 如何设置链接线的样式
 
-设置链接线的样式通过设置`options.attrs`进行设置.`option.attrs`支持标准的`svg`属性,可以根据需要再进行其他设置
+设置链接线的样式通过设置`option.attrs`进行设置.`option.attrs`支持标准的`svg`属性,可以根据需要再进行其他设置
 
 如:设置链接线为红色的虚线
 
@@ -100,12 +100,10 @@ export default class Test extends Component{
 }
 ```
 
-## change logs
+## 如何设置箭头链接线的大小?
 
-### next version
+设置箭头链接线的大小需要设置`option.distance`,即箭头的长度,长度越长箭头越大,越短越小
 
-- [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
-- [x] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
 ```
 {
   "type": "draw",
@@ -126,6 +124,13 @@ export default class Test extends Component{
   ]
 }
 ```
+
+## change logs
+
+### next version
+
+- [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
+- [x] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
 - [ ] 链接线支持多文本编辑
 - [ ] 链接线支持折点编辑
 - [ ] 菱形标记待确认
