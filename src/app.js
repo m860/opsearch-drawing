@@ -89,7 +89,7 @@ class Example extends Component {
     exec() {
         try {
             const actions = fromActions(JSON.parse(this.state.actionJson));
-            console.log(actions);
+            // console.log(actions);
             this.setState({
                 actions: actions,
                 manualActionText: JSON.stringify(actions.map(item => {
@@ -572,7 +572,7 @@ class Example extends Component {
                                                 {
                                                     "type": "CircleDrawing",
                                                     "option": {
-                                                        "id": "6f2b983b-8196-f600-5fb9-7710b358ee58",
+                                                        "id": "circle1",
                                                         "attrs": {
                                                             "cx": 197,
                                                             "cy": 82
@@ -588,7 +588,7 @@ class Example extends Component {
                                                 {
                                                     "type": "CircleDrawing",
                                                     "option": {
-                                                        "id": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+                                                        "id": "circle2",
                                                         "attrs": {
                                                             "cx": 57,
                                                             "cy": 82
@@ -604,9 +604,9 @@ class Example extends Component {
                                                 {
                                                     "type": "ArrowLinkDrawing",
                                                     "option": {
-                                                        "id": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
-                                                        "sourceId": "6f2b983b-8196-f600-5fb9-7710b358ee58",
-                                                        "targetId": "3d4d512f-7957-043a-fce0-770b9aa7ff45",
+                                                        "id": "arrowlink",
+                                                        "sourceId": "circle1",
+                                                        "targetId": "circle2",
                                                         "distance": 5
                                                     }
                                                 }
@@ -618,7 +618,7 @@ class Example extends Component {
                                                 {
                                                     "type": "LinkTextDrawing",
                                                     "option": {
-                                                        "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+                                                        "linkID": "arrowlink",
                                                         "text": "abc",
                                                         "attrs": {
                                                             "font-size": 12,
@@ -635,7 +635,7 @@ class Example extends Component {
                                                 {
                                                     "type": "LinkTextDrawing",
                                                     "option": {
-                                                        "linkID": "77634e02-e8fd-c9f3-fbb6-a2ebbb8d9688",
+                                                        "linkID": "arrowlink",
                                                         "text": "def",
                                                         "attrs": {
                                                             "font-size": 12,
@@ -751,7 +751,7 @@ class Example extends Component {
                              return tools;
                          }}
                          onAction={action => {
-                             console.log(action);
+                             // console.log(action);
                          }}
                          original={this.state.original}
                          scale={this.state.scale}

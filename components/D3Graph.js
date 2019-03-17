@@ -13,10 +13,6 @@ var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -1844,9 +1840,6 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
     }, {
         key: 'getLinkPoint',
         value: function getLinkPoint() {
-            // console.log("TextCircleDrawing",this.circleAttrs);
-            // const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
-            // console.log("circle attrs",circleAttrs);
             var x = parseFloat(this.circleAttrs.cx);
             var y = parseFloat(this.circleAttrs.cy);
             return new Point(x, y);
@@ -1913,8 +1906,8 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
         if (!_this24.linkID) {
             throw new Error('linkID is required');
         }
-        _this24.source = null;
-        _this24.target = null;
+        // this.source = null;
+        // this.target = null;
         _this24.listeners = [];
         return _this24;
     }
@@ -1926,11 +1919,11 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
 
             (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("text");
-            var link = graph.findShapeById(this.linkID);
-            if (link) {
-                this.source = link.source;
-                this.target = link.target;
-            }
+            // const link = graph.findShapeById(this.linkID);
+            // if (link) {
+            //     this.source = link.source;
+            //     this.target = link.target;
+            // }
             //监听link的rerender
             this.listeners.push(emitter.addListener('remove:' + this.linkID, function () {
                 _this25.remove();
@@ -1953,8 +1946,9 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
     }, {
         key: 'render',
         value: function render() {
-            if (this.source && this.target) {
-                var _calculateLinkPoint4 = _calculateLinkPoint(this.source, this.target),
+            var link = this.graph.findShapeById(this.linkID);
+            if (link) {
+                var _calculateLinkPoint4 = _calculateLinkPoint(link.source, link.target),
                     p1 = _calculateLinkPoint4.p1,
                     p2 = _calculateLinkPoint4.p2;
 
@@ -1964,6 +1958,7 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
                 var labelY = Math.min(p1.y, p2.y) + hy;
                 this.attrs.x = this.graph.toScreenX(labelX);
                 this.attrs.y = this.graph.toScreenY(labelY);
+                console.log('render <LinkTextDrawing/> x:' + this.attrs.x + ',y:' + this.attrs.y);
             }
             (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'render', this).call(this);
         }
@@ -2093,7 +2088,6 @@ DrawingToolbar.propTypes = {
 };
 
 DrawingToolbar.getShapeID = function (event) {
-    console.dir(event);
     var ele = event.target;
     if (ele.attributes) {
         var node = ele.attributes["shape-id"];
@@ -2107,7 +2101,6 @@ DrawingToolbar.getShapeID = function (event) {
 DrawingToolbar.findShape = function (graph, ele) {
     if (ele.attributes) {
         var shapeId = ele.attributes["shape-id"] ? ele.attributes["shape-id"].value : null;
-        console.log("MoveAction", 'shape-id=' + shapeId);
         if (shapeId) {
             return graph.findShapeById(shapeId);
         }
@@ -2198,18 +2191,16 @@ DrawingToolbar.handlers = {
                                 x: graph.toLocalX(d3.event.offsetX),
                                 y: graph.toLocalY(d3.event.offsetY)
                             };
-
-                            console.log("draw circle", 'mouse point : ' + d3.event.offsetX + ',' + d3.event.offsetY + ',point:' + point.x + ',' + point.y);
                             drawing = new CircleDrawing({
                                 attrs: {
                                     cx: point.x,
                                     cy: point.y
                                 }
                             });
-                            _context9.next = 5;
+                            _context9.next = 4;
                             return graph.doActionsAsync([new DrawAction(drawing)]);
 
-                        case 5:
+                        case 4:
                         case 'end':
                             return _context9.stop();
                     }
@@ -2228,7 +2219,6 @@ DrawingToolbar.handlers = {
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var event = d3.event;
-            console.dir(_this49);
             _this49._sourceID = DrawingToolbar.getShapeID(event);
         }).on("mouseup", function () {
             var event = d3.event;
@@ -2254,11 +2244,9 @@ DrawingToolbar.handlers = {
         svg.on("mousedown", function () {
             var event = d3.event;
             _this50._sourceID = DrawingToolbar.getShapeID(event);
-            console.log('arrow link source id = ' + _this50._sourceID);
         }).on("mouseup", function () {
             var event = d3.event;
             var targetID = DrawingToolbar.getShapeID(event);
-            console.log('arrow link target id = ' + targetID);
             if (_this50._sourceID && targetID) {
                 graph.doActionsAsync([new DrawAction(new ArrowLinkDrawing({
                     sourceId: _this50._sourceID,
@@ -2283,13 +2271,10 @@ DrawingToolbar.handlers = {
                 while (1) {
                     switch (_context10.prev = _context10.next) {
                         case 0:
-                            console.log("TextCircleToolbar", 'click point : ' + d3.event.offsetX + ',' + d3.event.offsetY);
                             point = {
                                 x: graph.toLocalX(d3.event.offsetX),
                                 y: graph.toLocalY(d3.event.offsetY)
                             };
-
-                            console.log("TextCircleToolbar", 'local point : ' + point.x + ',' + point.y);
                             drawing = new TextCircleDrawing({
                                 circleAttrs: {
                                     cx: point.x,
@@ -2297,10 +2282,10 @@ DrawingToolbar.handlers = {
                                 },
                                 text: "A"
                             });
-                            _context10.next = 6;
+                            _context10.next = 4;
                             return graph.doActionsAsync([new DrawAction(drawing)]);
 
-                        case 6:
+                        case 4:
                         case 'end':
                             return _context10.stop();
                     }
@@ -2852,20 +2837,20 @@ var D3Graph = function (_Component) {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(action) {
                 var _this39 = this;
 
-                var index, state, key, id, shape, _id, _shape, _id2, _shape2, _shape3;
+                var index, key, id, shape, _id, _shape, _id2, _shape2, _shape3;
 
                 return _regenerator2.default.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 _context5.t0 = action.type;
-                                _context5.next = _context5.t0 === ActionTypeEnums.draw ? 3 : _context5.t0 === ActionTypeEnums.redraw ? 6 : _context5.t0 === ActionTypeEnums.select ? 26 : _context5.t0 === ActionTypeEnums.unselect ? 37 : _context5.t0 === ActionTypeEnums.delete ? 43 : _context5.t0 === ActionTypeEnums.clear ? 48 : _context5.t0 === ActionTypeEnums.input ? 51 : _context5.t0 === ActionTypeEnums.move ? 54 : 58;
+                                _context5.next = _context5.t0 === ActionTypeEnums.draw ? 3 : _context5.t0 === ActionTypeEnums.redraw ? 6 : _context5.t0 === ActionTypeEnums.select ? 22 : _context5.t0 === ActionTypeEnums.unselect ? 33 : _context5.t0 === ActionTypeEnums.delete ? 39 : _context5.t0 === ActionTypeEnums.clear ? 44 : _context5.t0 === ActionTypeEnums.input ? 47 : _context5.t0 === ActionTypeEnums.move ? 50 : 53;
                                 break;
 
                             case 3:
                                 this.shapes.push(action.params);
                                 this.drawShapes([action.params]);
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
                             case 6:
                                 index = this.shapes.findIndex(function (f) {
@@ -2873,68 +2858,63 @@ var D3Graph = function (_Component) {
                                 });
 
                                 if (!(index >= 0)) {
-                                    _context5.next = 25;
+                                    _context5.next = 21;
                                     break;
                                 }
 
-                                state = {};
-
                                 if (!action.params.state) {
-                                    _context5.next = 22;
+                                    _context5.next = 20;
                                     break;
                                 }
 
                                 _context5.t1 = _regenerator2.default.keys(action.params.state);
 
-                            case 11:
+                            case 10:
                                 if ((_context5.t2 = _context5.t1()).done) {
-                                    _context5.next = 22;
+                                    _context5.next = 20;
                                     break;
                                 }
 
                                 key = _context5.t2.value;
-
-                                console.log("redraw", key + ' typeof ' + (0, _typeof3.default)(this.shapes[index][key]));
-                                _context5.t3 = (0, _typeof3.default)(this.shapes[index][key]);
-                                _context5.next = _context5.t3 === "object" ? 17 : 19;
+                                _context5.t3 = Object.prototype.toString.call(this.shapes[index][key]);
+                                _context5.next = _context5.t3 === "[object Object]" ? 15 : 17;
                                 break;
+
+                            case 15:
+                                this.shapes[index][key] = (0, _assign2.default)({}, this.shapes[index][key], action.params.state[key]);
+                                // state[key] = {$set: };
+                                return _context5.abrupt('break', 18);
 
                             case 17:
-                                state[key] = { $set: (0, _assign2.default)({}, this.shapes[index][key], action.params.state[key]) };
-                                return _context5.abrupt('break', 20);
+                                this.shapes[index][key] = action.params.state[key];
 
-                            case 19:
-                                state[key] = { $set: action.params.state[key] };
-
-                            case 20:
-                                _context5.next = 11;
+                            case 18:
+                                _context5.next = 10;
                                 break;
 
-                            case 22:
-                                console.log("redraw new state", state);
-                                this.shapes[index] = (0, _immutabilityHelper2.default)(this.shapes[index], state);
+                            case 20:
                                 this.drawShapes([this.shapes[index]]);
 
-                            case 25:
-                                return _context5.abrupt('break', 58);
+                            case 21:
+                                return _context5.abrupt('break', 53);
 
-                            case 26:
+                            case 22:
                                 id = action.params;
                                 shape = this.findShapeById(id);
 
                                 if (!shape.selected) {
-                                    _context5.next = 33;
+                                    _context5.next = 29;
                                     break;
                                 }
 
-                                _context5.next = 31;
+                                _context5.next = 27;
                                 return this.doActionAsync(new UnSelectAction(id));
 
-                            case 31:
-                                _context5.next = 35;
+                            case 27:
+                                _context5.next = 31;
                                 break;
 
-                            case 33:
+                            case 29:
                                 shape.selected = true;
                                 if (this.props.selectMode === selectModeEnums.single) {
                                     //将已选中的shape取消选中
@@ -2966,11 +2946,11 @@ var D3Graph = function (_Component) {
                                     this.selectedShapes.push(shape);
                                 }
 
-                            case 35:
+                            case 31:
                                 this.drawShapes([shape]);
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
-                            case 37:
+                            case 33:
                                 _id = action.params;
                                 _shape = this.findShapeById(_id);
 
@@ -2979,9 +2959,9 @@ var D3Graph = function (_Component) {
                                     return f.id !== _id;
                                 });
                                 this.drawShapes([_shape]);
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
-                            case 43:
+                            case 39:
                                 _id2 = action.params;
                                 //删除的图形
 
@@ -3000,9 +2980,9 @@ var D3Graph = function (_Component) {
                                 if (_shape2) {
                                     _shape2.remove();
                                 }
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
-                            case 48:
+                            case 44:
                                 this.shapes.forEach(function () {
                                     var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(shape) {
                                         return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -3025,17 +3005,16 @@ var D3Graph = function (_Component) {
                                     };
                                 }());
                                 this.selectedShapes = [];
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
-                            case 51:
-                                _context5.next = 53;
+                            case 47:
+                                _context5.next = 49;
                                 return this.showUserInputPromise(action);
 
-                            case 53:
-                                return _context5.abrupt('break', 58);
+                            case 49:
+                                return _context5.abrupt('break', 53);
 
-                            case 54:
-                                console.log('move action', action);
+                            case 50:
                                 _shape3 = this.shapes.find(function (f) {
                                     return f.id === action.params.id;
                                 });
@@ -3043,9 +3022,9 @@ var D3Graph = function (_Component) {
                                 if (_shape3) {
                                     _shape3.moveTo(action.params.vec);
                                 }
-                                return _context5.abrupt('break', 58);
+                                return _context5.abrupt('break', 53);
 
-                            case 58:
+                            case 53:
                                 this.setState((0, _immutabilityHelper2.default)(this.state, {
                                     actions: { $push: [action] }
                                 }), function () {
@@ -3054,7 +3033,7 @@ var D3Graph = function (_Component) {
                                     }
                                 });
 
-                            case 59:
+                            case 54:
                             case 'end':
                                 return _context5.stop();
                         }

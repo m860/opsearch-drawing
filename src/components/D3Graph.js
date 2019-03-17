@@ -1555,9 +1555,6 @@ export class TextCircleDrawing extends Drawing {
     }
 
     getLinkPoint() {
-        // console.log("TextCircleDrawing",this.circleAttrs);
-        // const circleAttrs = this.combineAttrs(this.defaultCircleAttrs, this.circleAttrs, this.defaultCircleSelectedAttrs, this.circleSelectedAttrs);
-        // console.log("circle attrs",circleAttrs);
         const x = parseFloat(this.circleAttrs.cx);
         const y = parseFloat(this.circleAttrs.cy);
         return new Point(x, y);
@@ -1598,19 +1595,19 @@ export class LinkTextDrawing extends Drawing implements IDrawing {
         if (!this.linkID) {
             throw new Error(`linkID is required`);
         }
-        this.source = null;
-        this.target = null;
+        // this.source = null;
+        // this.target = null;
         this.listeners = [];
     }
 
     initialize(graph) {
         super.initialize(graph);
         this.selection = d3.select(graph.ele).append("text");
-        const link = graph.findShapeById(this.linkID);
-        if (link) {
-            this.source = link.source;
-            this.target = link.target;
-        }
+        // const link = graph.findShapeById(this.linkID);
+        // if (link) {
+        //     this.source = link.source;
+        //     this.target = link.target;
+        // }
         //监听link的rerender
         this.listeners.push(
             emitter.addListener(`remove:${this.linkID}`, () => {
@@ -1635,14 +1632,16 @@ export class LinkTextDrawing extends Drawing implements IDrawing {
     // }
 
     render() {
-        if (this.source && this.target) {
-            const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+        const link = this.graph.findShapeById(this.linkID);
+        if (link) {
+            const {p1, p2} = _calculateLinkPoint(link.source, link.target);
             const hx = Math.abs(p1.x - p2.x) / 2;
             const hy = Math.abs(p1.y - p2.y) / 2;
             const labelX = Math.min(p1.x, p2.x) + hx;
             const labelY = Math.min(p1.y, p2.y) + hy;
             this.attrs.x = this.graph.toScreenX(labelX);
             this.attrs.y = this.graph.toScreenY(labelY);
+            console.log(`render <LinkTextDrawing/> x:${this.attrs.x},y:${this.attrs.y}`)
         }
         super.render();
     }
@@ -1694,7 +1693,6 @@ export class DrawingToolbar extends PureComponent {
     };
 
     static getShapeID = (event) => {
-        console.dir(event);
         const ele = event.target;
         if (ele.attributes) {
             const node = ele.attributes["shape-id"];
@@ -1708,7 +1706,6 @@ export class DrawingToolbar extends PureComponent {
     static findShape = (graph, ele) => {
         if (ele.attributes) {
             const shapeId = ele.attributes["shape-id"] ? ele.attributes["shape-id"].value : null;
-            console.log("MoveAction", `shape-id=${shapeId}`);
             if (shapeId) {
                 return graph.findShapeById(shapeId);
             }
@@ -1800,7 +1797,6 @@ export class DrawingToolbar extends PureComponent {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
-                console.log("draw circle", `mouse point : ${d3.event.offsetX},${d3.event.offsetY},point:${point.x},${point.y}`)
                 const drawing = new CircleDrawing({
                     attrs: {
                         cx: point.x,
@@ -1821,7 +1817,6 @@ export class DrawingToolbar extends PureComponent {
             const svg = d3.select(graph.ele);
             svg.on("mousedown", () => {
                 const event = d3.event;
-                console.dir(this);
                 this._sourceID = DrawingToolbar.getShapeID(event);
             }).on("mouseup", () => {
                 const event = d3.event;
@@ -1847,11 +1842,9 @@ export class DrawingToolbar extends PureComponent {
             svg.on("mousedown", () => {
                 const event = d3.event;
                 this._sourceID = DrawingToolbar.getShapeID(event);
-                console.log(`arrow link source id = ${this._sourceID}`)
             }).on("mouseup", () => {
                 const event = d3.event;
                 const targetID = DrawingToolbar.getShapeID(event);
-                console.log(`arrow link target id = ${targetID}`);
                 if (this._sourceID && targetID) {
                     graph.doActionsAsync([
                         new DrawAction(new ArrowLinkDrawing({
@@ -1871,12 +1864,10 @@ export class DrawingToolbar extends PureComponent {
             graph.removeAllSvgEvent();
             const svg = d3.select(graph.ele);
             svg.on("mousedown", async () => {
-                console.log("TextCircleToolbar", `click point : ${d3.event.offsetX},${d3.event.offsetY}`)
                 const point = {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
-                console.log("TextCircleToolbar", `local point : ${point.x},${point.y}`)
                 const drawing = new TextCircleDrawing({
                     circleAttrs: {
                         cx: point.x,
@@ -2379,21 +2370,18 @@ export default class D3Graph extends Component {
             case ActionTypeEnums.redraw: {
                 const index = this.shapes.findIndex(f => f.id === action.params.id);
                 if (index >= 0) {
-                    let state = {};
                     if (action.params.state) {
                         for (let key in action.params.state) {
-                            console.log("redraw", `${key} typeof ${typeof this.shapes[index][key]}`)
-                            switch (typeof this.shapes[index][key]) {
-                                case "object":
-                                    state[key] = {$set: Object.assign({}, this.shapes[index][key], action.params.state[key])};
+                            switch (Object.prototype.toString.call(this.shapes[index][key])) {
+                                case "[object Object]":
+                                    this.shapes[index][key] = Object.assign({}, this.shapes[index][key], action.params.state[key])
+                                    // state[key] = {$set: };
                                     break;
                                 default:
-                                    state[key] = {$set: action.params.state[key]};
+                                    this.shapes[index][key] = action.params.state[key];
                             }
                         }
                     }
-                    console.log("redraw new state", state);
-                    this.shapes[index] = update(this.shapes[index], state);
                     this.drawShapes([this.shapes[index]]);
                 }
                 break;
@@ -2456,7 +2444,6 @@ export default class D3Graph extends Component {
                 break;
             }
             case ActionTypeEnums.move: {
-                console.log('move action', action);
                 const shape = this.shapes.find(f => f.id === action.params.id);
                 if (shape) {
                     shape.moveTo(action.params.vec);
