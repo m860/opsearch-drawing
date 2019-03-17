@@ -42,8 +42,6 @@ LineDrawing.selectedAttrs = {
     stroke: "blue"
 };
 
-console.log(JSON.stringify(new ReDrawAction("sdf", {label: 1})))
-
 class Example extends Component {
     constructor(props) {
         super(props);
@@ -95,7 +93,7 @@ class Example extends Component {
             this.setState({
                 actions: actions,
                 manualActionText: JSON.stringify(actions.map(item => {
-                    if (item.params.toData) {
+                    if (item.params && item.params.toData) {
                         let state = item.params.toData().option;
                         delete state.id;
                         return {
@@ -557,7 +555,7 @@ class Example extends Component {
                                                     x: this.randomX(),
                                                     y: this.randomY(),
                                                 },
-                                                text:"Hello"
+                                                text: "Hello"
                                             }
                                         }]
                                     }])
