@@ -16,6 +16,7 @@ import {get as getPath, set as setPath} from 'object-path'
 import update from 'immutability-helper'
 import {EventEmitter} from 'fbemitter'
 import UserInput from "./UserInput"
+import type {InfectionPoint} from "./Types";
 
 //#region event
 const emitter = new EventEmitter();
@@ -23,6 +24,8 @@ const emitter = new EventEmitter();
 const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 //图形的位置发生变化
 const EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
+//PathLinkDrawing更新
+const EVENT_PATH_LINK_DRAWING_RENDER = "EVENT_PATH_LINK_DRAWING_RENDER";
 //#endregion
 
 /**
@@ -1312,6 +1315,149 @@ export class LinkDrawing extends Drawing {
 registerDrawing("LinkDrawing", LinkDrawing);
 
 /**
+ * @TODO 重新计算连接线的起始点位置
+ */
+export class PathLinkDrawing extends Drawing {
+    infectionPoints: Array<InfectionPoint> = [];
+
+    constructor(option) {
+        super(option);
+        this.attrs = Object.assign({
+            fill: "transparent",
+            stroke: "black"
+        }, this.attrs);
+        this.type = "PathLinkDrawing";
+        if (!option.sourceId) {
+            throw new Error("option.sourceId is required");
+        }
+        if (!option.targetId) {
+            throw new Error(`option.targetId is required`);
+        }
+        this.sourceId = option.sourceId;
+        this.targetId = option.targetId;
+        this.source = null;
+        this.target = null;
+        this.listeners = [];
+        if (option.points) {
+            this.infectionPoints = option.points.map(item => {
+                return {
+                    ele: null,
+                    x: item.x,
+                    y: item.y
+                };
+            })
+        }
+    }
+
+
+    initialize(...args) {
+        super.initialize(...args);
+        this.infectionPoints.forEach((item: InfectionPoint) => {
+            item.ele = d3.select(this.graph.ele).append("circle");
+            item.ele.attr("fill", "black")
+                .attr("stroke", "black")
+                .attr("r", 5)
+                .attr("shape-type", "infection-point")
+                .attr("drawing-id", this.id)
+                .attr("cx", this.graph.toScreenX(item.x))
+                .on("mouseover", function () {
+                    d3.select(this).attr("cursor", "move")
+                })
+                .on("mouseout", function () {
+                    d3.select(this).attr("cursor", "default")
+                })
+                .attr("cy", this.graph.toScreenY(item.y));
+        })
+        this.source = this.graph.findShapeById(this.sourceId);
+        this.target = this.graph.findShapeById(this.targetId);
+        this.selection = d3.select(this.graph.ele).append("path");
+        this.listeners.push(
+            emitter.addListener(EVENT_DRAWING_POSITION_CHANGE, shape => {
+                if (shape.id === this.sourceId || shape.id === this.targetId) {
+                    this.render();
+                }
+            })
+        );
+        this.listeners.push(
+            emitter.addListener(EVENT_PATH_LINK_DRAWING_RENDER, (id) => {
+                if (id === this.id) {
+                    this.render();
+                }
+            })
+        )
+    }
+
+    remove() {
+        super.remove();
+        this.infectionPoints.forEach(item => {
+            item.ele.on("mousemove", null)
+                .on("mouseout", null);
+            item.ele.remove();
+        });
+        this.listeners.forEach(listener => listener.remove());
+        emitter.emit(`remove:${this.id}`);
+    }
+
+    getPath(points) {
+        let arr = [];
+        points.forEach((point, index) => {
+            if (index === 0) {
+                arr.push(`M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
+            }
+            else {
+                arr.push(`L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
+            }
+        });
+        return arr.join(" ");
+    }
+
+    getInfectionPoints() {
+        return this.infectionPoints.map(item => {
+            if (item.ele) {
+                const x = parseFloat(item.ele.attr("cx"));
+                const y = parseFloat(item.ele.attr("cy"));
+                return {x, y};
+            }
+            return {x: item.x, y: item.y}
+        });
+    }
+
+    render() {
+        //计算link的位置信息
+        // const p1 = this.source.getLinkPoint();
+        // const p2 = this.target.getLinkPoint();
+        console.log('render')
+        const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+        let points = [p1, ...this.getInfectionPoints(), p2];
+        this.attrs = update(this.attrs, {
+            d: {$set: this.getPath(points)}
+        });
+        super.render();
+        emitter.emit(`render:${this.id}`);
+        // const hx = Math.abs(p1.x - p2.x) / 2;
+        // const hy = Math.abs(p1.y - p2.y) / 2;
+        // const labelX = Math.min(p1.x, p2.x) + hx;
+        // const labelY = Math.min(p1.y, p2.y) + hy;
+        // this.renderLabel(labelX, labelY);
+        // emitter.emit(`render:${this.id}`);
+    }
+
+    toData() {
+        return {
+            type: this.type,
+            option: {
+                id: this.id,
+                sourceId: this.sourceId,
+                targetId: this.targetId,
+                points: this.getInfectionPoints()
+            }
+        }
+    }
+}
+
+registerDrawing("PathLinkDrawing", PathLinkDrawing);
+
+/**
  * 绘画Path
  * */
 export class PathDrawing extends Drawing {
@@ -1653,6 +1799,8 @@ export class LinkTextDrawing extends Drawing implements IDrawing {
 }
 
 registerDrawing("LinkTextDrawing", LinkTextDrawing);
+
+
 //#endregion
 
 //#region Toolbar
@@ -1890,13 +2038,21 @@ export class DrawingToolbar extends PureComponent {
             svg.on("mousedown", () => {
                 const target = d3.event.target;
                 if (target) {
+                    this._target = d3.select(target);
                     const shape = DrawingToolbar.findShape(graph, target);
+                    const shapeType = this._target.attr("shape-type");
                     if (shape) {
                         this._mouseDownPoint = {
                             x: graph.toLocalX(d3.event.offsetX),
                             y: graph.toLocalY(d3.event.offsetY)
                         };
                         this._shape = shape;
+                    }
+                    else if (shapeType === "infection-point") {
+                        this._mouseDownPoint = {
+                            x: graph.toLocalX(d3.event.offsetX),
+                            y: graph.toLocalY(d3.event.offsetY)
+                        };
                     }
                 }
 
@@ -1912,8 +2068,16 @@ export class DrawingToolbar extends PureComponent {
                             y: point.y - this._mouseDownPoint.y
                         };
                         this._mouseDownPoint = point;
+                        const shapeType = this._target.attr("shape-type");
                         if (this._shape) {
                             this._shape.moveTo(vec);
+                        }
+                        else if (shapeType === "infection-point") {
+                            const x = parseFloat(this._target.attr("cx"));
+                            const y = parseFloat(this._target.attr("cy"));
+                            this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
+                            const drawingID = this._target.attr("drawing-id");
+                            emitter.emit(EVENT_PATH_LINK_DRAWING_RENDER, drawingID);
                         }
                     }
                 })
@@ -1924,11 +2088,20 @@ export class DrawingToolbar extends PureComponent {
                             y: graph.toLocalY(d3.event.offsetY) - this._mouseDownPoint.y
                         };
                         delete this._mouseDownPoint;
+                        const shapeType = this._target.attr("shape-type");
                         if (this._shape) {
                             this._shape.moveTo(vec);
                             delete this._shape;
                         }
+                        else if (shapeType === "infection-point") {
+                            const x = parseFloat(this._target.attr("cx"));
+                            const y = parseFloat(this._target.attr("cy"));
+                            this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
+                            const drawingID = this._target.attr("drawing-id");
+                            emitter.emit(EVENT_PATH_LINK_DRAWING_RENDER, drawingID);
+                        }
                     }
+                    delete this._target;
                 })
         }
     };

@@ -406,6 +406,51 @@ class Example extends Component {
                                             option: {
                                                 id: sourceId,
                                                 attrs: {
+                                                    cx: 100,
+                                                    cy: 100
+                                                }
+                                            }
+                                        }]
+                                    }, {
+                                        type: "draw",
+                                        params: [{
+                                            type: "CircleDrawing",
+                                            option: {
+                                                id: targetId,
+                                                attrs: {
+                                                    cx: 200,
+                                                    cy: 100
+                                                }
+                                            }
+                                        }]
+                                    }, {
+                                        type: "draw",
+                                        params: [{
+                                            type: "PathLinkDrawing",
+                                            option: {
+                                                sourceId: sourceId,
+                                                targetId: targetId,
+                                                points: [{
+                                                    x: 150,
+                                                    y: 200
+                                                }]
+                                            }
+                                        }]
+                                    }])
+                                }, this.exec.bind(this))
+                            }}>链接图形(折线)
+                            </button>
+                            <button type="button" onClick={() => {
+                                const sourceId = guid.raw();
+                                const targetId = guid.raw();
+                                this.setState({
+                                    actionJson: JSON.stringify([{
+                                        type: "draw",
+                                        params: [{
+                                            type: "CircleDrawing",
+                                            option: {
+                                                id: sourceId,
+                                                attrs: {
                                                     cx: this.randomX(),
                                                     cy: this.randomY()
                                                 }
