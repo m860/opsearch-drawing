@@ -6,3 +6,9 @@ export type InfectionPoint = {
     y: number,
     ele: any
 };
+
+export type Circle = {
+    x: number,
+    y: number,
+    r: number
+};

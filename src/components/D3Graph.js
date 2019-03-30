@@ -16,7 +16,7 @@ import {get as getPath, set as setPath} from 'object-path'
 import update from 'immutability-helper'
 import {EventEmitter} from 'fbemitter'
 import UserInput from "./UserInput"
-import type {InfectionPoint} from "./Types";
+import type {Circle, InfectionPoint} from "./Types";
 
 //#region event
 const emitter = new EventEmitter();
@@ -174,6 +174,27 @@ function _calculateLinkPoint(source, target) {
         p2.x = ((r2 * (q1.x - q2.x)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q2.x;
         p2.y = ((r2 * (q1.y - q2.y)) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2))) + q2.y;
     }
+    return {
+        p1,
+        p2
+    }
+}
+
+function _calculateCircleLinkPoint(source: Circle, target: Circle) {
+    let p1 = {
+        x: source.x,
+        y: source.y
+    };
+    let p2 = {
+        x: target.x,
+        y: target.y
+    };
+    const r1 = source.r;
+    p1.x = ((r1 * (target.x - source.x)) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2))) + source.x;
+    p1.y = ((r1 * (target.y - source.y)) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2))) + source.y;
+    const r2 = target.r;
+    p2.x = ((r2 * (source.x - target.x)) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2))) + target.x;
+    p2.y = ((r2 * (source.y - target.y)) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2))) + target.y;
     return {
         p1,
         p2
@@ -1426,9 +1447,39 @@ export class PathLinkDrawing extends Drawing {
         //计算link的位置信息
         // const p1 = this.source.getLinkPoint();
         // const p2 = this.target.getLinkPoint();
-        console.log('render')
-        const {p1, p2} = _calculateLinkPoint(this.source, this.target);
-        let points = [p1, ...this.getInfectionPoints(), p2];
+        let begin, end;
+        // const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+        if (this.infectionPoints.length > 0) {
+            //TODO
+            const beginPoint = this.source.getLinkPoint();
+            const endPoint = this.target.getLinkPoint();
+            const {p1} = _calculateCircleLinkPoint({
+                x: beginPoint.x,
+                y: beginPoint.y,
+                r: this.source.r
+            }, {
+                x: parseFloat(this.infectionPoints[0].ele.attr("cx")),
+                y: parseFloat(this.infectionPoints[0].ele.attr("cy")),
+                r: 0
+            });
+            begin = p1;
+            const {p2} = _calculateCircleLinkPoint({
+                x: parseFloat(this.infectionPoints[this.infectionPoints.length - 1].ele.attr("cx")),
+                y: parseFloat(this.infectionPoints[this.infectionPoints.length - 1].ele.attr("cy")),
+                r: 0
+            }, {
+                x: endPoint.x,
+                y: endPoint.y,
+                r: this.target.r
+            });
+            end = p2;
+        }
+        else {
+            const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+            begin = p1;
+            end = p2;
+        }
+        const points = [begin, ...this.getInfectionPoints(), end];
         this.attrs = update(this.attrs, {
             d: {$set: this.getPath(points)}
         });
