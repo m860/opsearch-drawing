@@ -17,6 +17,7 @@ import update from 'immutability-helper'
 import {EventEmitter} from 'fbemitter'
 import UserInput from "./UserInput"
 import type {Circle, InfectionPoint} from "./Types";
+import {getArrowPath} from "./Utils";
 
 //#region event
 const emitter = new EventEmitter();
@@ -1368,6 +1369,10 @@ export class PathLinkDrawing extends Drawing {
                 };
             })
         }
+        this.arrow = null;
+        if (option.arrow) {
+            this.arrow = option.arrow;
+        }
     }
 
 
@@ -1479,7 +1484,11 @@ export class PathLinkDrawing extends Drawing {
             begin = p1;
             end = p2;
         }
-        const points = [begin, ...this.getInfectionPoints(), end];
+        let points = [begin, ...this.getInfectionPoints(), end];
+        if (this.arrow) {
+            const arrowPoint = getArrowPath(points[points.length - 2], points[points.length - 1], this.arrow.distance || 5);
+            points = [begin, ...this.getInfectionPoints(), ...arrowPoint];
+        }
         this.attrs = update(this.attrs, {
             d: {$set: this.getPath(points)}
         });
