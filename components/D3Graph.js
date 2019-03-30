@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.LinkTextDrawing = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.ActionTypeEnums = undefined;
+exports.default = exports.MoveToolbar = exports.TextCircleToolbar = exports.ArrowLinkToolbar = exports.LinkToolbar = exports.CircleToolbar = exports.LineToolbar = exports.NoneToolbar = exports.DrawingToolbar = exports.Toolbar = exports.LinkTextDrawing = exports.TextCircleDrawing = exports.TextDrawing = exports.PathDrawing = exports.PathLinkDrawing = exports.LinkDrawing = exports.ArrowLinkDrawing = exports.NumberScaleDrawing = exports.RectDrawing = exports.DotDrawing = exports.CircleDrawing = exports.LineDrawing = exports.Drawing = exports.MoveAction = exports.ReDrawAction = exports.ClearAction = exports.DeleteAction = exports.UnSelectAction = exports.SelectAction = exports.DrawAction = exports.InputAction = exports.coordinateTypeEnum = exports.graphModeEnum = exports.ActionTypeEnums = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -25,9 +25,9 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _get2 = require('babel-runtime/helpers/get');
+var _get3 = require('babel-runtime/helpers/get');
 
-var _get3 = _interopRequireDefault(_get2);
+var _get4 = _interopRequireDefault(_get3);
 
 var _assign = require('babel-runtime/core-js/object/assign');
 
@@ -96,13 +96,13 @@ var _UserInput = require('./UserInput');
 
 var _UserInput2 = _interopRequireDefault(_UserInput);
 
+var _Utils = require('./Utils');
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 //#region event
-var emitter = new _fbemitter.EventEmitter();
-//toolbar 按钮切换
 /**
  * @todo 实现用户的输入action,输入action是一个中断操作
  * 实现link,arrowLink的label
@@ -112,9 +112,13 @@ var emitter = new _fbemitter.EventEmitter();
  *
  * */
 
+var emitter = new _fbemitter.EventEmitter();
+//toolbar 按钮切换
 var EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 //图形的位置发生变化
 var EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
+//PathLinkDrawing更新
+var EVENT_PATH_LINK_DRAWING_RENDER = "EVENT_PATH_LINK_DRAWING_RENDER";
 //#endregion
 
 /**
@@ -240,6 +244,27 @@ function _calculateLinkPoint(source, target) {
         p2.x = r2 * (q1.x - q2.x) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q2.x;
         p2.y = r2 * (q1.y - q2.y) / Math.sqrt(Math.pow(q1.x - q2.x, 2) + Math.pow(q1.y - q2.y, 2)) + q2.y;
     }
+    return {
+        p1: p1,
+        p2: p2
+    };
+}
+
+function _calculateCircleLinkPoint(source, target) {
+    var p1 = {
+        x: source.x,
+        y: source.y
+    };
+    var p2 = {
+        x: target.x,
+        y: target.y
+    };
+    var r1 = source.r;
+    p1.x = r1 * (target.x - source.x) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2)) + source.x;
+    p1.y = r1 * (target.y - source.y) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2)) + source.y;
+    var r2 = target.r;
+    p2.x = r2 * (source.x - target.x) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2)) + target.x;
+    p2.y = r2 * (source.y - target.y) / Math.sqrt(Math.pow(source.x - target.x, 2) + Math.pow(source.y - target.y, 2)) + target.y;
     return {
         p1: p1,
         p2: p2
@@ -812,7 +837,7 @@ var LineDrawing = exports.LineDrawing = function (_Drawing) {
         value: function initialize(graph) {
             var _this10 = this;
 
-            (0, _get3.default)(LineDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LineDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(LineDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LineDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("line");
             this.selection.on("mouseover", function (a, b, eles) {
                 if (eles.length > 0) {
@@ -901,7 +926,7 @@ var CircleDrawing = exports.CircleDrawing = function (_Drawing2) {
     (0, _createClass3.default)(CircleDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(CircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(CircleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(CircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(CircleDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("circle");
         }
     }, {
@@ -983,7 +1008,7 @@ var DotDrawing = exports.DotDrawing = function (_Drawing3) {
     (0, _createClass3.default)(DotDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(DotDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(DotDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(DotDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(DotDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("circle");
         }
     }, {
@@ -1052,7 +1077,7 @@ var RectDrawing = exports.RectDrawing = function (_Drawing4) {
     (0, _createClass3.default)(RectDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(RectDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(RectDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(RectDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(RectDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("path");
         }
     }, {
@@ -1112,7 +1137,7 @@ var NumberScaleDrawing = exports.NumberScaleDrawing = function (_Drawing5) {
         value: function initialize(graph) {
             var _this15 = this;
 
-            (0, _get3.default)(NumberScaleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(NumberScaleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(NumberScaleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(NumberScaleDrawing.prototype), 'initialize', this).call(this, graph);
             // const width = graph.ele.clientWidth;
             // const height = graph.ele.clientHeight;
             this.selection = d3.select(graph.ele).append("g");
@@ -1228,7 +1253,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
         value: function initialize(graph) {
             var _this17 = this;
 
-            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'initialize', this).call(this, graph);
             this.source = this.graph.findShapeById(this.sourceId);
             this.target = this.graph.findShapeById(this.targetId);
             this.selection = d3.select(graph.ele).append("path");
@@ -1263,7 +1288,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
     }, {
         key: 'remove',
         value: function remove() {
-            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'remove', this).call(this);
+            (0, _get4.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'remove', this).call(this);
             if (this.labelSelection) {
                 this.labelSelection.remove();
             }
@@ -1298,7 +1323,7 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
                 d: { $set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ') }
             });
-            (0, _get3.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
+            (0, _get4.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
@@ -1439,7 +1464,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
         value: function initialize(graph) {
             var _this19 = this;
 
-            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'initialize', this).call(this, graph);
             this.source = this.graph.findShapeById(this.sourceId);
             this.target = this.graph.findShapeById(this.targetId);
             this.selection = d3.select(graph.ele).append("line");
@@ -1471,7 +1496,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
     }, {
         key: 'remove',
         value: function remove() {
-            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'remove', this).call(this);
+            (0, _get4.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'remove', this).call(this);
             if (this.labelSelection) {
                 this.labelSelection.remove();
             }
@@ -1511,7 +1536,7 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
                 x2: { $set: p2.x },
                 y2: { $set: p2.y }
             });
-            (0, _get3.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'render', this).call(this);
+            (0, _get4.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
@@ -1559,11 +1584,213 @@ LinkDrawing.selectedAttrs = {
 registerDrawing("LinkDrawing", LinkDrawing);
 
 /**
+ * @TODO 重新计算连接线的起始点位置
+ */
+
+var PathLinkDrawing = exports.PathLinkDrawing = function (_Drawing8) {
+    (0, _inherits3.default)(PathLinkDrawing, _Drawing8);
+
+    function PathLinkDrawing(option) {
+        (0, _classCallCheck3.default)(this, PathLinkDrawing);
+
+        var _this20 = (0, _possibleConstructorReturn3.default)(this, (PathLinkDrawing.__proto__ || (0, _getPrototypeOf2.default)(PathLinkDrawing)).call(this, option));
+
+        _this20.infectionPoints = [];
+
+        _this20.attrs = (0, _assign2.default)({
+            fill: "transparent",
+            stroke: "black"
+        }, _this20.attrs);
+        _this20.type = "PathLinkDrawing";
+        if (!option.sourceId) {
+            throw new Error("option.sourceId is required");
+        }
+        if (!option.targetId) {
+            throw new Error('option.targetId is required');
+        }
+        _this20.sourceId = option.sourceId;
+        _this20.targetId = option.targetId;
+        _this20.source = null;
+        _this20.target = null;
+        _this20.listeners = [];
+        if (option.points) {
+            _this20.infectionPoints = option.points.map(function (item) {
+                return {
+                    ele: null,
+                    x: item.x,
+                    y: item.y
+                };
+            });
+        }
+        _this20.arrow = null;
+        if (option.arrow) {
+            _this20.arrow = option.arrow;
+        }
+        return _this20;
+    }
+
+    (0, _createClass3.default)(PathLinkDrawing, [{
+        key: 'initialize',
+        value: function initialize() {
+            var _get2,
+                _this21 = this;
+
+            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                args[_key] = arguments[_key];
+            }
+
+            (_get2 = (0, _get4.default)(PathLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathLinkDrawing.prototype), 'initialize', this)).call.apply(_get2, [this].concat(args));
+            this.infectionPoints.forEach(function (item) {
+                item.ele = d3.select(_this21.graph.ele).append("circle");
+                item.ele.attr("fill", "black").attr("stroke", "black").attr("r", 5).attr("shape-type", "infection-point").attr("drawing-id", _this21.id).attr("cx", _this21.graph.toScreenX(item.x)).on("mouseover", function () {
+                    d3.select(this).attr("cursor", "move");
+                }).on("mouseout", function () {
+                    d3.select(this).attr("cursor", "default");
+                }).attr("cy", _this21.graph.toScreenY(item.y));
+            });
+            this.source = this.graph.findShapeById(this.sourceId);
+            this.target = this.graph.findShapeById(this.targetId);
+            this.selection = d3.select(this.graph.ele).append("path");
+            this.listeners.push(emitter.addListener(EVENT_DRAWING_POSITION_CHANGE, function (shape) {
+                if (shape.id === _this21.sourceId || shape.id === _this21.targetId) {
+                    _this21.render();
+                }
+            }));
+            this.listeners.push(emitter.addListener(EVENT_PATH_LINK_DRAWING_RENDER, function (id) {
+                if (id === _this21.id) {
+                    _this21.render();
+                }
+            }));
+        }
+    }, {
+        key: 'remove',
+        value: function remove() {
+            (0, _get4.default)(PathLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathLinkDrawing.prototype), 'remove', this).call(this);
+            this.infectionPoints.forEach(function (item) {
+                item.ele.on("mousemove", null).on("mouseout", null);
+                item.ele.remove();
+            });
+            this.listeners.forEach(function (listener) {
+                return listener.remove();
+            });
+            emitter.emit('remove:' + this.id);
+        }
+    }, {
+        key: 'getPath',
+        value: function getPath(points) {
+            var _this22 = this;
+
+            var arr = [];
+            points.forEach(function (point, index) {
+                if (index === 0) {
+                    arr.push('M ' + _this22.graph.toScreenX(point.x) + ' ' + _this22.graph.toScreenY(point.y));
+                } else {
+                    arr.push('L ' + _this22.graph.toScreenX(point.x) + ' ' + _this22.graph.toScreenY(point.y));
+                }
+            });
+            return arr.join(" ");
+        }
+    }, {
+        key: 'getInfectionPoints',
+        value: function getInfectionPoints() {
+            return this.infectionPoints.map(function (item) {
+                if (item.ele) {
+                    var x = parseFloat(item.ele.attr("cx"));
+                    var y = parseFloat(item.ele.attr("cy"));
+                    return { x: x, y: y };
+                }
+                return { x: item.x, y: item.y };
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            //计算link的位置信息
+            // const p1 = this.source.getLinkPoint();
+            // const p2 = this.target.getLinkPoint();
+            var begin = void 0,
+                end = void 0;
+            // const {p1, p2} = _calculateLinkPoint(this.source, this.target);
+            if (this.infectionPoints.length > 0) {
+                //TODO
+                var beginPoint = this.source.getLinkPoint();
+                var endPoint = this.target.getLinkPoint();
+
+                var _calculateCircleLinkP = _calculateCircleLinkPoint({
+                    x: beginPoint.x,
+                    y: beginPoint.y,
+                    r: this.source.r
+                }, {
+                    x: parseFloat(this.infectionPoints[0].ele.attr("cx")),
+                    y: parseFloat(this.infectionPoints[0].ele.attr("cy")),
+                    r: 0
+                }),
+                    p1 = _calculateCircleLinkP.p1;
+
+                begin = p1;
+
+                var _calculateCircleLinkP2 = _calculateCircleLinkPoint({
+                    x: parseFloat(this.infectionPoints[this.infectionPoints.length - 1].ele.attr("cx")),
+                    y: parseFloat(this.infectionPoints[this.infectionPoints.length - 1].ele.attr("cy")),
+                    r: 0
+                }, {
+                    x: endPoint.x,
+                    y: endPoint.y,
+                    r: this.target.r
+                }),
+                    p2 = _calculateCircleLinkP2.p2;
+
+                end = p2;
+            } else {
+                var _calculateLinkPoint4 = _calculateLinkPoint(this.source, this.target),
+                    _p = _calculateLinkPoint4.p1,
+                    _p2 = _calculateLinkPoint4.p2;
+
+                begin = _p;
+                end = _p2;
+            }
+            var points = [begin].concat((0, _toConsumableArray3.default)(this.getInfectionPoints()), [end]);
+            if (this.arrow) {
+                var arrowPoint = (0, _Utils.getArrowPath)(points[points.length - 2], points[points.length - 1], this.arrow.distance || 5);
+                points = [begin].concat((0, _toConsumableArray3.default)(this.getInfectionPoints()), (0, _toConsumableArray3.default)(arrowPoint));
+            }
+            this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
+                d: { $set: this.getPath(points) }
+            });
+            (0, _get4.default)(PathLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathLinkDrawing.prototype), 'render', this).call(this);
+            emitter.emit('render:' + this.id);
+            // const hx = Math.abs(p1.x - p2.x) / 2;
+            // const hy = Math.abs(p1.y - p2.y) / 2;
+            // const labelX = Math.min(p1.x, p2.x) + hx;
+            // const labelY = Math.min(p1.y, p2.y) + hy;
+            // this.renderLabel(labelX, labelY);
+            // emitter.emit(`render:${this.id}`);
+        }
+    }, {
+        key: 'toData',
+        value: function toData() {
+            return {
+                type: this.type,
+                option: {
+                    id: this.id,
+                    sourceId: this.sourceId,
+                    targetId: this.targetId,
+                    points: this.getInfectionPoints()
+                }
+            };
+        }
+    }]);
+    return PathLinkDrawing;
+}(Drawing);
+
+registerDrawing("PathLinkDrawing", PathLinkDrawing);
+
+/**
  * 绘画Path
  * */
 
-var PathDrawing = exports.PathDrawing = function (_Drawing8) {
-    (0, _inherits3.default)(PathDrawing, _Drawing8);
+var PathDrawing = exports.PathDrawing = function (_Drawing9) {
+    (0, _inherits3.default)(PathDrawing, _Drawing9);
 
     /**
      * path默认的attribute
@@ -1573,11 +1800,11 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
     function PathDrawing(option) {
         (0, _classCallCheck3.default)(this, PathDrawing);
 
-        var _this20 = (0, _possibleConstructorReturn3.default)(this, (PathDrawing.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing)).call(this, option));
+        var _this23 = (0, _possibleConstructorReturn3.default)(this, (PathDrawing.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing)).call(this, option));
 
-        _this20.type = "PathDrawing";
-        _this20.d = (0, _objectPath.get)(option, "d", []);
-        return _this20;
+        _this23.type = "PathDrawing";
+        _this23.d = (0, _objectPath.get)(option, "d", []);
+        return _this23;
     }
     /**
      * path选中的attribute
@@ -1589,25 +1816,25 @@ var PathDrawing = exports.PathDrawing = function (_Drawing8) {
     (0, _createClass3.default)(PathDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("path");
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this21 = this;
+            var _this24 = this;
 
             if (!this.attrs.d) {
                 var d = this.d.map(function (point, index) {
                     if (index === 0) {
-                        return 'M ' + _this21.graph.toScreenX(point.x) + ' ' + _this21.graph.toScreenY(point.y);
+                        return 'M ' + _this24.graph.toScreenX(point.x) + ' ' + _this24.graph.toScreenY(point.y);
                     }
-                    return 'L ' + _this21.graph.toScreenX(point.x) + ' ' + _this21.graph.toScreenY(point.y);
+                    return 'L ' + _this24.graph.toScreenX(point.x) + ' ' + _this24.graph.toScreenY(point.y);
                 });
                 d.push("Z");
                 this.attrs.d = d.join(" ");
             }
-            (0, _get3.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'render', this).call(this);
+            (0, _get4.default)(PathDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathDrawing.prototype), 'render', this).call(this);
         }
     }, {
         key: 'defaultAttrs',
@@ -1633,8 +1860,8 @@ registerDrawing("PathDrawing", PathDrawing);
  * 绘制text
  * */
 
-var TextDrawing = exports.TextDrawing = function (_Drawing9) {
-    (0, _inherits3.default)(TextDrawing, _Drawing9);
+var TextDrawing = exports.TextDrawing = function (_Drawing10) {
+    (0, _inherits3.default)(TextDrawing, _Drawing10);
 
     /**
      * 文本默认的attribute
@@ -1644,10 +1871,10 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
     function TextDrawing(option) {
         (0, _classCallCheck3.default)(this, TextDrawing);
 
-        var _this22 = (0, _possibleConstructorReturn3.default)(this, (TextDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing)).call(this, option));
+        var _this25 = (0, _possibleConstructorReturn3.default)(this, (TextDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing)).call(this, option));
 
-        _this22.type = "TextDrawing";
-        return _this22;
+        _this25.type = "TextDrawing";
+        return _this25;
     }
     /**
      * 文本选中的attribute
@@ -1659,7 +1886,7 @@ var TextDrawing = exports.TextDrawing = function (_Drawing9) {
     (0, _createClass3.default)(TextDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(TextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(TextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("text");
         }
     }, {
@@ -1701,8 +1928,8 @@ registerDrawing("TextDrawing", TextDrawing);
  * 绘制带文本的圆圈
  */
 
-var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
-    (0, _inherits3.default)(TextCircleDrawing, _Drawing10);
+var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing11) {
+    (0, _inherits3.default)(TextCircleDrawing, _Drawing11);
     (0, _createClass3.default)(TextCircleDrawing, [{
         key: 'defaultCircleAttrs',
 
@@ -1774,52 +2001,52 @@ var TextCircleDrawing = exports.TextCircleDrawing = function (_Drawing10) {
          * 绘制的类型
          * @member {String}
          * */
-        var _this23 = (0, _possibleConstructorReturn3.default)(this, (TextCircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing)).call(this, option));
+        var _this26 = (0, _possibleConstructorReturn3.default)(this, (TextCircleDrawing.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing)).call(this, option));
 
-        _this23.type = "TextCircleDrawing";
+        _this26.type = "TextCircleDrawing";
         /**
          * 圆圈的属性
          * @member {Object}
          * @private
          * */
-        _this23.circleAttrs = (0, _objectPath.get)(option, "circleAttrs", {});
+        _this26.circleAttrs = (0, _objectPath.get)(option, "circleAttrs", {});
         /**
          * 圆圈选中的属性
          * @member {Object}
          * @private
          * */
-        _this23.circleSelectedAttrs = (0, _objectPath.get)(option, "circleSelectedAttrs", {});
+        _this26.circleSelectedAttrs = (0, _objectPath.get)(option, "circleSelectedAttrs", {});
         /**
          * 文本的属性
          * @member {Object}
          * @private
          * */
-        _this23.textAttrs = (0, _objectPath.get)(option, "textAttrs", {});
+        _this26.textAttrs = (0, _objectPath.get)(option, "textAttrs", {});
         /**
          * 文本选中的属性
          * @member {Object}
          * @private
          * */
-        _this23.textSelectedAttrs = (0, _objectPath.get)(option, "textSelectedAttrs", {});
+        _this26.textSelectedAttrs = (0, _objectPath.get)(option, "textSelectedAttrs", {});
         /**
          * 文本的selection
          * @member {D3.Selection}
          * @private
          * */
-        _this23.textSelection = null;
+        _this26.textSelection = null;
         /**
          * 圆圈的selection
          * @member {D3.Selection}
          * @private
          * */
-        _this23.circleSelection = null;
-        return _this23;
+        _this26.circleSelection = null;
+        return _this26;
     }
 
     (0, _createClass3.default)(TextCircleDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            (0, _get3.default)(TextCircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(TextCircleDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(TextCircleDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("g");
             //add  circle
             this.circleSelection = this.selection.append("circle");
@@ -1893,31 +2120,31 @@ TextCircleDrawing.textSelectedAttrs = {
 
 registerDrawing("TextCircleDrawing", TextCircleDrawing);
 
-var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
-    (0, _inherits3.default)(LinkTextDrawing, _Drawing11);
+var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing12) {
+    (0, _inherits3.default)(LinkTextDrawing, _Drawing12);
 
     function LinkTextDrawing(option) {
         (0, _classCallCheck3.default)(this, LinkTextDrawing);
 
-        var _this24 = (0, _possibleConstructorReturn3.default)(this, (LinkTextDrawing.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing)).call(this, option));
+        var _this27 = (0, _possibleConstructorReturn3.default)(this, (LinkTextDrawing.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing)).call(this, option));
 
-        _this24.type = "LinkTextDrawing";
-        _this24.linkID = (0, _objectPath.get)(option, "linkID", null);
-        if (!_this24.linkID) {
+        _this27.type = "LinkTextDrawing";
+        _this27.linkID = (0, _objectPath.get)(option, "linkID", null);
+        if (!_this27.linkID) {
             throw new Error('linkID is required');
         }
         // this.source = null;
         // this.target = null;
-        _this24.listeners = [];
-        return _this24;
+        _this27.listeners = [];
+        return _this27;
     }
 
     (0, _createClass3.default)(LinkTextDrawing, [{
         key: 'initialize',
         value: function initialize(graph) {
-            var _this25 = this;
+            var _this28 = this;
 
-            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'initialize', this).call(this, graph);
+            (0, _get4.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'initialize', this).call(this, graph);
             this.selection = d3.select(graph.ele).append("text");
             // const link = graph.findShapeById(this.linkID);
             // if (link) {
@@ -1926,10 +2153,10 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
             // }
             //监听link的rerender
             this.listeners.push(emitter.addListener('remove:' + this.linkID, function () {
-                _this25.remove();
+                _this28.remove();
             }));
             this.listeners.push(emitter.addListener('render:' + this.linkID, function () {
-                _this25.render();
+                _this28.render();
             }));
         }
 
@@ -1948,9 +2175,9 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
         value: function render() {
             var link = this.graph.findShapeById(this.linkID);
             if (link) {
-                var _calculateLinkPoint4 = _calculateLinkPoint(link.source, link.target),
-                    p1 = _calculateLinkPoint4.p1,
-                    p2 = _calculateLinkPoint4.p2;
+                var _calculateLinkPoint5 = _calculateLinkPoint(link.source, link.target),
+                    p1 = _calculateLinkPoint5.p1,
+                    p2 = _calculateLinkPoint5.p2;
 
                 var hx = Math.abs(p1.x - p2.x) / 2;
                 var hy = Math.abs(p1.y - p2.y) / 2;
@@ -1960,12 +2187,12 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
                 this.attrs.y = this.graph.toScreenY(labelY);
                 console.log('render <LinkTextDrawing/> x:' + this.attrs.x + ',y:' + this.attrs.y);
             }
-            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'render', this).call(this);
+            (0, _get4.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'render', this).call(this);
         }
     }, {
         key: 'remove',
         value: function remove() {
-            (0, _get3.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'remove', this).call(this);
+            (0, _get4.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'remove', this).call(this);
             this.listeners.forEach(function (listener) {
                 return listener.remove();
             });
@@ -1975,6 +2202,7 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing11) {
 }(Drawing);
 
 registerDrawing("LinkTextDrawing", LinkTextDrawing);
+
 //#endregion
 
 //#region Toolbar
@@ -2021,13 +2249,13 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     function DrawingToolbar(props) {
         (0, _classCallCheck3.default)(this, DrawingToolbar);
 
-        var _this27 = (0, _possibleConstructorReturn3.default)(this, (DrawingToolbar.__proto__ || (0, _getPrototypeOf2.default)(DrawingToolbar)).call(this, props));
+        var _this30 = (0, _possibleConstructorReturn3.default)(this, (DrawingToolbar.__proto__ || (0, _getPrototypeOf2.default)(DrawingToolbar)).call(this, props));
 
-        _this27.listener = null;
-        _this27.state = {
+        _this30.listener = null;
+        _this30.state = {
             selected: false
         };
-        return _this27;
+        return _this30;
     }
 
     /**
@@ -2039,7 +2267,7 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     (0, _createClass3.default)(DrawingToolbar, [{
         key: 'render',
         value: function render() {
-            var _this28 = this;
+            var _this31 = this;
 
             return _react2.default.createElement(
                 Toolbar,
@@ -2050,8 +2278,8 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
                     onClick: function onClick() {
                         var _props;
 
-                        emitter.emit(EVENT_TOOLBAR_CHANGE, _this28.props.type);
-                        _this28.props.onClick && (_props = _this28.props).onClick.apply(_props, arguments);
+                        emitter.emit(EVENT_TOOLBAR_CHANGE, _this31.props.type);
+                        _this31.props.onClick && (_props = _this31.props).onClick.apply(_props, arguments);
                     } },
                 this.props.children
             );
@@ -2059,11 +2287,11 @@ var DrawingToolbar = exports.DrawingToolbar = function (_PureComponent2) {
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this29 = this;
+            var _this32 = this;
 
             this.listener = emitter.addListener(EVENT_TOOLBAR_CHANGE, function (type) {
-                _this29.setState({
-                    selected: type === _this29.props.type
+                _this32.setState({
+                    selected: type === _this32.props.type
                 });
             });
         }
@@ -2136,7 +2364,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setLineDrawHandler: function setLineDrawHandler(graph) {
-        var _this47 = this;
+        var _this50 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2153,15 +2381,15 @@ DrawingToolbar.handlers = {
                     y2: point.y
                 }
             });
-            _this47._id = drawing.id;
+            _this50._id = drawing.id;
             graph.doActionsAsync([new DrawAction(drawing)]);
         }).on("mousemove", function () {
-            if (_this47._id) {
+            if (_this50._id) {
                 var point = {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
-                graph.doActionsAsync([new ReDrawAction(_this47._id, {
+                graph.doActionsAsync([new ReDrawAction(_this50._id, {
                     attrs: {
                         x2: point.x,
                         y2: point.y
@@ -2169,7 +2397,7 @@ DrawingToolbar.handlers = {
                 })]);
             }
         }).on("mouseup", function () {
-            delete _this47._id;
+            delete _this50._id;
         });
     },
     /**
@@ -2177,7 +2405,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setCircleDrawHandler: function setCircleDrawHandler(graph) {
-        var _this48 = this;
+        var _this51 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2205,7 +2433,7 @@ DrawingToolbar.handlers = {
                             return _context9.stop();
                     }
                 }
-            }, _callee9, _this48);
+            }, _callee9, _this51);
         })));
     },
     /**
@@ -2213,23 +2441,23 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setLinkDrawHandler: function setLinkDrawHandler(graph) {
-        var _this49 = this;
+        var _this52 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var event = d3.event;
-            _this49._sourceID = DrawingToolbar.getShapeID(event);
+            _this52._sourceID = DrawingToolbar.getShapeID(event);
         }).on("mouseup", function () {
             var event = d3.event;
             var targetID = DrawingToolbar.getShapeID(event);
-            if (_this49._sourceID && targetID) {
+            if (_this52._sourceID && targetID) {
                 graph.doActionsAsync([new DrawAction(new LinkDrawing({
-                    sourceId: _this49._sourceID,
+                    sourceId: _this52._sourceID,
                     targetId: targetID
                 }))]);
             }
-            delete _this49._sourceID;
+            delete _this52._sourceID;
         });
     },
     /**
@@ -2237,23 +2465,23 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setArrowLinkDrawHandler: function setArrowLinkDrawHandler(graph) {
-        var _this50 = this;
+        var _this53 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var event = d3.event;
-            _this50._sourceID = DrawingToolbar.getShapeID(event);
+            _this53._sourceID = DrawingToolbar.getShapeID(event);
         }).on("mouseup", function () {
             var event = d3.event;
             var targetID = DrawingToolbar.getShapeID(event);
-            if (_this50._sourceID && targetID) {
+            if (_this53._sourceID && targetID) {
                 graph.doActionsAsync([new DrawAction(new ArrowLinkDrawing({
-                    sourceId: _this50._sourceID,
+                    sourceId: _this53._sourceID,
                     targetId: targetID
                 }))]);
             }
-            delete _this50._sourceID;
+            delete _this53._sourceID;
         });
     },
     /**
@@ -2261,7 +2489,7 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setTextCircleDrawHandler: function setTextCircleDrawHandler(graph) {
-        var _this51 = this;
+        var _this54 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
@@ -2290,7 +2518,7 @@ DrawingToolbar.handlers = {
                             return _context10.stop();
                     }
                 }
-            }, _callee10, _this51);
+            }, _callee10, _this54);
         })));
     },
     /**
@@ -2298,49 +2526,71 @@ DrawingToolbar.handlers = {
      * @param graph
      */
     setMoveHandler: function setMoveHandler(graph) {
-        var _this52 = this;
+        var _this55 = this;
 
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("mousedown", function () {
             var target = d3.event.target;
             if (target) {
+                _this55._target = d3.select(target);
                 var shape = DrawingToolbar.findShape(graph, target);
+                var shapeType = _this55._target.attr("shape-type");
                 if (shape) {
-                    _this52._mouseDownPoint = {
+                    _this55._mouseDownPoint = {
                         x: graph.toLocalX(d3.event.offsetX),
                         y: graph.toLocalY(d3.event.offsetY)
                     };
-                    _this52._shape = shape;
+                    _this55._shape = shape;
+                } else if (shapeType === "infection-point") {
+                    _this55._mouseDownPoint = {
+                        x: graph.toLocalX(d3.event.offsetX),
+                        y: graph.toLocalY(d3.event.offsetY)
+                    };
                 }
             }
         }).on("mousemove", function () {
-            if (_this52._mouseDownPoint) {
+            if (_this55._mouseDownPoint) {
                 var point = {
                     x: graph.toLocalX(d3.event.offsetX),
                     y: graph.toLocalY(d3.event.offsetY)
                 };
                 var _vec = {
-                    x: point.x - _this52._mouseDownPoint.x,
-                    y: point.y - _this52._mouseDownPoint.y
+                    x: point.x - _this55._mouseDownPoint.x,
+                    y: point.y - _this55._mouseDownPoint.y
                 };
-                _this52._mouseDownPoint = point;
-                if (_this52._shape) {
-                    _this52._shape.moveTo(_vec);
+                _this55._mouseDownPoint = point;
+                var shapeType = _this55._target.attr("shape-type");
+                if (_this55._shape) {
+                    _this55._shape.moveTo(_vec);
+                } else if (shapeType === "infection-point") {
+                    var x = parseFloat(_this55._target.attr("cx"));
+                    var y = parseFloat(_this55._target.attr("cy"));
+                    _this55._target.attr("cx", x + _vec.x).attr("cy", y + _vec.y);
+                    var drawingID = _this55._target.attr("drawing-id");
+                    emitter.emit(EVENT_PATH_LINK_DRAWING_RENDER, drawingID);
                 }
             }
         }).on("mouseup", function () {
-            if (_this52._mouseDownPoint) {
+            if (_this55._mouseDownPoint) {
                 var _vec2 = {
-                    x: graph.toLocalX(d3.event.offsetX) - _this52._mouseDownPoint.x,
-                    y: graph.toLocalY(d3.event.offsetY) - _this52._mouseDownPoint.y
+                    x: graph.toLocalX(d3.event.offsetX) - _this55._mouseDownPoint.x,
+                    y: graph.toLocalY(d3.event.offsetY) - _this55._mouseDownPoint.y
                 };
-                delete _this52._mouseDownPoint;
-                if (_this52._shape) {
-                    _this52._shape.moveTo(_vec2);
-                    delete _this52._shape;
+                delete _this55._mouseDownPoint;
+                var shapeType = _this55._target.attr("shape-type");
+                if (_this55._shape) {
+                    _this55._shape.moveTo(_vec2);
+                    delete _this55._shape;
+                } else if (shapeType === "infection-point") {
+                    var x = parseFloat(_this55._target.attr("cx"));
+                    var y = parseFloat(_this55._target.attr("cy"));
+                    _this55._target.attr("cx", x + _vec2.x).attr("cy", y + _vec2.y);
+                    var drawingID = _this55._target.attr("drawing-id");
+                    emitter.emit(EVENT_PATH_LINK_DRAWING_RENDER, drawingID);
                 }
             }
+            delete _this55._target;
         });
     }
 };
@@ -2657,25 +2907,25 @@ var D3Graph = function (_Component) {
     function D3Graph(props) {
         (0, _classCallCheck3.default)(this, D3Graph);
 
-        var _this37 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
+        var _this40 = (0, _possibleConstructorReturn3.default)(this, (D3Graph.__proto__ || (0, _getPrototypeOf2.default)(D3Graph)).call(this, props));
 
-        _this37.ele = null;
+        _this40.ele = null;
         //画布中已有的图形
-        _this37.shapes = [];
+        _this40.shapes = [];
         //已经选中的图形的id
-        _this37.selectedShapes = [];
+        _this40.selectedShapes = [];
         //绘制类型
         // this.definedDrawing = Object.assign({}, builtinDefinedDrawing, this.props.customDefinedDrawing);
-        _this37.playingTimer = null;
+        _this40.playingTimer = null;
         //播放的索引
-        _this37.playingIndex = 0;
+        _this40.playingIndex = 0;
         //正在播放的action
-        _this37.playingActions = [];
+        _this40.playingActions = [];
         //播放选项
-        _this37.playingOption = null;
+        _this40.playingOption = null;
         //执行action的timter
-        _this37.timer = null;
-        _this37.state = {
+        _this40.timer = null;
+        _this40.state = {
             //inputAction的属性
             inputProperties: [],
             //是否显示用户输入
@@ -2692,7 +2942,7 @@ var D3Graph = function (_Component) {
             coordinateType: props.coordinateType,
             attrs: props.attrs
         };
-        return _this37;
+        return _this40;
     }
 
     /**
@@ -2777,7 +3027,7 @@ var D3Graph = function (_Component) {
         key: 'doActionsAsync',
         value: function () {
             var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(actions) {
-                var _this38 = this;
+                var _this41 = this;
 
                 var action;
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -2803,14 +3053,14 @@ var D3Graph = function (_Component) {
                                                 switch (_context.prev = _context.next) {
                                                     case 0:
                                                         _context.next = 2;
-                                                        return _this38.doActionsAsync(actions);
+                                                        return _this41.doActionsAsync(actions);
 
                                                     case 2:
                                                     case 'end':
                                                         return _context.stop();
                                                 }
                                             }
-                                        }, _callee, _this38);
+                                        }, _callee, _this41);
                                     })), action.nextInterval ? action.nextInterval : this.state.interval);
                                 } else {
                                     //保存后续的action,等待继续执行
@@ -2835,7 +3085,7 @@ var D3Graph = function (_Component) {
         key: 'doActionAsync',
         value: function () {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(action) {
-                var _this39 = this;
+                var _this42 = this;
 
                 var index, key, id, shape, _id, _shape, _id2, _shape2, _shape3;
 
@@ -2927,14 +3177,14 @@ var D3Graph = function (_Component) {
                                                     switch (_context3.prev = _context3.next) {
                                                         case 0:
                                                             _context3.next = 2;
-                                                            return _this39.doActionAsync(new UnSelectAction(i));
+                                                            return _this42.doActionAsync(new UnSelectAction(i));
 
                                                         case 2:
                                                         case 'end':
                                                             return _context3.stop();
                                                     }
                                                 }
-                                            }, _callee3, _this39);
+                                            }, _callee3, _this42);
                                         }));
 
                                         return function (_x7) {
@@ -2990,14 +3240,14 @@ var D3Graph = function (_Component) {
                                                 switch (_context4.prev = _context4.next) {
                                                     case 0:
                                                         _context4.next = 2;
-                                                        return _this39.doActionAsync(new DeleteAction(shape.id));
+                                                        return _this42.doActionAsync(new DeleteAction(shape.id));
 
                                                     case 2:
                                                     case 'end':
                                                         return _context4.stop();
                                                 }
                                             }
-                                        }, _callee4, _this39);
+                                        }, _callee4, _this42);
                                     }));
 
                                     return function (_x8) {
@@ -3028,8 +3278,8 @@ var D3Graph = function (_Component) {
                                 this.setState((0, _immutabilityHelper2.default)(this.state, {
                                     actions: { $push: [action] }
                                 }), function () {
-                                    if (_this39.props.onAction) {
-                                        _this39.props.onAction(action);
+                                    if (_this42.props.onAction) {
+                                        _this42.props.onAction(action);
                                     }
                                 });
 
@@ -3057,10 +3307,10 @@ var D3Graph = function (_Component) {
     }, {
         key: 'showUserInputPromise',
         value: function showUserInputPromise(action) {
-            var _this40 = this;
+            var _this43 = this;
 
             return new _promise2.default(function (resolve) {
-                _this40.setState({
+                _this43.setState({
                     showUserInput: true,
                     inputProperties: action.params
                 }, function () {
@@ -3077,7 +3327,7 @@ var D3Graph = function (_Component) {
     }, {
         key: 'hideUserInput',
         value: function hideUserInput(nextActionOption) {
-            var _this41 = this;
+            var _this44 = this;
 
             var params = this.state.inputProperties.map(function (property) {
                 return {
@@ -3094,31 +3344,31 @@ var D3Graph = function (_Component) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 //执行下一个action
-                                if (_this41._leftActions.length > 0) {
+                                if (_this44._leftActions.length > 0) {
                                     params.forEach(function (p) {
-                                        (0, _objectPath.set)(_this41._leftActions[0].params, p.path, p.value);
+                                        (0, _objectPath.set)(_this44._leftActions[0].params, p.path, p.value);
                                     });
                                 }
                                 _context6.next = 3;
-                                return _this41.doActionsAsync(_this41._leftActions);
+                                return _this44.doActionsAsync(_this44._leftActions);
 
                             case 3:
                             case 'end':
                                 return _context6.stop();
                         }
                     }
-                }, _callee6, _this41);
+                }, _callee6, _this44);
             })));
         }
     }, {
         key: 'drawShapes',
         value: function drawShapes(shapes) {
-            var _this42 = this;
+            var _this45 = this;
 
             shapes.forEach(function (shape) {
                 //初始化
                 if (!shape.ready) {
-                    shape.initialize(_this42);
+                    shape.initialize(_this45);
                 }
                 shape.render();
             });
@@ -3134,14 +3384,14 @@ var D3Graph = function (_Component) {
     }, {
         key: 'getDrawingData',
         value: function getDrawingData() {
-            var _this43 = this;
+            var _this46 = this;
 
             console.warn('getDrawingData \u65B9\u6CD5\u5C06\u5728\u4E0B\u4E00\u4E2A\u7248\u672C\u5220\u9664\u6389,\u8BF7\u4F7F\u7528 getDrawingActions \u4EE3\u66FF');
             var actions = this.state.actions.filter(function (f) {
                 return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
-                var shape = _this43.findShapeById(item.params.id);
+                var shape = _this46.findShapeById(item.params.id);
                 return {
                     type: item.type,
                     params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
@@ -3157,13 +3407,13 @@ var D3Graph = function (_Component) {
     }, {
         key: 'getDrawingActions',
         value: function getDrawingActions() {
-            var _this44 = this;
+            var _this47 = this;
 
             var actions = this.state.actions.filter(function (f) {
                 return f.type === ActionTypeEnums.draw;
             });
             return actions.map(function (item) {
-                var shape = _this44.findShapeById(item.params.id);
+                var shape = _this47.findShapeById(item.params.id);
                 return {
                     type: item.type,
                     params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
@@ -3260,25 +3510,25 @@ var D3Graph = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this45 = this;
+            var _this48 = this;
 
             return _react2.default.createElement(
                 _WorkSpace2.default,
                 { actions: this.props.renderToolbar(this) },
                 _react2.default.createElement('svg', (0, _extends3.default)({ ref: function ref(_ref8) {
-                        return _this45.ele = _ref8;
+                        return _this48.ele = _ref8;
                     } }, this.state.attrs)),
                 this.state.showUserInput && _react2.default.createElement(_UserInput2.default, { properties: this.state.inputProperties,
                     onOK: function onOK(value) {
                         //执行下一个action,并把用户的输入参数参入到下一个action
-                        _this45.hideUserInput(value);
+                        _this48.hideUserInput(value);
                     } })
             );
         }
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            var _this46 = this;
+            var _this49 = this;
 
             var newState = {};
             if (nextProps.attrs) {
@@ -3298,7 +3548,7 @@ var D3Graph = function (_Component) {
             }
             var doActions = function doActions() {
                 if (nextProps.actions.length > 0) {
-                    _this46.doActionsAsync(nextProps.actions);
+                    _this49.doActionsAsync(nextProps.actions);
                 }
             };
             var keys = (0, _keys2.default)(newState);
