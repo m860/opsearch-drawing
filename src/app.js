@@ -398,6 +398,7 @@ class Example extends Component {
                             <button type="button" onClick={() => {
                                 const sourceId = guid.raw();
                                 const targetId = guid.raw();
+                                const pathLinkID = guid.raw();
                                 this.setState({
                                     actionJson: JSON.stringify([{
                                         type: "draw",
@@ -428,7 +429,7 @@ class Example extends Component {
                                         params: [{
                                             type: "PathLinkDrawing",
                                             option: {
-                                                id: "path-link",
+                                                id: pathLinkID,
                                                 sourceId: sourceId,
                                                 targetId: targetId,
                                                 points: [{
@@ -444,6 +445,7 @@ class Example extends Component {
                             <button type="button" onClick={() => {
                                 const sourceId = guid.raw();
                                 const targetId = guid.raw();
+                                const pathLinkID = guid.raw();
                                 this.setState({
                                     actionJson: JSON.stringify([{
                                         type: "draw",
@@ -474,14 +476,14 @@ class Example extends Component {
                                         params: [{
                                             type: "PathLinkDrawing",
                                             option: {
-                                                id: "path-link",
+                                                id: pathLinkID,
                                                 sourceId: sourceId,
                                                 targetId: targetId,
                                                 points: [{
                                                     x: 150,
                                                     y: 200
                                                 }],
-                                                arrow:{}
+                                                arrow: {}
                                             }
                                         }]
                                     }])
