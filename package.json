@@ -10,7 +10,7 @@
     "win-dev": "set NODE_ENV=development&&webpack-dev-server --host 0.0.0.0 --inline --progress --colors --port 3000 --content-base src/",
     "win-build": "set NODE_ENV=production&&webpack --progress --profile --colors",
     "cm": "git-cz",
-    "publish": "semantic-release"
+    "publish": "npm run build && semantic-release"
   },
   "repository": {
     "type": "git",
