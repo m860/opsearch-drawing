@@ -1589,6 +1589,12 @@ registerDrawing("LinkDrawing", LinkDrawing);
 
 var PathLinkDrawing = exports.PathLinkDrawing = function (_Drawing8) {
     (0, _inherits3.default)(PathLinkDrawing, _Drawing8);
+    (0, _createClass3.default)(PathLinkDrawing, [{
+        key: 'selectedAttrs',
+        get: function get() {
+            return PathLinkDrawing.selectedAttrs;
+        }
+    }]);
 
     function PathLinkDrawing(option) {
         (0, _classCallCheck3.default)(this, PathLinkDrawing);
@@ -1782,6 +1788,11 @@ var PathLinkDrawing = exports.PathLinkDrawing = function (_Drawing8) {
     }]);
     return PathLinkDrawing;
 }(Drawing);
+
+PathLinkDrawing.selectedAttrs = {
+    stroke: "red"
+};
+
 
 registerDrawing("PathLinkDrawing", PathLinkDrawing);
 
@@ -2185,7 +2196,7 @@ var LinkTextDrawing = exports.LinkTextDrawing = function (_Drawing12) {
                 var labelY = Math.min(p1.y, p2.y) + hy;
                 this.attrs.x = this.graph.toScreenX(labelX);
                 this.attrs.y = this.graph.toScreenY(labelY);
-                console.log('render <LinkTextDrawing/> x:' + this.attrs.x + ',y:' + this.attrs.y);
+                // console.log(`render <LinkTextDrawing/> x:${this.attrs.x},y:${this.attrs.y}`)
             }
             (0, _get4.default)(LinkTextDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkTextDrawing.prototype), 'render', this).call(this);
         }
