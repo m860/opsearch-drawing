@@ -1340,6 +1340,14 @@ registerDrawing("LinkDrawing", LinkDrawing);
  * @TODO 重新计算连接线的起始点位置
  */
 export class PathLinkDrawing extends Drawing {
+    static selectedAttrs = {
+        stroke: "red"
+    };
+
+    get selectedAttrs() {
+        return PathLinkDrawing.selectedAttrs;
+    }
+
     infectionPoints: Array<InfectionPoint> = [];
 
     constructor(option) {
@@ -1847,7 +1855,7 @@ export class LinkTextDrawing extends Drawing implements IDrawing {
             const labelY = Math.min(p1.y, p2.y) + hy;
             this.attrs.x = this.graph.toScreenX(labelX);
             this.attrs.y = this.graph.toScreenY(labelY);
-            console.log(`render <LinkTextDrawing/> x:${this.attrs.x},y:${this.attrs.y}`)
+            // console.log(`render <LinkTextDrawing/> x:${this.attrs.x},y:${this.attrs.y}`)
         }
         super.render();
     }
