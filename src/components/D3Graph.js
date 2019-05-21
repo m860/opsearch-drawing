@@ -1073,8 +1073,7 @@ export class ArrowLinkDrawing extends Drawing {
                 const e = d3.select(eles[0]);
                 if (this._originalWidth) {
                     e.attr("stroke-width", this._originalWidth);
-                }
-                else if (isNaN(this._originalWidth)) {
+                } else if (isNaN(this._originalWidth)) {
                     e.attr("stroke-width", null);
                 }
                 delete this._originalWidth;
@@ -1429,8 +1428,7 @@ export class PathLinkDrawing extends Drawing {
         points.forEach((point, index) => {
             if (index === 0) {
                 arr.push(`M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
-            }
-            else {
+            } else {
                 arr.push(`L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
             }
         });
@@ -1478,8 +1476,7 @@ export class PathLinkDrawing extends Drawing {
                 r: this.target.r
             });
             end = p2;
-        }
-        else {
+        } else {
             const {p1, p2} = _calculateLinkPoint(this.source, this.target);
             begin = p1;
             end = p2;
@@ -1927,10 +1924,15 @@ export class DrawingToolbar extends PureComponent {
      */
     static handlers = {
         /**
-         * 移除到画布的所有操作
-         * @param graph
+         * 移除所有的操作
          */
         setNoneHandler: function (graph) {
+            graph.removeAllSvgEvent();
+        },
+        /**
+         * 设置为选择操作
+         */
+        setSelectHandler: function (graph) {
             graph.removeAllSvgEvent();
             const svg = d3.select(graph.ele);
             svg.on("click", () => {
@@ -2107,8 +2109,7 @@ export class DrawingToolbar extends PureComponent {
                             y: graph.toLocalY(d3.event.offsetY)
                         };
                         this._shape = shape;
-                    }
-                    else if (shapeType === "infection-point") {
+                    } else if (shapeType === "infection-point") {
                         this._mouseDownPoint = {
                             x: graph.toLocalX(d3.event.offsetX),
                             y: graph.toLocalY(d3.event.offsetY)
@@ -2131,8 +2132,7 @@ export class DrawingToolbar extends PureComponent {
                         const shapeType = this._target.attr("shape-type");
                         if (this._shape) {
                             this._shape.moveTo(vec);
-                        }
-                        else if (shapeType === "infection-point") {
+                        } else if (shapeType === "infection-point") {
                             const x = parseFloat(this._target.attr("cx"));
                             const y = parseFloat(this._target.attr("cy"));
                             this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
@@ -2152,8 +2152,7 @@ export class DrawingToolbar extends PureComponent {
                         if (this._shape) {
                             this._shape.moveTo(vec);
                             delete this._shape;
-                        }
-                        else if (shapeType === "infection-point") {
+                        } else if (shapeType === "infection-point") {
                             const x = parseFloat(this._target.attr("cx"));
                             const y = parseFloat(this._target.attr("cy"));
                             this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
@@ -2585,8 +2584,7 @@ export default class D3Graph extends Component {
                 this.timer = setTimeout(async () => {
                     await this.doActionsAsync(actions);
                 }, action.nextInterval ? action.nextInterval : this.state.interval);
-            }
-            else {
+            } else {
                 //保存后续的action,等待继续执行
                 this._leftActions = actions;
             }
@@ -2624,8 +2622,7 @@ export default class D3Graph extends Component {
                 let shape = this.findShapeById(id);
                 if (shape.selected) {
                     await this.doActionAsync(new UnSelectAction(id));
-                }
-                else {
+                } else {
                     shape.selected = true;
                     if (this.props.selectMode === selectModeEnums.single) {
                         //将已选中的shape取消选中
@@ -2633,8 +2630,7 @@ export default class D3Graph extends Component {
                             await this.doActionAsync(new UnSelectAction(i));
                         });
                         this.selectedShapes = [shape];
-                    }
-                    else {
+                    } else {
                         this.selectedShapes.push(shape);
                     }
                 }
@@ -2876,8 +2872,7 @@ export default class D3Graph extends Component {
         const keys = Object.keys(newState);
         if (keys.length > 0) {
             this.setState(newState, doActions);
-        }
-        else {
+        } else {
             doActions();
         }
     }
