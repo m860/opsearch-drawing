@@ -27,6 +27,7 @@ const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 const EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
 //PathLinkDrawing更新
 const EVENT_PATH_LINK_DRAWING_RENDER = "EVENT_PATH_LINK_DRAWING_RENDER";
+const EVENT_DRAWING_RENDER = "EVENT_DRAWING_RENDER";
 //#endregion
 
 /**
@@ -527,6 +528,8 @@ export class Drawing {
         if (this.text) {
             this.selection.text(this.text);
         }
+        emitter.emit(`render:${this.id}`);
+        emitter.emit(EVENT_DRAWING_RENDER, this.toData());
     }
 
     /**
@@ -1073,8 +1076,7 @@ export class ArrowLinkDrawing extends Drawing {
                 const e = d3.select(eles[0]);
                 if (this._originalWidth) {
                     e.attr("stroke-width", this._originalWidth);
-                }
-                else if (isNaN(this._originalWidth)) {
+                } else if (isNaN(this._originalWidth)) {
                     e.attr("stroke-width", null);
                 }
                 delete this._originalWidth;
@@ -1119,13 +1121,12 @@ export class ArrowLinkDrawing extends Drawing {
         this.attrs = update(this.attrs, {
             d: {$set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ')}
         });
-        super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
         const hy = Math.abs(p1.y - p2.y) / 2;
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
-        emitter.emit(`render:${this.id}`);
+        super.render();
     }
 
     /**
@@ -1312,13 +1313,12 @@ export class LinkDrawing extends Drawing {
             x2: {$set: p2.x},
             y2: {$set: p2.y}
         });
-        super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
         const hy = Math.abs(p1.y - p2.y) / 2;
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
-        emitter.emit(`render:${this.id}`);
+        super.render();
     }
 
     toData() {
@@ -1437,8 +1437,7 @@ export class PathLinkDrawing extends Drawing {
         points.forEach((point, index) => {
             if (index === 0) {
                 arr.push(`M ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
-            }
-            else {
+            } else {
                 arr.push(`L ${this.graph.toScreenX(point.x)} ${this.graph.toScreenY(point.y)}`);
             }
         });
@@ -1486,8 +1485,7 @@ export class PathLinkDrawing extends Drawing {
                 r: this.target.r
             });
             end = p2;
-        }
-        else {
+        } else {
             const {p1, p2} = _calculateLinkPoint(this.source, this.target);
             begin = p1;
             end = p2;
@@ -1501,7 +1499,7 @@ export class PathLinkDrawing extends Drawing {
             d: {$set: this.getPath(points)}
         });
         super.render();
-        emitter.emit(`render:${this.id}`);
+
         // const hx = Math.abs(p1.x - p2.x) / 2;
         // const hy = Math.abs(p1.y - p2.y) / 2;
         // const labelX = Math.min(p1.x, p2.x) + hx;
@@ -1935,10 +1933,15 @@ export class DrawingToolbar extends PureComponent {
      */
     static handlers = {
         /**
-         * 移除到画布的所有操作
-         * @param graph
+         * 移除所有的操作
          */
         setNoneHandler: function (graph) {
+            graph.removeAllSvgEvent();
+        },
+        /**
+         * 设置为选择操作
+         */
+        setSelectHandler: function (graph) {
             graph.removeAllSvgEvent();
             const svg = d3.select(graph.ele);
             svg.on("click", () => {
@@ -2115,8 +2118,7 @@ export class DrawingToolbar extends PureComponent {
                             y: graph.toLocalY(d3.event.offsetY)
                         };
                         this._shape = shape;
-                    }
-                    else if (shapeType === "infection-point") {
+                    } else if (shapeType === "infection-point") {
                         this._mouseDownPoint = {
                             x: graph.toLocalX(d3.event.offsetX),
                             y: graph.toLocalY(d3.event.offsetY)
@@ -2139,8 +2141,7 @@ export class DrawingToolbar extends PureComponent {
                         const shapeType = this._target.attr("shape-type");
                         if (this._shape) {
                             this._shape.moveTo(vec);
-                        }
-                        else if (shapeType === "infection-point") {
+                        } else if (shapeType === "infection-point") {
                             const x = parseFloat(this._target.attr("cx"));
                             const y = parseFloat(this._target.attr("cy"));
                             this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
@@ -2160,8 +2161,7 @@ export class DrawingToolbar extends PureComponent {
                         if (this._shape) {
                             this._shape.moveTo(vec);
                             delete this._shape;
-                        }
-                        else if (shapeType === "infection-point") {
+                        } else if (shapeType === "infection-point") {
                             const x = parseFloat(this._target.attr("cx"));
                             const y = parseFloat(this._target.attr("cy"));
                             this._target.attr("cx", x + vec.x).attr("cy", y + vec.y);
@@ -2421,6 +2421,7 @@ export default class D3Graph extends Component {
      * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
      * @property {?Number} interval [1] - action的执行时间间隔
      * @property {?Function} onAction [null] - action的回调函数,函数包含一个参数 action
+     * @property {(actionData:mixed)=>void} onDrawingRender - 图形render完成的回调函数
      * */
     static propTypes = {
         attrs: PropTypes.object,
@@ -2458,7 +2459,8 @@ export default class D3Graph extends Component {
         renderToolbar: PropTypes.func,
         scale: PropTypes.number,
         interval: PropTypes.number,
-        onAction: PropTypes.func
+        onAction: PropTypes.func,
+        onDrawingRender: PropTypes.func
     };
     static defaultProps = {
         attrs: {
@@ -2593,8 +2595,7 @@ export default class D3Graph extends Component {
                 this.timer = setTimeout(async () => {
                     await this.doActionsAsync(actions);
                 }, action.nextInterval ? action.nextInterval : this.state.interval);
-            }
-            else {
+            } else {
                 //保存后续的action,等待继续执行
                 this._leftActions = actions;
             }
@@ -2632,8 +2633,7 @@ export default class D3Graph extends Component {
                 let shape = this.findShapeById(id);
                 if (shape.selected) {
                     await this.doActionAsync(new UnSelectAction(id));
-                }
-                else {
+                } else {
                     shape.selected = true;
                     if (this.props.selectMode === selectModeEnums.single) {
                         //将已选中的shape取消选中
@@ -2641,8 +2641,7 @@ export default class D3Graph extends Component {
                             await this.doActionAsync(new UnSelectAction(i));
                         });
                         this.selectedShapes = [shape];
-                    }
-                    else {
+                    } else {
                         this.selectedShapes.push(shape);
                     }
                 }
@@ -2774,6 +2773,23 @@ export default class D3Graph extends Component {
     }
 
     /**
+     * 根据id查找对应的action的数据
+     * @param id
+     * @returns {null|{type: string, params: ({type: String, id: String, attrs: Object, text: (String|Function)}|*|{type: ActionTypeEnums, params}|{type: string, option: {sourceId, targetId, distance, labelAttrs, id: String, label}}|{type: string, option: {sourceId, targetId, id: String, label}}|{type: string, option: {sourceId: *, targetId: *, id: String, points: *}})[]}}
+     */
+    getActionByID(id) {
+        const shape = this.findShapeById(id);
+        const action = this.state.actions.find(f => f.params.id === id);
+        if (shape) {
+            return {
+                type: action ? action.type : "Unknown",
+                params: (shape && shape.toData) ? [shape.toData()] : [item.params.toData()]
+            };
+        }
+        return null;
+    }
+
+    /**
      * 获取所有绘图的action
      * @return {*[]}
      */
@@ -2884,14 +2900,14 @@ export default class D3Graph extends Component {
         const keys = Object.keys(newState);
         if (keys.length > 0) {
             this.setState(newState, doActions);
-        }
-        else {
+        } else {
             doActions();
         }
     }
 
     async componentDidMount() {
         await this.doActionsAsync(this.props.actions);
+        emitter.addListener(EVENT_DRAWING_RENDER, this.props.onDrawingRender);
     }
 
     componentWillUnmount() {

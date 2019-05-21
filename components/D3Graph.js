@@ -119,6 +119,7 @@ var EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 var EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
 //PathLinkDrawing更新
 var EVENT_PATH_LINK_DRAWING_RENDER = "EVENT_PATH_LINK_DRAWING_RENDER";
+var EVENT_DRAWING_RENDER = "EVENT_DRAWING_RENDER";
 //#endregion
 
 /**
@@ -652,6 +653,8 @@ var Drawing = exports.Drawing = function () {
             if (this.text) {
                 this.selection.text(this.text);
             }
+            emitter.emit('render:' + this.id);
+            emitter.emit(EVENT_DRAWING_RENDER, this.toData());
         }
 
         /**
@@ -1323,13 +1326,12 @@ var ArrowLinkDrawing = exports.ArrowLinkDrawing = function (_Drawing6) {
             this.attrs = (0, _immutabilityHelper2.default)(this.attrs, {
                 d: { $set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ') }
             });
-            (0, _get4.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
-            emitter.emit('render:' + this.id);
+            (0, _get4.default)(ArrowLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(ArrowLinkDrawing.prototype), 'render', this).call(this);
         }
 
         /**
@@ -1536,13 +1538,12 @@ var LinkDrawing = exports.LinkDrawing = function (_Drawing7) {
                 x2: { $set: p2.x },
                 y2: { $set: p2.y }
             });
-            (0, _get4.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'render', this).call(this);
             var hx = Math.abs(p1.x - p2.x) / 2;
             var hy = Math.abs(p1.y - p2.y) / 2;
             var labelX = Math.min(p1.x, p2.x) + hx;
             var labelY = Math.min(p1.y, p2.y) + hy;
             this.renderLabel(labelX, labelY);
-            emitter.emit('render:' + this.id);
+            (0, _get4.default)(LinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(LinkDrawing.prototype), 'render', this).call(this);
         }
     }, {
         key: 'toData',
@@ -1764,7 +1765,7 @@ var PathLinkDrawing = exports.PathLinkDrawing = function (_Drawing8) {
                 d: { $set: this.getPath(points) }
             });
             (0, _get4.default)(PathLinkDrawing.prototype.__proto__ || (0, _getPrototypeOf2.default)(PathLinkDrawing.prototype), 'render', this).call(this);
-            emitter.emit('render:' + this.id);
+
             // const hx = Math.abs(p1.x - p2.x) / 2;
             // const hy = Math.abs(p1.y - p2.y) / 2;
             // const labelX = Math.min(p1.x, p2.x) + hx;
@@ -2349,10 +2350,15 @@ DrawingToolbar.findShape = function (graph, ele) {
 
 DrawingToolbar.handlers = {
     /**
-     * 移除到画布的所有操作
-     * @param graph
+     * 移除所有的操作
      */
     setNoneHandler: function setNoneHandler(graph) {
+        graph.removeAllSvgEvent();
+    },
+    /**
+     * 设置为选择操作
+     */
+    setSelectHandler: function setSelectHandler(graph) {
         graph.removeAllSvgEvent();
         var svg = d3.select(graph.ele);
         svg.on("click", function () {
@@ -2909,6 +2915,7 @@ var D3Graph = function (_Component) {
          * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
          * @property {?Number} interval [1] - action的执行时间间隔
          * @property {?Function} onAction [null] - action的回调函数,函数包含一个参数 action
+         * @property {(actionData:mixed)=>void} onDrawingRender - 图形render完成的回调函数
          * */
         get: function get() {
             return this.state.scale;
@@ -3411,6 +3418,28 @@ var D3Graph = function (_Component) {
         }
 
         /**
+         * 根据id查找对应的action的数据
+         * @param id
+         * @returns {null|{type: string, params: ({type: String, id: String, attrs: Object, text: (String|Function)}|*|{type: ActionTypeEnums, params}|{type: string, option: {sourceId, targetId, distance, labelAttrs, id: String, label}}|{type: string, option: {sourceId, targetId, id: String, label}}|{type: string, option: {sourceId: *, targetId: *, id: String, points: *}})[]}}
+         */
+
+    }, {
+        key: 'getActionByID',
+        value: function getActionByID(id) {
+            var shape = this.findShapeById(id);
+            var action = this.state.actions.find(function (f) {
+                return f.params.id === id;
+            });
+            if (shape) {
+                return {
+                    type: action ? action.type : "Unknown",
+                    params: shape && shape.toData ? [shape.toData()] : [item.params.toData()]
+                };
+            }
+            return null;
+        }
+
+        /**
          * 获取所有绘图的action
          * @return {*[]}
          */
@@ -3581,6 +3610,9 @@ var D3Graph = function (_Component) {
                                 return this.doActionsAsync(this.props.actions);
 
                             case 2:
+                                emitter.addListener(EVENT_DRAWING_RENDER, this.props.onDrawingRender);
+
+                            case 3:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -3649,7 +3681,8 @@ D3Graph.propTypes = {
     renderToolbar: _propTypes2.default.func,
     scale: _propTypes2.default.number,
     interval: _propTypes2.default.number,
-    onAction: _propTypes2.default.func
+    onAction: _propTypes2.default.func,
+    onDrawingRender: _propTypes2.default.func
 };
 D3Graph.defaultProps = {
     attrs: {

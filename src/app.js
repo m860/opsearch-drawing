@@ -104,8 +104,7 @@ class Example extends Component {
                     return {};
                 }))
             })
-        }
-        catch (ex) {
+        } catch (ex) {
             throw ex;
         }
     }
@@ -121,8 +120,7 @@ class Example extends Component {
                             this.setState({
                                 attrs: attrs
                             })
-                        }
-                        catch (ex) {
+                        } catch (ex) {
                             console.error(ex);
                         }
                     }} style={{width: "100%", height: 100}}>
@@ -193,8 +191,7 @@ class Example extends Component {
                                 y: 280
                             };
                             newState.scale = 10;
-                        }
-                        else {
+                        } else {
                             newState.original = {
                                 x: 0,
                                 y: 0
@@ -216,8 +213,7 @@ class Example extends Component {
                                         }]
                                     }])
                                 }, this.exec.bind(this));
-                            }
-                            else {
+                            } else {
                                 //remove number scale
                                 this.setState({
                                     actionJson: JSON.stringify([{
@@ -249,12 +245,14 @@ class Example extends Component {
                         </div>
                         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", flex: "1 0 auto"}}>
                             <button type="button" onClick={() => {
+                                const id = guid.raw();
                                 this.setState({
                                     actionJson: JSON.stringify([{
                                         type: "draw",
                                         params: [{
                                             type: "DotDrawing",
                                             option: {
+                                                id,
                                                 attrs: {
                                                     cx: this.randomX(),
                                                     cy: this.randomY()
@@ -262,7 +260,15 @@ class Example extends Component {
                                             }
                                         }]
                                     }])
-                                }, this.exec.bind(this))
+                                }, () => {
+                                    this.exec();
+                                    //为了正确的获取到绘制的数据，这里需要进行一个延迟操作，在实际使用中是不需要这样做的
+                                    setTimeout(() => {
+                                        const actionData = this.graph.getActionByID(id);
+                                        console.log(actionData);
+                                    }, 1000);
+
+                                })
                             }}>随机画点
                             </button>
                             <button type="button" onClick={() => {
@@ -785,8 +791,7 @@ class Example extends Component {
                                                     }]
                                                 }]),
                                             }, this.exec.bind(this));
-                                        }
-                                        else {
+                                        } else {
                                             alert("请选择一个图形")
                                         }
                                     }}>平移(10,10)
@@ -817,8 +822,7 @@ class Example extends Component {
                                         this.setState({
                                             actions: fromActions(actions),
                                         })
-                                    }
-                                    catch (ex) {
+                                    } catch (ex) {
                                         console.log(ex)
                                     }
                                 }
@@ -829,6 +833,9 @@ class Example extends Component {
                 </div>
 
                 <D3Graph actions={this.state.actions}
+                         onDrawingRender={(...args) => {
+                             console.log("drawing render", args);
+                         }}
                          ref={ref => this.graph = ref}
                          coordinateType={this.state.coordinateType}
                          renderToolbar={(graph) => {
