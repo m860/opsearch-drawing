@@ -2413,6 +2413,7 @@ export default class D3Graph extends Component {
      * @property {?Number} scale [1] - 缩放比例,默认是1(1个单位对应一个像素)
      * @property {?Number} interval [1] - action的执行时间间隔
      * @property {?Function} onAction [null] - action的回调函数,函数包含一个参数 action
+     * @property {(actionData:mixed)=>void} onDrawingRender - 图形render完成的回调函数
      * */
     static propTypes = {
         attrs: PropTypes.object,
@@ -2763,6 +2764,11 @@ export default class D3Graph extends Component {
         });
     }
 
+    /**
+     * 根据id查找对应的action的数据
+     * @param id
+     * @returns {null|{type: string, params: ({type: String, id: String, attrs: Object, text: (String|Function)}|*|{type: ActionTypeEnums, params}|{type: string, option: {sourceId, targetId, distance, labelAttrs, id: String, label}}|{type: string, option: {sourceId, targetId, id: String, label}}|{type: string, option: {sourceId: *, targetId: *, id: String, points: *}})[]}}
+     */
     getActionByID(id) {
         const shape = this.findShapeById(id);
         const action = this.state.actions.find(f => f.params.id === id);
