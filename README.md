@@ -220,18 +220,3 @@ export default class Test extends Component{
 ]
 ```
 
-## change logs
-
-### next version
-
-- [ ] 圆圈中的文本居中显示.目前在测试环境没有发现不居中的问题
-- [x] 箭头链接线支持箭头大小的调整.大小可以通过`distance`来进行控制
-- [x] 链接线支持多文本编辑
-- [ ] 链接线支持折点编辑
-- [ ] 菱形标记待确认
-
-### 0.0.4
-
-- 优化了link的显示
-- 修复了PathDrawing绘制的Bug
-- 调整了刻度尺的显示问题
