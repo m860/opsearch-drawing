@@ -27,6 +27,7 @@ const EVENT_TOOLBAR_CHANGE = "EVENT_TOOLBAR_CHANGE";
 const EVENT_DRAWING_POSITION_CHANGE = "EVENT_DRAWING_POSITION_CHANGE";
 //PathLinkDrawing更新
 const EVENT_PATH_LINK_DRAWING_RENDER = "EVENT_PATH_LINK_DRAWING_RENDER";
+const EVENT_DRAWING_RENDER = "EVENT_DRAWING_RENDER";
 //#endregion
 
 /**
@@ -527,6 +528,8 @@ export class Drawing {
         if (this.text) {
             this.selection.text(this.text);
         }
+        emitter.emit(`render:${this.id}`);
+        emitter.emit(EVENT_DRAWING_RENDER, this.toData());
     }
 
     /**
@@ -1118,13 +1121,12 @@ export class ArrowLinkDrawing extends Drawing {
         this.attrs = update(this.attrs, {
             d: {$set: this.getArrowLinkPath(p1, p2, this.distance / this.graph.scale).join(' ')}
         });
-        super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
         const hy = Math.abs(p1.y - p2.y) / 2;
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
-        emitter.emit(`render:${this.id}`);
+        super.render();
     }
 
     /**
@@ -1311,13 +1313,12 @@ export class LinkDrawing extends Drawing {
             x2: {$set: p2.x},
             y2: {$set: p2.y}
         });
-        super.render();
         const hx = Math.abs(p1.x - p2.x) / 2;
         const hy = Math.abs(p1.y - p2.y) / 2;
         const labelX = Math.min(p1.x, p2.x) + hx;
         const labelY = Math.min(p1.y, p2.y) + hy;
         this.renderLabel(labelX, labelY);
-        emitter.emit(`render:${this.id}`);
+        super.render();
     }
 
     toData() {
@@ -1490,7 +1491,7 @@ export class PathLinkDrawing extends Drawing {
             d: {$set: this.getPath(points)}
         });
         super.render();
-        emitter.emit(`render:${this.id}`);
+
         // const hx = Math.abs(p1.x - p2.x) / 2;
         // const hy = Math.abs(p1.y - p2.y) / 2;
         // const labelX = Math.min(p1.x, p2.x) + hx;
@@ -2449,7 +2450,8 @@ export default class D3Graph extends Component {
         renderToolbar: PropTypes.func,
         scale: PropTypes.number,
         interval: PropTypes.number,
-        onAction: PropTypes.func
+        onAction: PropTypes.func,
+        onDrawingRender: PropTypes.func
     };
     static defaultProps = {
         attrs: {
@@ -2891,6 +2893,7 @@ export default class D3Graph extends Component {
 
     async componentDidMount() {
         await this.doActionsAsync(this.props.actions);
+        emitter.addListener(EVENT_DRAWING_RENDER, this.props.onDrawingRender);
     }
 
     componentWillUnmount() {

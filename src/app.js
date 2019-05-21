@@ -263,10 +263,10 @@ class Example extends Component {
                                 }, () => {
                                     this.exec();
                                     //为了正确的获取到绘制的数据，这里需要进行一个延迟操作，在实际使用中是不需要这样做的
-                                    setTimeout(()=>{
+                                    setTimeout(() => {
                                         const actionData = this.graph.getActionByID(id);
                                         console.log(actionData);
-                                    },1000);
+                                    }, 1000);
 
                                 })
                             }}>随机画点
@@ -831,6 +831,9 @@ class Example extends Component {
                 </div>
 
                 <D3Graph actions={this.state.actions}
+                         onDrawingRender={(...args) => {
+                             console.log("drawing render", args);
+                         }}
                          ref={ref => this.graph = ref}
                          coordinateType={this.state.coordinateType}
                          renderToolbar={(graph) => {
