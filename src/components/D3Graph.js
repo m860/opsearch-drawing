@@ -2761,6 +2761,18 @@ export default class D3Graph extends Component {
         });
     }
 
+    getActionByID(id) {
+        const shape = this.findShapeById(id);
+        const action = this.state.actions.find(f => f.params.id === id);
+        if (shape) {
+            return {
+                type: action ? action.type : "Unknown",
+                params: (shape && shape.toData) ? [shape.toData()] : [item.params.toData()]
+            };
+        }
+        return null;
+    }
+
     /**
      * 获取所有绘图的action
      * @return {*[]}
