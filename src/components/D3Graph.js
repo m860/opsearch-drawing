@@ -2482,7 +2482,8 @@ export default class D3Graph extends Component {
         renderToolbar: () => null,
         scale: 1,
         interval: 1,
-        onAction: null
+        onAction: null,
+        onDrawingRender: () => null
     }
 
     get scale() {
