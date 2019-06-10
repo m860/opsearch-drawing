@@ -3695,6 +3695,9 @@ D3Graph.defaultProps = {
     },
     scale: 1,
     interval: 1,
-    onAction: null
+    onAction: null,
+    onDrawingRender: function onDrawingRender() {
+        return null;
+    }
 };
 exports.default = D3Graph;
